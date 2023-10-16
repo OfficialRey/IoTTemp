@@ -7,5 +7,7 @@
 - [ ] 3x Buttons
 - [ ] Gyroscope + Compass
 - [ ] Laserpointer
-- [ ] Soundchip
+- [ ] MP3 Module
+- [ ] Speaker
 - [ ] Connectors?
+- [ ] Resistors
