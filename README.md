@@ -23,8 +23,9 @@ feedback to the user
 - [x] Gyroscope + Compass
 - [ ] Laserpointer
 - [ ] MP3 Module
-- [ ] Speaker
+- [X] Speaker
 - [x] Connectors
 - [x] Resistors
 - [ ] Breadboard
 - [x] USB Cable
+- [X] AAA Battery Pack
