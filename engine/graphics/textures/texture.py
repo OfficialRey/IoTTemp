@@ -11,7 +11,7 @@ class Texture:
         self.base_image = base_image
         self.image = image if image is not None else base_image.copy()
         self.scale = scale
-        self.is_empty()
+        print(self.is_empty())
 
     def reset(self):
         self.image = self.base_image.copy()

@@ -47,8 +47,10 @@ class LevelAtlas:
         textures = []
         for y in range(self.y_length):
             for x in range(self.x_length):
-                textures.append(get_texture(self.image, self.sprite_width, self.sprite_height, x * self.sprite_width,
-                                            y * self.sprite_height))
+                texture = get_texture(self.image, self.sprite_width, self.sprite_height, x * self.sprite_width,
+                                      y * self.sprite_height)
+                if not texture.is_empty():
+                    textures.append(texture)
         return textures
 
     def __getitem__(self, item: int) -> Texture:

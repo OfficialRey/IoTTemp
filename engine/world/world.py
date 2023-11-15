@@ -24,10 +24,10 @@ class World:
 
         self.player = Player(texture_manager)
 
-        # centipede = Centipede(texture_manager)
+        centipede = Centipede(texture_manager)
 
-        #        self.enemies.add(centipede)
-        #       self.units.add(centipede)
+        self.enemies.add(centipede)
+        self.units.add(centipede)
 
         self.set_camera_zoom(zoom)
 

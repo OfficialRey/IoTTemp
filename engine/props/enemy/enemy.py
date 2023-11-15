@@ -12,7 +12,6 @@ class Enemy(Entity):
 
     def _act(self, delta_time: float):
         self.run_behaviour(delta_time)
-        self.run(delta_time)
 
     def accelerate(self, acceleration: Vector) -> None:
         super().accelerate(acceleration)

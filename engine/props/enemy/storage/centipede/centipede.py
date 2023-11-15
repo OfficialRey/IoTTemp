@@ -10,7 +10,7 @@ class Centipede(Enemy):
         super().__init__(texture_manager.centipede, EnemyData.CENTIPEDE)
 
     def run_behaviour(self, delta_time: float):
-        self.accelerate(Vector(1, 1))
+        pass
 
     def on_hit(self):
         pass
