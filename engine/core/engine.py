@@ -58,8 +58,9 @@ class Engine:
         world.cursor.position = Vector(self.input_manager.mouse_x, self.input_manager.mouse_y)
 
     def _process_units(self, world: World):
-        for enemy in world.enemies:
-            enemy.update_relative_position(world.camera)
+        for unit in world.units:
+            unit.act(self.delta_time)
+            unit.update_relative_position(world.camera)
 
     def render(self, world: World) -> None:
         self.window.fill(BLACK)
@@ -86,6 +87,7 @@ class Engine:
 
     def _render_units(self, world: World) -> None:
         camera = world.camera
+
         for unit in world.units:
             if camera.is_visible(unit):
                 unit.render(self.window.surface, camera.get_relative_position(unit))

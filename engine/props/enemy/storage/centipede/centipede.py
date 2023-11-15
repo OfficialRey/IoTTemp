@@ -1,3 +1,4 @@
+from engine.core.vector import Vector
 from engine.graphics.textures.texture_manager import TextureManager
 from engine.props.enemy.data import EnemyData
 from engine.props.enemy.enemy import Enemy
@@ -9,8 +10,8 @@ class Centipede(Enemy):
         super().__init__(texture_manager.centipede, EnemyData.CENTIPEDE)
 
     def run_behaviour(self, delta_time: float):
-        print("Test")
-        pass
+        self.accelerate(Vector(1, 1))
+        self.position += Vector(1, 1)
 
     def on_hit(self):
         pass

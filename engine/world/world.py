@@ -1,12 +1,9 @@
-from typing import List
-
 import pygame.sprite
 
 from engine.core.vector import Vector
 from engine.core.window import Window
 from engine.graphics.textures.texture_manager import TextureManager
 from engine.props.enemy.storage.centipede.centipede import Centipede
-from engine.props.entity import Entity
 from engine.props.player.cursor import Cursor
 from engine.props.player.player import Player
 from engine.world.camera import Camera
@@ -21,11 +18,17 @@ class World:
         self.cursor = Cursor(texture_manager)
         self.player = Player(texture_manager)
         self.texture_atlas = self.level_data.texture_atlas
-        self.units: List[Entity] = []
-        self.set_camera_zoom(zoom)
 
+        self.units = pygame.sprite.Group()
         self.enemies = pygame.sprite.Group()
-        self.enemies.add(Centipede(texture_manager))
+        self.units.add(self.enemies)
+
+        centipede = Centipede(texture_manager)
+
+        self.enemies.add(centipede)
+        self.units.add(centipede)
+
+        self.set_camera_zoom(zoom)
 
     # Camera Manipulation
     def get_camera_zoom(self):
@@ -39,7 +42,7 @@ class World:
 
         self.texture_atlas.set_size(target_width, target_height)
 
-        for unit in self.units:
+        for unit in self.units.sprites():
             unit.set_size(target_width, target_height)
 
     def set_camera_position(self, position: Vector):

@@ -5,7 +5,6 @@ from engine.graphics.textures.atlas import AnimationAtlas
 from engine.graphics.textures.texture_animation import AnimationType
 from engine.graphics.textures.texture import Texture
 from engine.util.constants import VECTOR_UP
-from engine.world.camera import Camera
 
 
 class Movable:
@@ -43,7 +42,7 @@ class Sprite(Movable, pygame.sprite.Sprite):
         return self.current_animation.get_texture()
 
     def render(self, surface: pygame.Surface, screen_position: Vector) -> None:
-        surface.blit(self.current_animation.get_texture(self.current_animation).get_surface(),
+        surface.blit(self.current_animation.get_texture().image,
                      screen_position.as_tuple())
 
     def get_center_position(self) -> Vector:
@@ -69,7 +68,7 @@ class Sprite(Movable, pygame.sprite.Sprite):
         y_scale = height / self.base_height
         self.set_scale(Vector(x_scale, y_scale))
 
-    def update_relative_position(self, camera: Camera):
+    def update_relative_position(self, camera):
         self.relative_position = camera.get_relative_position(self)
 
 

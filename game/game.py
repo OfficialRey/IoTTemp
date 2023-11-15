@@ -13,7 +13,7 @@ class TopDownGame:
             self.texture_manager,
             LevelData(self.texture_manager.level_textures, "Test", 512, 512),
             self.engine.window,
-            1
+            10
         )
 
     def run(self):
