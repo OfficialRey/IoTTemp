@@ -14,7 +14,7 @@ class Camera(Movable):
 
     def set_zoom(self, zoom: float):
         self._zoom = zoom
-        self.resolution = Vector(self.window.resolution.x // zoom, self.window.resolution.y // zoom)
+        self.resolution = self.window.resolution
 
     def get_zoom(self):
         return self._zoom
