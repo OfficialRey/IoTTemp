@@ -54,19 +54,19 @@ class Engine:
         self._process_units(world)
 
     def _process_player(self, world: World):
-        world.cursor.update(self.delta_time)
-        world.cursor.position = Vector(self.input_manager.mouse_x, self.input_manager.mouse_y)
+        world.player.handle_input(self.input_manager)
+        world.player.update(self.delta_time)
 
     def _process_units(self, world: World):
-        for unit in world.units:
-            unit.act(self.delta_time)
+        for unit in world.units.sprites():
+            unit.update(self.delta_time)
             unit.update_relative_position(world.camera)
 
     def render(self, world: World) -> None:
         self.window.fill(BLACK)
         self._render_level(world)
+        self._render_player(world)
         self._render_units(world)
-        self._render_cursor(world)
         pygame.display.flip()
 
     def _render_level(self, world: World) -> None:
@@ -85,12 +85,12 @@ class Engine:
                     self.window.surface.blit(world.level_data.get_texture(x_pos, y_pos).image,
                                              (x - camera_x % sprite_width, y - camera_y % sprite_height))
 
+    def _render_player(self, world: World) -> None:
+        world.player.render(self.window.surface, world.camera.get_relative_position(world.player))
+
     def _render_units(self, world: World) -> None:
         camera = world.camera
 
         for unit in world.units:
             if camera.is_visible(unit):
                 unit.render(self.window.surface, camera.get_relative_position(unit))
-
-    def _render_cursor(self, world: World) -> None:
-        self.window.surface.blit(world.cursor.get_texture().image, world.cursor.position.as_tuple())

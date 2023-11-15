@@ -1,6 +1,8 @@
 from engine.graphics.textures.atlas import LevelAtlas, AnimationAtlas
 from engine.graphics.textures.texture_animation import AnimationType
 
+# Define Animations in Sprite Sheet
+
 PLAYER = [AnimationType.IDLE, AnimationType.WALKING_E, None, AnimationType.ATTACK, AnimationType.DAMAGED,
           AnimationType.DEATH]
 CURSOR = [AnimationType.GENERIC]
@@ -17,8 +19,8 @@ class TextureManager:
 
     def __init__(self):
         self.level_textures = LevelAtlas("level", "level_textures.png", 16, 16)
-        self.centipede = AnimationAtlas("enemies", "centipede.png", CENTIPEDE, 32, 32, time=0.2, loop=True)
-        self.centipede_body = AnimationAtlas("enemies", "centipede.png", CENTIPEDE_BODY, 32, 32, time=0.2, loop=True)
+        self.centipede = AnimationAtlas("enemies", "centipede.png", CENTIPEDE, 16, 16, time=0.2, loop=True)
+        self.centipede_body = AnimationAtlas("enemies", "centipede.png", CENTIPEDE_BODY, 16, 16, time=0.2, loop=True)
 
         # Player
         self.cursor = AnimationAtlas("player", "target.png", CURSOR, 24, 24, time=0.2, loop=True)

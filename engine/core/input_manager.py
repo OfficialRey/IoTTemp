@@ -1,9 +1,23 @@
 from typing import List
+from enum import Enum
 
 import pygame
 
 MOUSE_LEFT = 1
 MOUSE_RIGHT = 3
+
+
+class InputEnum(Enum):
+    W = 0,
+    A = 1,
+    S = 2,
+    D = 3,
+    SPACE = 4,
+
+    MOUSE_X = 5,
+    MOUSE_Y = 6,
+    LEFT_CLICK = 7,
+    RIGHT_CLICK = 8
 
 
 class InputManager:
@@ -25,7 +39,8 @@ class InputManager:
         self._monitor(event)
 
     def read(self) -> List[int]:
-        return [self.w, self.a, self.s, self.d, self.space, self.left_click, self.right_click]
+        return [self.w, self.a, self.s, self.d, self.space, self.mouse_x, self.mouse_y, self.left_click,
+                self.right_click]
 
     def _monitor(self, event: pygame.event) -> None:
         # Keyboard

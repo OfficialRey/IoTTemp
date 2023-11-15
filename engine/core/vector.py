@@ -25,6 +25,8 @@ class Vector:
     def angle(self, other):
         dot_product = self.dot_product(other)
         len_product = self.magnitude() * other.magnitude()
+        if len_product == 0:
+            return 0
         return math.degrees(math.acos(dot_product / len_product))
 
     def as_tuple(self) -> Tuple[float, float]:

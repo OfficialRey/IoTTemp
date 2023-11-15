@@ -7,15 +7,18 @@ from engine.props.entity import Entity
 class Enemy(Entity):
 
     def __init__(self, animation_atlas: AnimationAtlas, enemy_data: EnemyData):
-        super().__init__(animation_atlas, enemy_data.get_health(), enemy_data.get_attack(), enemy_data.get_defense())
+        super().__init__(animation_atlas, enemy_data.get_health(), enemy_data.get_attack(), enemy_data.get_defense(),
+                         enemy_data.get_max_speed())
 
-    def act(self, delta_time: float):
+    def _act(self, delta_time: float):
         self.run_behaviour(delta_time)
+        self.run(delta_time)
 
     def accelerate(self, acceleration: Vector) -> None:
         super().accelerate(acceleration)
 
     def _update_sprite(self):
+        velocity = self.velocity
         pass
 
     def run_behaviour(self, delta_time: float):

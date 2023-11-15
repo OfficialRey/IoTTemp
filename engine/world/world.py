@@ -15,7 +15,6 @@ class World:
     def __init__(self, texture_manager: TextureManager, level_data: LevelData, window: Window, zoom: float):
         self.level_data = level_data
         self.camera = Camera(window, zoom)
-        self.cursor = Cursor(texture_manager)
         self.player = Player(texture_manager)
         self.texture_atlas = self.level_data.texture_atlas
 
@@ -23,10 +22,12 @@ class World:
         self.enemies = pygame.sprite.Group()
         self.units.add(self.enemies)
 
-        centipede = Centipede(texture_manager)
+        self.player = Player(texture_manager)
 
-        self.enemies.add(centipede)
-        self.units.add(centipede)
+        # centipede = Centipede(texture_manager)
+
+        #        self.enemies.add(centipede)
+        #       self.units.add(centipede)
 
         self.set_camera_zoom(zoom)
 

@@ -23,9 +23,6 @@ class Movable:
     def update(self, delta_time: float) -> None:
         self.position += self.velocity * delta_time
 
-    def run(self, delta_time: float) -> None:
-        self.position += self.velocity * delta_time
-
 
 class Sprite(Movable, pygame.sprite.Sprite):
 
@@ -74,20 +71,19 @@ class Sprite(Movable, pygame.sprite.Sprite):
 
 class Entity(Sprite):
 
-    def __init__(self, animation_atlas: AnimationAtlas, max_health: int, attack: int, defense: int,
-                 position: Vector = Vector(),
-                 velocity: Vector = Vector(), max_speed: float = 0):
+    def __init__(self, animation_atlas: AnimationAtlas, max_health: int, attack: int, defense: int, max_speed: float,
+                 position: Vector = Vector(), velocity: Vector = Vector()):
         super().__init__(animation_atlas, position, velocity, max_speed)
         self.max_health = max_health
         self.health = self.max_health
         self.attack = attack
         self.defense = defense
 
-    def act(self, delta_time: float) -> None:
+    def _act(self, delta_time: float) -> None:
         raise NotImplementedError("Implement a behaviour for this props!")
 
     def update(self, delta_time: float):
         # Animation update
         angle = VECTOR_UP.angle(self.velocity)
-
+        self._act(delta_time)
         super().update(delta_time)

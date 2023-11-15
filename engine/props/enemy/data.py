@@ -6,11 +6,11 @@ ANIMATION = 0
 
 
 class EnemyData(Enum):
-    # Syntax: Base Max Health, Base Attack, Base Defense
+    # Syntax: Base Max Health, Base Attack, Base Defense, Max Speed
 
-    CACO_DEMON = (12, 12, 12)
-    CENTIPEDE = (30, 6, 2)
-    _CENTIPEDE_BODY = (12, 2, 0)
+    CACO_DEMON = (12, 12, 12, 1)
+    CENTIPEDE = (30, 6, 2, 200)
+    _CENTIPEDE_BODY = (12, 2, 0, 200)
 
     def get_health(self):
         return self.value[0]
@@ -20,6 +20,12 @@ class EnemyData(Enum):
 
     def get_defense(self):
         return self.value[2]
+
+    def get_max_speed(self):
+        if isinstance(self.value, tuple):
+            if len(self.value) > 2:
+                return self.value[3]
+        return 0
 
     def get_enemy(self, texture_manager: TextureManager):
         # TODO: Return actual entity object
