@@ -50,8 +50,10 @@ class TextureAnimation:
     def _load_textures(self):
         textures = []
         for x in range(self.surface.get_width() // self.sprite_width):
-            textures.append(
-                Texture(self.surface.subsurface((x * self.sprite_width, 0, self.sprite_width, self.sprite_height))))
+            texture = Texture(
+                self.surface.subsurface((x * self.sprite_width, 0, self.sprite_width, self.sprite_height)))
+            if not texture.is_empty():
+                textures.append(texture)
         return textures
 
     def get_texture(self) -> Texture:
