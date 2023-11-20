@@ -18,7 +18,7 @@ class Movable:
         self.acceleration = acceleration
 
     def accelerate(self, acceleration: Vector) -> None:
-        self.velocity += acceleration.normalize() * self.acceleration
+        self.velocity += acceleration * self.acceleration
         if self.velocity.magnitude() > self.max_speed:
             self.velocity = self.velocity.normalize() * self.max_speed
 

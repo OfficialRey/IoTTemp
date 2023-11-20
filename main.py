@@ -13,7 +13,11 @@ def init():
     pygame.display.init()
 
 
-if __name__ == '__main__':
+def start():
     init()
     game = TopDownGame()
     game.run()
+
+
+if __name__ == '__main__':
+    start()

@@ -55,3 +55,9 @@ class World:
         if position.y < 0:
             position.y = 0
         self.camera.position = position
+
+    def set_camera_position_smooth(self, position: Vector, speed: float = 0.6):
+        current_position = self.camera.position
+        position_to_target = (position - current_position) / 10
+        target_position = current_position + position_to_target * speed
+        self.set_camera_position(target_position)

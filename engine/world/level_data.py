@@ -6,7 +6,7 @@ from engine.graphics.textures.texture import Texture
 
 class LevelData:
 
-    def __init__(self, texture_atlas: LevelAtlas, world_name: str, width: int = 512, height: int = 512):
+    def __init__(self, texture_atlas: LevelAtlas, world_name: str, width: int = 50, height: int = 50):
         # TODO: Add multiple texture layers
         self.world_name = world_name
         self.width = width

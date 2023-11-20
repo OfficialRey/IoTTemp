@@ -7,7 +7,7 @@ from engine.world.world import World
 class TopDownGame:
 
     def __init__(self):
-        self.engine = Engine(max_fps=144)
+        self.engine = Engine(max_fps=90)
         self.texture_manager = TextureManager()
         self.world = World(
             self.texture_manager,

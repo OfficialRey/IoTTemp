@@ -13,7 +13,7 @@ from engine.util.util import get_texture
 class LevelAtlas:
 
     def __init__(self, path: str, file_name: str, sprite_width: int, sprite_height: int):
-        self.image = pygame.image.load(os.path.join(get_resource_path(), os.path.join(path, file_name)))
+        self.image = pygame.image.load(os.path.join(get_resource_path(), os.path.join(path, file_name))).convert_alpha()
         self.path = path
 
         self.base_width = sprite_width
@@ -61,7 +61,8 @@ class AnimationAtlas:
 
     def __init__(self, path: str, file_name: str, animation_types: List[AnimationType], sprite_width: int,
                  sprite_height: int, time: float = 0.2, loop: bool = True, scale: Union[Vector, float] = 1):
-        self.surface = pygame.image.load(os.path.join(get_resource_path(), os.path.join(path, file_name)))
+        self.surface = pygame.image.load(
+            os.path.join(get_resource_path(), os.path.join(path, file_name))).convert_alpha()
         self.animation_types = animation_types
         self.sprite_width, self.sprite_height = sprite_width, sprite_height
         self.time = time

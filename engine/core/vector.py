@@ -14,7 +14,9 @@ class Vector:
 
     def normalize(self):
         magnitude = self.magnitude()
-        return Vector(self.x / magnitude, self.y / magnitude)
+        if magnitude > 0:
+            return Vector(self.x / magnitude, self.y / magnitude)
+        return Vector(0, 0)
 
     def distance(self, other) -> float:
         return (other - self).magnitude()
