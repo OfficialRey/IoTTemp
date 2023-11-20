@@ -21,13 +21,12 @@ class World:
         self.units = pygame.sprite.Group()
         self.enemies = pygame.sprite.Group()
         self.units.add(self.enemies)
+        self.units.add(self.player)
 
-        self.player = Player(texture_manager)
-
-        centipede = Centipede(texture_manager)
-
-        self.enemies.add(centipede)
-        self.units.add(centipede)
+        # centipede = Centipede(texture_manager)
+        #
+        # self.enemies.add(centipede)
+        # self.units.add(centipede)
 
         self.set_camera_zoom(zoom)
 

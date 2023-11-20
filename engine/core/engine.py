@@ -1,3 +1,4 @@
+import time
 from enum import Enum
 
 import pygame
@@ -33,13 +34,31 @@ class Engine:
 
     def run(self, world: World) -> None:
         while not self.done:
+            old_time = time.time()
+
             self._check_events()
+
+            event_time = time.time() - old_time
+            old_time = time.time()
+
             self.process(world)
+
+            process_time = time.time() - old_time
+            old_time = time.time()
+
             self.render(world)
+
+            render_time = time.time() - old_time
+
             self._update_delta_time()
+
+            print(f"Event Time: {event_time}")
+            print(f"Process Time: {process_time}")
+            print(f"Render Time: {render_time}")
 
     def _update_delta_time(self) -> None:
         self.delta_time = self.clock.tick(self.max_fps) / MILLI_SECONDS
+        self.fps = 1 / self.delta_time
 
     def _check_events(self) -> None:
         for event in pygame.event.get():
@@ -60,7 +79,6 @@ class Engine:
     def _process_units(self, world: World):
         for unit in world.units.sprites():
             unit.update(self.delta_time)
-            unit.update_relative_position(world.camera)
 
     def render(self, world: World) -> None:
         self.window.fill(WHITE)
@@ -70,6 +88,9 @@ class Engine:
         pygame.display.flip()
 
     def _render_level(self, world: World) -> None:
+
+        old_time = time.time()
+
         zoom = world.get_camera_zoom()
         camera_x = int(world.camera.position.x)
         camera_y = int(world.camera.position.y)
@@ -84,6 +105,9 @@ class Engine:
                 if 0 <= x_pos < world.level_data.width and 0 <= y_pos < world.level_data.height:
                     self.window.surface.blit(world.level_data.get_texture(x_pos, y_pos).image,
                                              (x - camera_x % sprite_width, y - camera_y % sprite_height))
+
+        level_time = time.time() - old_time
+        print(f"Level Render: {level_time}")
 
     def _render_player(self, world: World) -> None:
         world.player.render(self.window.surface, world.camera.get_relative_position(world.player))
