@@ -61,7 +61,7 @@ class AnimationAtlas:
 
     def __init__(self, path: str, file_name: str, animation_types: List[AnimationType], sprite_width: int,
                  sprite_height: int, time: float = 0.2, loop: bool = True, scale: Union[Vector, float] = 1):
-        self.image = pygame.image.load(os.path.join(get_resource_path(), os.path.join(path, file_name)))
+        self.surface = pygame.image.load(os.path.join(get_resource_path(), os.path.join(path, file_name)))
         self.animation_types = animation_types
         self.sprite_width, self.sprite_height = sprite_width, sprite_height
         self.time = time
@@ -75,11 +75,13 @@ class AnimationAtlas:
 
     def _load_animations(self) -> List[TextureAnimation]:
         animations = []
-        for animation_type in self.animation_types:
+        for i in range(len(self.animation_types)):
+            animation_type = self.animation_types[i]
             if animation_type is not None:
-                surface = pygame.Surface((self.image.get_width(), self.sprite_height))
-                surface.blit(self.image, (0, 0))
-                animations.append(TextureAnimation(surface, animation_type, self.sprite_width, self.time, self.loop))
+                animations.append(
+                    TextureAnimation(self.surface.subsurface((0, i * self.sprite_height, self.surface.get_width(),
+                                                              self.sprite_height)),
+                                     self.sprite_width, animation_type, self.time, self.loop))
 
         # Mirror walking animation
         if AnimationType.WALKING_W not in self.animation_types and AnimationType.WALKING_E in self.animation_types:
@@ -104,7 +106,7 @@ class AnimationAtlas:
         for animation in self.texture_animations:
             animation.update(delta_time)
 
-    def get_texture(self, index: AnimationType):
+    def get_texture(self, index: AnimationType) -> Texture:
         return self.texture_animations[index.value].get_texture()
 
     def get_animation(self, animation_type: AnimationType):

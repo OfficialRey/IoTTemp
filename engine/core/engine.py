@@ -3,7 +3,7 @@ from enum import Enum
 import pygame
 
 from engine.core.vector import Vector
-from engine.util.constants import BLACK
+from engine.util.constants import BLACK, WHITE
 from engine.world.world import World
 from engine.core.input_manager import InputManager
 from engine.core.window import Window
@@ -63,7 +63,7 @@ class Engine:
             unit.update_relative_position(world.camera)
 
     def render(self, world: World) -> None:
-        self.window.fill(BLACK)
+        self.window.fill(WHITE)
         self._render_level(world)
         self._render_player(world)
         self._render_units(world)

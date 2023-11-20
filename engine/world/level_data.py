@@ -12,7 +12,7 @@ class LevelData:
         self.width = width
         self.height = height
         self.texture_atlas = texture_atlas
-        self.level = [-1 for _ in range(width * height)]
+        self.level = [5 for _ in range(width * height)]
 
     def get_texture(self, x: int, y: int) -> Texture:
         return self.texture_atlas.textures[self.get_texture_id(x, y)]

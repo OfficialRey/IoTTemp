@@ -32,11 +32,11 @@ class AnimationType(Enum):
 
 class TextureAnimation:
 
-    def __init__(self, surface: pygame.Surface, animation_type: AnimationType, sprite_width: int, time: float = 0.2,
+    def __init__(self, surface: pygame.Surface, sprite_width: int, animation_type: AnimationType, time: float = 0.2,
                  loop: bool = True, scale: Vector = Vector(1, 1)):
         self.surface = surface
-        self.animation_type = animation_type
         self.sprite_width = sprite_width
+        self.animation_type = animation_type
         self.sprite_height = self.surface.get_height()
 
         self.timer = 0
@@ -50,7 +50,8 @@ class TextureAnimation:
     def _load_textures(self):
         textures = []
         for x in range(self.surface.get_width() // self.sprite_width):
-            textures.append(get_texture(self.surface, self.sprite_width, self.sprite_height, x * self.sprite_width, 0))
+            textures.append(
+                Texture(self.surface.subsurface((x * self.sprite_width, 0, self.sprite_width, self.sprite_height))))
         return textures
 
     def get_texture(self) -> Texture:
@@ -81,5 +82,5 @@ class TextureAnimation:
             texture.mirror(x_axis, y_axis)
 
     def copy(self):
-        return TextureAnimation(self.surface, self.animation_type, self.sprite_width, self.target_time, self.loop,
+        return TextureAnimation(self.surface, self.sprite_width, self.animation_type, self.target_time, self.loop,
                                 self.scale)
