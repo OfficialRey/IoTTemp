@@ -4,7 +4,6 @@ import pygame
 
 from engine.core.vector import Vector
 from engine.graphics.textures.texture import Texture
-from engine.util.util import get_texture
 
 
 class AnimationType(Enum):

@@ -15,9 +15,14 @@ class Player(Entity):
         self.input_manager = None
         self.cursor = Cursor(texture_manager)
         self.cursor.play_animation(AnimationType.GENERIC)
+        self.shot_delay = 0.5
+        self.current_shot_timer = 0
 
     def _act(self, delta_time: float) -> None:
         self.cursor.update(delta_time)
+
+        if self.current_shot_timer > 0:
+            self.current_shot_timer -= delta_time
 
     # Format: [w, a, s, d, space, mouse_x, mouse_y, left_click, right_click]
 
@@ -25,6 +30,10 @@ class Player(Entity):
         position = Vector(input_manager.mouse_x, input_manager.mouse_y)
         self.cursor.set_position(position)
         self.accelerate((self.cursor.position - camera.get_relative_position(self)))
+
+        if input_manager.left_click and self.current_shot_timer <= 0:
+            # TODO: SHOOT BULLET
+            pass
 
     def render(self, surface: pygame.Surface, screen_position: Vector) -> None:
         self.cursor.render(surface, self.cursor.position)

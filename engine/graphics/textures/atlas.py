@@ -7,7 +7,6 @@ from engine.core.vector import Vector
 from engine.graphics.textures.texture import Texture
 from engine.graphics.textures.texture_animation import AnimationType, TextureAnimation
 from engine.util.resources import get_resource_path
-from engine.util.util import get_texture
 
 
 class LevelAtlas:
@@ -61,6 +60,8 @@ class AnimationAtlas:
 
     def __init__(self, path: str, file_name: str, animation_types: List[AnimationType], sprite_width: int,
                  sprite_height: int, time: float = 0.2, loop: bool = True, scale: Union[Vector, float] = 1):
+        self.path = path
+        self.file_name = file_name
         self.surface = pygame.image.load(
             os.path.join(get_resource_path(), os.path.join(path, file_name))).convert_alpha()
         self.animation_types = animation_types
@@ -72,6 +73,7 @@ class AnimationAtlas:
         self.base_height = sprite_height
 
         self.texture_animations = self._load_animations()
+        self.scale = Vector(1, 1)
         self.set_scale(scale if isinstance(scale, Vector) else Vector(scale, scale))
 
     def _load_animations(self) -> List[TextureAnimation]:
@@ -95,6 +97,7 @@ class AnimationAtlas:
         return animations
 
     def set_scale(self, scale: Vector):
+        self.scale = scale
         for texture_animation in self.texture_animations:
             texture_animation.set_scale(scale)
 
@@ -115,3 +118,7 @@ class AnimationAtlas:
             if animation.animation_type == animation_type:
                 return animation
         return None
+
+    def copy(self):
+        return AnimationAtlas(self.path, self.file_name, self.animation_types, self.sprite_width, self.sprite_height,
+                              self.time, self.loop, self.scale)

@@ -3,8 +3,11 @@ from typing import Tuple
 
 NUMBER_TYPE = (int, float, complex)
 
+VECTOR_UP = (0, -1)
+
 
 class Vector:
+
     def __init__(self, x: float = 0, y: float = 0):
         self.x = x
         self.y = y
