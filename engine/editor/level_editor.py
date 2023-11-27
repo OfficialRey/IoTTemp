@@ -24,10 +24,11 @@ BOX_OFFSET = 5
 GRAPHICS_PER_ROW = 20
 
 
-class EditorStates(Enum):
-    FILE_SELECT = 0,
-    EDITING = 1
-
+# TODO: Multiple layers per level
+# TODO: Change layers in editor
+# TODO: Save level layouts
+# TODO: Level Collision editor
+# TODO: Delete textures
 
 class LevelEditor:
     texture_atlas: LevelAtlas
