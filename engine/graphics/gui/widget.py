@@ -71,10 +71,13 @@ class Button(Label):
         self.pressed = False
 
     def render(self, surface: pygame.Surface) -> None:
-        if self.enabled:
-            super().render(surface)
+        if not self.enabled:
+            return
+        super().render(surface)
 
     def act(self, event: pygame.event.Event):
+        if not self.enabled:
+            return
         if event.type == pygame.MOUSEBUTTONDOWN or event.type == pygame.MOUSEBUTTONUP:
             x_pos, y_pos = pygame.mouse.get_pos()
             if self.area.x <= x_pos <= self.area.x + self.area.width and \

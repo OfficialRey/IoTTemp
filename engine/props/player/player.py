@@ -37,4 +37,4 @@ class Player(Entity):
 
     def render(self, surface: pygame.Surface, screen_position: Vector) -> None:
         self.cursor.render(surface, self.cursor.position)
-        super(Player, self).render(surface, screen_position)
+        super().render(surface, screen_position)

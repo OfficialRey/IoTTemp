@@ -95,11 +95,11 @@ class Engine:
                                              (x - camera_x % sprite_width, y - camera_y % sprite_height))
 
     def _render_player(self, world: World) -> None:
-        world.player._render(self.window.surface, world.camera.get_relative_position(world.player))
+        world.player.render(self.window.surface, world.camera.get_relative_position(world.player))
 
     def _render_units(self, world: World) -> None:
         camera = world.camera
 
         for unit in world.units:
             if camera.is_visible(unit):
-                unit._render(self.window.surface, camera.get_relative_position(unit))
+                unit.render(self.window.surface, camera.get_relative_position(unit))

@@ -31,6 +31,7 @@ class World:
         # self.units.add(centipede)
 
         self.set_camera_zoom(zoom)
+
     def get_camera_zoom(self):
         return self.camera.get_zoom()
 
