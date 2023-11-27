@@ -17,15 +17,15 @@ feedback to the user
 
 ## Hardware List
 - [x] ESP32 Microcontroller
-- [ ] 2x Rumble Motor
-- [ ] LEDS
-- [ ] Buttons
+- [x] 2x Rumble Motor
+- [x] LEDS
+- [x] Buttons
 - [x] Gyroscope + Compass
-- [ ] Laserpointer
-- [ ] MP3 Module
+- [x] Laserpointer
+- [x] MP3 Module
 - [X] Speaker
 - [x] Connectors
 - [x] Resistors
-- [ ] Breadboard
+- [x] Breadboard
 - [x] USB Cable
 - [X] AAA Battery Pack
