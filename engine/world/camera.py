@@ -1,6 +1,7 @@
 from engine.core.vector import Vector
 from engine.core.window import Window
-from engine.props.types.entity import Movable, Sprite
+from engine.props.types.movable import Movable
+from engine.props.types.sprite import Sprite
 
 
 class Camera(Movable):

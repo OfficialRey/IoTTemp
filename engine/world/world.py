@@ -14,7 +14,7 @@ class World:
     def __init__(self, texture_manager: TextureManager, level_data: LevelData, window: Window, zoom: float):
         self.level_data = level_data
         self.camera = Camera(window, zoom)
-        self.player = Player(texture_manager)
+        self.player = Player(self, texture_manager)
         self.texture_atlas = self.level_data.texture_atlas
 
         self.units = pygame.sprite.Group()

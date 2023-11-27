@@ -10,8 +10,8 @@ from engine.props.player.cursor import Cursor
 
 class Player(Entity):
 
-    def __init__(self, texture_manager: TextureManager):
-        super().__init__(texture_manager.player, 100, 20, 20, 200, 0.1)
+    def __init__(self, world, texture_manager: TextureManager):
+        super().__init__(world, texture_manager.player, 100, 20, 20, 200, 0.1)
         self.input_manager = None
         self.cursor = Cursor(texture_manager)
         self.cursor.play_animation(AnimationType.GENERIC)

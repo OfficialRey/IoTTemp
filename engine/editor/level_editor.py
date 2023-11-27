@@ -5,8 +5,10 @@ import pygame.draw
 
 from engine.core.vector import Vector
 from engine.core.window import Window
+from engine.editor.editor_widget import LevelEditorSelectTextureButton, LevelEditorScrollTextureButton
 from engine.graphics.gui.widget import Button
 from engine.graphics.textures.atlas import LevelAtlas
+from engine.graphics.textures.texture_animation import AnimationType
 from engine.graphics.textures.texture_manager import TextureManager
 from engine.util.constants import RED, WHITE, BLACK
 from engine.world.level_data import LevelData
@@ -18,7 +20,7 @@ from engine.world.world import World
 
 DRAW_PERCENTAGE = 0.8
 BOX_OFFSET = 5
-GRAPHICS_PER_ROW = 12
+GRAPHICS_PER_ROW = 20
 
 
 class EditorStates(Enum):
@@ -30,6 +32,7 @@ class LevelEditor:
     texture_atlas: LevelAtlas
     level_data: LevelData
     buttons: List[Button]
+    scroll_buttons: List[LevelEditorScrollTextureButton]
 
     def __init__(self, fps: int = 60):
         self.window = Window(Vector(1920, 1080), full_screen=False)
@@ -43,6 +46,8 @@ class LevelEditor:
 
         self.selected_texture = 0
         self.current_row = 0
+
+        self.upper_bound = 0
 
         self.clock = pygame.time.Clock()
         self.fps = fps
@@ -69,11 +74,32 @@ class LevelEditor:
 
     def load_textures(self):
         self.buttons = []
-        for texture in self.texture_atlas.textures:
-            button = Button()
+        for index in range(len(self.texture_atlas.textures)):
+            button = LevelEditorSelectTextureButton(self, texture_id=index)
             button.enabled = False
-            button.set_content(texture.base_image)
+            button.set_content(self.texture_atlas.textures[index].base_image)
             self.buttons.append(button)
+
+        self.upper_bound = len(self.buttons) // GRAPHICS_PER_ROW
+
+        # Scroll Buttons
+        self.scroll_buttons = []
+
+        button = LevelEditorScrollTextureButton(self, -1)
+        button.enabled = True
+        button.set_content(self.texture_manager.arrow_up.get_texture(AnimationType.GENERIC).image)
+        button.set_area((self.window.get_width() * 0.95, self.window.get_height() * 0.81,
+                         self.texture_manager.arrow_up.sprite_width * 5,
+                         self.texture_manager.arrow_up.sprite_height * 5))
+        self.scroll_buttons.append(button)
+
+        button = LevelEditorScrollTextureButton(self, 1)
+        button.enabled = True
+        button.set_content(self.texture_manager.arrow_down.get_texture(AnimationType.GENERIC).image)
+        button.set_area((self.window.get_width() * 0.95, self.window.get_height() * 0.9,
+                         self.texture_manager.arrow_up.sprite_width * 5,
+                         self.texture_manager.arrow_up.sprite_height * 5))
+        self.scroll_buttons.append(button)
 
     def update_gui(self):
         for button in self.buttons:
@@ -84,9 +110,9 @@ class LevelEditor:
             if index >= len(self.buttons):
                 return
             button = self.buttons[index]
-            button.set_area((BOX_OFFSET * 2 + (i % GRAPHICS_PER_ROW) * self.texture_atlas.sprite_width * 2,
-                             self.window.get_height() * DRAW_PERCENTAGE + BOX_OFFSET * 2 + (
-                                     i // GRAPHICS_PER_ROW) * self.texture_atlas.sprite_height * 1.5,
+            button.set_area((BOX_OFFSET * 2 + (i % GRAPHICS_PER_ROW) * self.texture_atlas.sprite_width * 1.1,
+                             self.window.get_height() * DRAW_PERCENTAGE + BOX_OFFSET * 3 + (
+                                     i // GRAPHICS_PER_ROW) * self.texture_atlas.sprite_height * 1.2,
                              self.texture_atlas.sprite_width,
                              self.texture_atlas.sprite_height))
             button.enabled = True
@@ -104,10 +130,12 @@ class LevelEditor:
 
     def check_events(self):
         for event in pygame.event.get():
+            for button in self.buttons:
+                button.act(event)
+            for button in self.scroll_buttons:
+                button.act(event)
             if event.type == pygame.QUIT:
                 exit()
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                self.handle_mouse_input(event)
 
     def render(self):
         self.render_world()
@@ -151,3 +179,16 @@ class LevelEditor:
     def render_gui_textures(self):
         for button in self.buttons:
             button.render(self.window.surface)
+        for button in self.scroll_buttons:
+            button.render(self.window.surface)
+
+    def select_texture(self, texture_id: int):
+        self.buttons[self.selected_texture].background_color = None
+        self.selected_texture = texture_id
+        self.buttons[self.selected_texture].background_color = BLACK
+
+    def scroll_texture(self, direction: int):
+        self.current_row += direction
+        self.current_row = self.upper_bound if self.current_row >= self.upper_bound else self.current_row
+        self.current_row = 0 if self.current_row < 0 else self.current_row
+        self.update_gui()

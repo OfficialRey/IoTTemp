@@ -1,6 +1,5 @@
 from engine.core.vector import Vector
 from engine.graphics.textures.atlas import AnimationAtlas
-from engine.props.bullet.bullet import BulletType, Bullet
 from engine.props.types.sprite import Sprite
 
 
@@ -23,6 +22,3 @@ class Entity(Sprite):
         # Animation update
         self._act(delta_time)
         super().update(delta_time)
-
-    def shoot_bullet(self, bullet_type: BulletType, direction: Vector):
-        bullet = Bullet(self.world.texture_manager., self, )
