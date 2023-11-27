@@ -1,7 +1,7 @@
 from engine.core.vector import Vector
 from engine.graphics.textures.atlas import AnimationAtlas
 from engine.props.enemy.data import EnemyData
-from engine.props.entity import Entity
+from engine.props.types.entity import Entity
 
 
 class Enemy(Entity):

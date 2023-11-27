@@ -4,7 +4,7 @@ from engine.core.input_manager import InputManager
 from engine.core.vector import Vector
 from engine.graphics.textures.texture_animation import AnimationType
 from engine.graphics.textures.texture_manager import TextureManager
-from engine.props.entity import Entity
+from engine.props.types.entity import Entity
 from engine.props.player.cursor import Cursor
 
 

@@ -1,6 +1,6 @@
 from engine.core.vector import Vector
 from engine.graphics.textures.texture_manager import TextureManager
-from engine.props.entity import Sprite
+from engine.props.types.entity import Sprite
 
 
 class Cursor(Sprite):

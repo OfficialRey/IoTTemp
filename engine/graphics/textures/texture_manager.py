@@ -7,6 +7,8 @@ PLAYER = [AnimationType.IDLE, AnimationType.WALKING_E, None, AnimationType.ATTAC
           AnimationType.DEATH]
 CURSOR = [AnimationType.GENERIC]
 
+CALIBRATOR = [AnimationType.GENERIC]
+
 CENTIPEDE = [AnimationType.WALKING_E, AnimationType.WALKING_NE, AnimationType.WALKING_N, AnimationType.WALKING_NW,
              AnimationType.WALKING_W, AnimationType.WALKING_SW, AnimationType.WALKING_S, AnimationType.WALKING_SE]
 CENTIPEDE_BODY = [None, None, None, None, None, None, None, None,
@@ -25,3 +27,6 @@ class TextureManager:
         # Player
         self.cursor = AnimationAtlas("player", "target.png", CURSOR, 24, 24, time=0.2, loop=True)
         self.player = AnimationAtlas("player", "player.png", PLAYER, 16, 16, time=0.2, loop=True)
+
+        # Calibration
+        self.calibrator = AnimationAtlas("calibration", "calibration.png", CALIBRATOR, 16, 16)

@@ -31,3 +31,6 @@ class Window:
 
     def show_cursor(self, visibility: bool = True) -> None:
         pygame.mouse.set_visible(visibility)
+
+    def get_size(self):
+        return Vector(*self.surface.get_size())
