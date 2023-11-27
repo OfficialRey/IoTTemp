@@ -1,19 +1,24 @@
 from enum import Enum
+from typing import List
 
 import pygame.draw
 
+from engine.core.vector import Vector
 from engine.core.window import Window
-from engine.graphics.textures.texture import LevelAtlas
-from engine.util.constants import RED, WHITE
+from engine.graphics.gui.widget import Button
+from engine.graphics.textures.atlas import LevelAtlas
+from engine.graphics.textures.texture_manager import TextureManager
+from engine.util.constants import RED, WHITE, BLACK
 from engine.world.level_data import LevelData
 
 from tkinter import Tk
 from tkinter.filedialog import askopenfilename
 
-DRAW_PERCENTAGE = 0.7
-GRAPHICS_PER_ROW = 10
-GRAPHICS_LOADED = GRAPHICS_PER_ROW * 2
-EDGE_DISTANCE = 20
+from engine.world.world import World
+
+DRAW_PERCENTAGE = 0.8
+BOX_OFFSET = 5
+GRAPHICS_PER_ROW = 12
 
 
 class EditorStates(Enum):
@@ -24,26 +29,76 @@ class EditorStates(Enum):
 class LevelEditor:
     texture_atlas: LevelAtlas
     level_data: LevelData
+    buttons: List[Button]
 
-    def __init__(self):
-        self.window = Window(width=1080, height=720, full_screen=False)
-        self.window.change_dimensions(full_screen=False)
+    def __init__(self, fps: int = 60):
+        self.window = Window(Vector(1920, 1080), full_screen=False)
 
         # Editor Parameters
         self.done = False
-        self.zoom = 5
-        self.texture_atlas = None
+        self.texture_manager = TextureManager()
+        self.texture_atlas = self.texture_manager.level_textures
         self.level_data = None
+        self.world = None
 
         self.selected_texture = 0
-        self.draw_row = 0
-        self.draw_textures = []
+        self.current_row = 0
+
+        self.clock = pygame.time.Clock()
+        self.fps = fps
+
+    def select_textures(self):
+        while self.texture_atlas is None:
+            Tk().withdraw()
+            file = askopenfilename().replace("\\", "/")
+            file_name = file.split("/")[-1]
+            path = "".join([(file.split("/")[index] + "/") for index in range(len(file.split("/")) - 1)])
+            sprite_width = int(input("Sprite Width:"))
+            sprite_height = int(input("Sprite Height:"))
+            self.texture_atlas = LevelAtlas(path, file_name, sprite_width, sprite_height)
+
+    def create_world(self):
+        # world_name = input("World Name:")
+        # width = int(input("Width:"))
+        # height = int(input("Height:"))
+        world_name = "Test"
+        width = 200
+        height = 200
+        self.level_data = LevelData(self.texture_atlas, world_name, width, height)
+        self.world = World(self.texture_manager, self.level_data, self.window, 5)
+
+    def load_textures(self):
+        self.buttons = []
+        for texture in self.texture_atlas.textures:
+            button = Button()
+            button.enabled = False
+            button.set_content(texture.base_image)
+            self.buttons.append(button)
+
+    def update_gui(self):
+        for button in self.buttons:
+            button.enabled = False
+
+        for i in range(GRAPHICS_PER_ROW * 2):
+            index = self.current_row * GRAPHICS_PER_ROW + i
+            if index >= len(self.buttons):
+                return
+            button = self.buttons[index]
+            button.set_area((BOX_OFFSET * 2 + (i % GRAPHICS_PER_ROW) * self.texture_atlas.sprite_width * 2,
+                             self.window.get_height() * DRAW_PERCENTAGE + BOX_OFFSET * 2 + (
+                                     i // GRAPHICS_PER_ROW) * self.texture_atlas.sprite_height * 1.5,
+                             self.texture_atlas.sprite_width,
+                             self.texture_atlas.sprite_height))
+            button.enabled = True
 
     def run(self):
         self.select_textures()
         self.create_world()
+        self.load_textures()
+        self.update_gui()
 
         while not self.done:
+            self.clock.tick(self.fps)
             self.check_events()
             self.render()
 
@@ -57,7 +112,7 @@ class LevelEditor:
     def render(self):
         self.render_world()
         self.render_grid()
-        self.render_draw_textures()
+        self.render_gui()
         pygame.display.flip()
 
     def render_world(self):
@@ -67,99 +122,32 @@ class LevelEditor:
                 if texture_id >= 0:
                     texture = self.texture_atlas[texture_id]
                     destination = (
-                        x * self.texture_atlas.sprite_width * self.zoom,
-                        y * self.texture_atlas.sprite_height * self.zoom)
+                        x * self.texture_atlas.sprite_width,
+                        y * self.texture_atlas.sprite_height)
                     self.window.surface.blit(texture.image, destination)
 
     def render_grid(self):
-        for x in range(0, self.window.width, self.texture_atlas.sprite_width * self.zoom):
-            pygame.draw.line(self.window.surface, RED, (x, 0), (x, self.window.height * DRAW_PERCENTAGE))
+        width = self.window.get_width()
+        height = self.window.get_height()
+        for x in range(0, width, self.texture_atlas.sprite_width):
+            pygame.draw.line(self.window.surface, RED, (x, 0), (x, height))
 
-        for y in range(0, int(self.window.height * DRAW_PERCENTAGE), self.texture_atlas.sprite_height * self.zoom):
-            pygame.draw.line(self.window.surface, RED, (0, y), (self.window.width, y))
+        for y in range(0, height, self.texture_atlas.sprite_height):
+            pygame.draw.line(self.window.surface, RED, (0, y), (width, y))
 
-    def render_draw_textures(self):
-        self.window.surface.fill(WHITE,
-                                       (0, self.window.height * DRAW_PERCENTAGE, self.window.width, self.window.height))
-        x_distance = self.window.width - EDGE_DISTANCE * 2
-        texture_distance = x_distance // (len(self.draw_textures) / 2)
-        for i in range(len(self.draw_textures)):
-            x_pos = EDGE_DISTANCE + i * texture_distance
-            y_pos = self.window.height * DRAW_PERCENTAGE + EDGE_DISTANCE
-            if i >= GRAPHICS_PER_ROW:
-                y_pos = y_pos + self.draw_textures[i].get_height() * 1.2
-                x_pos = EDGE_DISTANCE + (i - 10) * texture_distance
-            self.window.surface.blit(self.draw_textures[i], (x_pos, y_pos))
+    def render_gui(self):
+        # Render Overlay
+        pygame.draw.rect(self.window.surface, BLACK, (
+            0, self.window.get_height() * DRAW_PERCENTAGE, self.window.get_width(), self.window.get_height()))
+        pygame.draw.rect(self.window.surface, WHITE, (
+            BOX_OFFSET,
+            self.window.get_height() * DRAW_PERCENTAGE + BOX_OFFSET,
+            self.window.get_width() - 2 * BOX_OFFSET,
+            self.window.get_height()))
 
-    def create_world(self):
-        print("World Creation:")
-        # world_name = input("World Name:")
-        # width = int(input("Width:"))
-        # height = int(input("Height:"))
-        world_name = "Test"
-        width = 200
-        height = 200
-        self.level_data = LevelData(self.texture_atlas, world_name, width, height)
+        # Render Textures
+        self.render_gui_textures()
 
-    def select_textures(self):
-        while self.texture_atlas is None:
-            Tk().withdraw()
-            filename = askopenfilename()
-            sprite_width = int(input("Sprite Width:"))
-            sprite_height = int(input("Sprite Height:"))
-            self.texture_atlas = LevelAtlas(filename, sprite_width, sprite_height)
-        self.update_draw_textures()
-
-    def update_draw_textures(self):
-        if self.draw_row < 0:
-            self.draw_row = 0
-        while self.draw_row * GRAPHICS_LOADED >= len(self.texture_atlas.base_textures):
-            self.draw_row -= 1
-
-        self.draw_textures = []
-        for i in range(self.draw_row * GRAPHICS_LOADED,
-                       min(self.draw_row * GRAPHICS_LOADED + GRAPHICS_LOADED, len(self.texture_atlas.base_textures))):
-            self.draw_textures.append(self.texture_atlas.base_textures[i].base_image)
-
-        for i in range(len(self.draw_textures)):
-            self.draw_textures[i] = pygame.transform.scale(
-                self.draw_textures[i],
-                (self.draw_textures[i].get_width() * 4,
-                 self.draw_textures[i].get_height() * 4)
-            )
-
-    def select_texture(self):
-        pass
-
-    def place_texture(self):
-        mouse_x, mouse_y = pygame.mouse.get_pos()
-        if mouse_y < self.window.height * DRAW_PERCENTAGE:
-            target_x = mouse_x // (self.texture_atlas.sprite_width * self.zoom)
-            target_y = mouse_y // (self.texture_atlas.sprite_height * self.zoom)
-            self.level_data.place_texture(self.selected_texture, target_x, target_y)
-
-    def handle_mouse_input(self, event):
-        mouse_y = pygame.mouse.get_pos()[1]
-        if mouse_y < self.window.height * DRAW_PERCENTAGE:
-
-            # Editor Controls
-            if event.button == 1:
-                self.place_texture()
-
-        else:
-
-            # Texture Controls
-            if event.button == 1:
-                self.select_texture()
-            elif event.button == 4:
-                self.draw_row -= 1
-                self.update_draw_textures()
-            elif event.button == 5:
-                self.draw_row += 1
-                self.update_draw_textures()
-
-
-if __name__ == '__main__':
-    # Launch Level Editor
-    editor = LevelEditor()
-    editor.run()
+    def render_gui_textures(self):
+        for button in self.buttons:
+            button.render(self.window.surface)

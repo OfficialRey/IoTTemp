@@ -19,10 +19,10 @@ class Window:
         if event.type == pygame.QUIT:
             exit(0)
 
-    def change_dimensions(self, resolution: Vector = None, full_screen: bool = None) -> None:
+    def change_dimensions(self, resolution: Vector = None, full_screen: bool = False) -> None:
         if resolution is not None:
             self.resolution = resolution
-        self.full_screen = full_screen if full_screen is not None else self.full_screen
+        self.full_screen = full_screen
         self.window_flags = pygame.FULLSCREEN | pygame.DOUBLEBUF | int(full_screen) * pygame.FULLSCREEN
         self.surface = pygame.display.set_mode((self.resolution.as_tuple()), self.window_flags)
 
@@ -31,3 +31,9 @@ class Window:
 
     def show_cursor(self, visibility: bool = True) -> None:
         pygame.mouse.set_visible(visibility)
+
+    def get_width(self):
+        return self.surface.get_width()
+
+    def get_height(self):
+        return self.surface.get_height()

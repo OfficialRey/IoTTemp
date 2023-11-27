@@ -3,8 +3,7 @@ import pygame.sprite
 from engine.core.vector import Vector
 from engine.core.window import Window
 from engine.graphics.textures.texture_manager import TextureManager
-from engine.props.enemy.storage.centipede.centipede import Centipede
-from engine.props.player.cursor import Cursor
+from engine.props.bullet.bullet import Bullet
 from engine.props.player.player import Player
 from engine.world.camera import Camera
 from engine.world.level_data import LevelData
@@ -20,6 +19,9 @@ class World:
 
         self.units = pygame.sprite.Group()
         self.enemies = pygame.sprite.Group()
+        self.player_bullets = pygame.sprite.Group()
+        self.enemy_bullets = pygame.sprite.Group()
+
         self.units.add(self.enemies)
         self.units.add(self.player)
 
@@ -61,3 +63,9 @@ class World:
         position_to_target = (position - current_position) / 10
         target_position = current_position + position_to_target * speed
         self.set_camera_position(target_position)
+
+    def add_bullet(self, bullet: Bullet):
+        if isinstance(bullet.owner, Player):
+            self.player_bullets.add(bullet)
+        else:
+            self.enemy_bullets.add(bullet)
