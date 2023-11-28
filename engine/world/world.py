@@ -91,15 +91,12 @@ class World:
                                         (x - camera_x % sprite_width, y - camera_y % sprite_height))
 
     def _render_player(self, window: Window) -> None:
-        self.player.render(window.surface, self.camera.get_relative_position(self.player))
-        self.player.render_bullets(window.surface, self)
+        self.player.render(window.surface, self.camera)
 
     def _render_units(self, window: Window) -> None:
-        camera = self.camera
-
         for unit in self.units:
-            if camera.is_visible(unit):
-                unit.render(window.surface, camera.get_relative_position(unit))
+            if self.camera.is_visible(unit):
+                unit.render(window.surface, self.camera)
 
     def process(self, input_manager: InputManager, delta_time: float):
         self._process_player(input_manager, delta_time)
