@@ -100,6 +100,7 @@ class Engine:
 
     def _render_player(self, world) -> None:
         world.player.render(self.window.surface, world.camera.get_relative_position(world.player))
+        world.player.render_bullets(self.window.surface, world)
 
     def _render_units(self, world) -> None:
         camera = world.camera

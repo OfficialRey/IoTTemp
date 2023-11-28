@@ -28,8 +28,11 @@ class Sprite(Movable, pygame.sprite.Sprite):
     def get_center_position(self) -> Vector:
         return self.position + Vector(self.sprite_width // 2, self.sprite_height // 2)
 
-    def play_animation(self, animation_type: AnimationType):
-        self.current_animation = self.animation_atlas.get_animation(animation_type)
+    def play_animation(self, animation_type):
+        if isinstance(animation_type, AnimationType):
+            self.current_animation = self.animation_atlas.get_animation(animation_type)
+        elif isinstance(animation_type, int):
+            self.current_animation = self.animation_atlas.texture_animations[animation_type]
         self.current_animation.reset()
 
     def update(self, delta_time: float) -> None:
