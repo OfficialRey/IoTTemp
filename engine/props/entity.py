@@ -4,7 +4,6 @@ from engine.core.vector import Vector
 from engine.graphics.textures.atlas import AnimationAtlas
 from engine.graphics.textures.texture_animation import AnimationType
 from engine.graphics.textures.texture import Texture
-from engine.util.constants import VECTOR_UP
 
 
 class Movable:

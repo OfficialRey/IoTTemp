@@ -36,6 +36,7 @@ class Engine:
 
     def run(self, world: World) -> None:
         while not self.done:
+            self._create_package()
             self._check_events()
             self.process(world)
             self.render(world)
@@ -43,6 +44,10 @@ class Engine:
 
     def _update_delta_time(self) -> None:
         self.delta_time = self.clock.tick(self.max_fps) / MILLI_SECONDS
+
+    def _create_package(self):
+        # TODO: Create package
+        pass
 
     def _check_events(self) -> None:
         for event in pygame.event.get():
