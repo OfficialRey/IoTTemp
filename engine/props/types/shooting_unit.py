@@ -30,6 +30,7 @@ class ShootingUnit(Unit):
             if bullet.life_time <= 0:
                 self.bullets.remove(bullet)
 
+        # Allow Auto Fire
         if self.current_shot_timer >= self.shot_delay:
             return
         self.current_shot_timer += delta_time

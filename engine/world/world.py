@@ -1,9 +1,12 @@
 import pygame.sprite
 
+from engine.core.input_manager import InputManager
 from engine.core.vector import Vector
 from engine.core.window import Window
 from engine.graphics.textures.texture_manager import TextureManager
+from engine.props.enemy.storage.centipede.centipede import Centipede
 from engine.props.player.player import Player
+from engine.util.constants import WHITE
 from engine.world.camera import Camera
 from engine.world.level_data import LevelData
 
@@ -23,6 +26,8 @@ class World:
 
         self.units.add(self.enemies)
         self.units.add(self.player)
+
+        self.enemies.add(Centipede(texture_manager))
 
         # centipede = Centipede(texture_manager)
         #
@@ -61,3 +66,56 @@ class World:
         position_to_target = (position - current_position) / 10
         target_position = current_position + position_to_target * speed
         self.set_camera_position(target_position)
+
+    def render(self, window: Window):
+        window.fill(WHITE)
+        self._render_level(window)
+        self._render_player(window)
+        self._render_units(window)
+        pygame.display.flip()
+
+    def _render_level(self, window: Window) -> None:
+        zoom = self.get_camera_zoom()
+        camera_x = int(self.camera.position.x)
+        camera_y = int(self.camera.position.y)
+
+        sprite_width, sprite_height = self.level_data.texture_atlas.get_texture_size()
+
+        for x in range(int(-sprite_width), int(self.camera.resolution.x * zoom + sprite_width * 2), sprite_width):
+            for y in range(int(-sprite_height), int(self.camera.resolution.y * zoom + sprite_height * 2),
+                           sprite_height):
+                x_pos = (x + camera_x) // sprite_width
+                y_pos = (y + camera_y) // sprite_height
+                if 0 <= x_pos < self.level_data.width and 0 <= y_pos < self.level_data.height:
+                    window.surface.blit(self.level_data.get_texture(x_pos, y_pos).image,
+                                        (x - camera_x % sprite_width, y - camera_y % sprite_height))
+
+    def _render_player(self, window: Window) -> None:
+        self.player.render(window.surface, self.camera.get_relative_position(self.player))
+        self.player.render_bullets(window.surface, self)
+
+    def _render_units(self, window: Window) -> None:
+        camera = self.camera
+
+        for unit in self.units:
+            if camera.is_visible(unit):
+                unit.render(window.surface, camera.get_relative_position(unit))
+
+    def process(self, input_manager: InputManager, delta_time: float):
+        self._process_player(input_manager, delta_time)
+        self._process_units(delta_time)
+
+    def _process_player(self, input_manager: InputManager, delta_time: float):
+        self.player.handle_input(input_manager, self.camera)
+        self.player.update(delta_time)
+
+        # Update Camera
+        player_to_cursor = (self.player.cursor.position - self.camera.get_relative_position(
+            self.player)) / 4
+
+        position = (self.player.position + player_to_cursor) - self.camera.resolution / 2
+        self.set_camera_position_smooth(position)
+
+    def _process_units(self, delta_time: float):
+        for unit in self.units.sprites():
+            unit.update(delta_time)
