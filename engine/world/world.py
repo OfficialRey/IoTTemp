@@ -14,7 +14,7 @@ class World:
     def __init__(self, texture_manager: TextureManager, level_data: LevelData, window: Window, zoom: float):
         self.level_data = level_data
         self.camera = Camera(window, zoom)
-        self.player = Player(texture_manager)
+        self.player = Player(self, texture_manager)
         self.texture_atlas = self.level_data.texture_atlas
 
         self.units = pygame.sprite.Group()
@@ -32,7 +32,6 @@ class World:
 
         self.set_camera_zoom(zoom)
 
-    # Camera Manipulation
     def get_camera_zoom(self):
         return self.camera.get_zoom()
 
@@ -69,3 +68,9 @@ class World:
             self.player_bullets.add(bullet)
         else:
             self.enemy_bullets.add(bullet)
+
+    def remove_bullet(self, bullet: Bullet):
+        if bullet in self.player_bullets:
+            self.player_bullets.remove(bullet)
+        elif bullet in self.enemy_bullets:
+            self.enemy_bullets.remove(bullet)

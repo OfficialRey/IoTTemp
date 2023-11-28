@@ -1,10 +1,9 @@
-import time
 from enum import Enum
 
 import pygame
 
 from engine.core.vector import Vector
-from engine.util.constants import BLACK, WHITE
+from engine.util.constants import WHITE
 from engine.world.world import World
 from engine.core.input_manager import InputManager
 from engine.core.window import Window

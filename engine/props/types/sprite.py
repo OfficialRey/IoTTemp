@@ -2,27 +2,9 @@ import pygame
 
 from engine.core.vector import Vector
 from engine.graphics.textures.atlas import AnimationAtlas
-from engine.graphics.textures.texture_animation import AnimationType
 from engine.graphics.textures.texture import Texture
-
-
-class Movable:
-
-    def __init__(self, position: Vector = Vector(), velocity: Vector = Vector(), max_speed: float = 0,
-                 acceleration: float = 0):
-        super().__init__()
-        self.position = position
-        self.velocity = velocity
-        self.max_speed = max_speed
-        self.acceleration = acceleration
-
-    def accelerate(self, acceleration: Vector) -> None:
-        self.velocity += acceleration * self.acceleration
-        if self.velocity.magnitude() > self.max_speed:
-            self.velocity = self.velocity.normalize() * self.max_speed
-
-    def update(self, delta_time: float) -> None:
-        self.position += self.velocity * delta_time
+from engine.graphics.textures.texture_animation import AnimationType
+from engine.props.types.movable import Movable
 
 
 class Sprite(Movable, pygame.sprite.Sprite):
@@ -61,22 +43,3 @@ class Sprite(Movable, pygame.sprite.Sprite):
         x_scale = width / self.base_width
         y_scale = height / self.base_height
         self.set_scale(Vector(x_scale, y_scale))
-
-
-class Entity(Sprite):
-
-    def __init__(self, animation_atlas: AnimationAtlas, max_health: int, attack: int, defense: int, max_speed: float,
-                 acceleration: float, position: Vector = Vector(), velocity: Vector = Vector()):
-        super().__init__(animation_atlas, position, velocity, max_speed, acceleration)
-        self.max_health = max_health
-        self.health = self.max_health
-        self.attack = attack
-        self.defense = defense
-
-    def _act(self, delta_time: float) -> None:
-        raise NotImplementedError("Implement a behaviour for this props!")
-
-    def update(self, delta_time: float):
-        # Animation update
-        self._act(delta_time)
-        super().update(delta_time)

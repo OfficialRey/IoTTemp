@@ -37,3 +37,6 @@ class Window:
 
     def get_height(self):
         return self.surface.get_height()
+
+    def get_size(self) -> Vector:
+        return Vector(*self.surface.get_size())

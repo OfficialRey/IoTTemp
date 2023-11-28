@@ -1,4 +1,4 @@
-from engine.props.entity import Sprite, Entity
+from engine.props.types.entity import Sprite, Entity
 from engine.world.world import World
 
 

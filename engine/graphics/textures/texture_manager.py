@@ -3,6 +3,8 @@ from engine.graphics.textures.texture_animation import AnimationType
 
 # Define Animations in Sprite Sheet
 
+SINGLE_SPRITE = [AnimationType.GENERIC]
+
 PLAYER = [AnimationType.IDLE, AnimationType.WALKING_E, None, AnimationType.ATTACK, AnimationType.DAMAGED,
           AnimationType.DEATH]
 CURSOR = [AnimationType.GENERIC]
@@ -25,3 +27,10 @@ class TextureManager:
         # Player
         self.cursor = AnimationAtlas("player", "target.png", CURSOR, 24, 24, time=0.2, loop=True)
         self.player = AnimationAtlas("player", "player.png", PLAYER, 16, 16, time=0.2, loop=True)
+
+        # Calibration
+        self.calibrator = AnimationAtlas("calibration", "calibration.png", SINGLE_SPRITE, 16, 16)
+
+        # Widgets and Icons
+        self.arrow_up = AnimationAtlas("widgets", "arrow_up.png", SINGLE_SPRITE, 16, 16)
+        self.arrow_down = AnimationAtlas("widgets", "arrow_down.png", SINGLE_SPRITE, 16, 16)
