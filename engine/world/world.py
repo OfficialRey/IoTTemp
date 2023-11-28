@@ -68,3 +68,9 @@ class World:
             self.player_bullets.add(bullet)
         else:
             self.enemy_bullets.add(bullet)
+
+    def remove_bullet(self, bullet: Bullet):
+        if bullet in self.player_bullets:
+            self.player_bullets.remove(bullet)
+        elif bullet in self.enemy_bullets:
+            self.enemy_bullets.remove(bullet)
