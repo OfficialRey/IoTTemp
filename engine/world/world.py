@@ -3,7 +3,6 @@ import pygame.sprite
 from engine.core.vector import Vector
 from engine.core.window import Window
 from engine.graphics.textures.texture_manager import TextureManager
-from engine.props.bullet.bullet import Bullet
 from engine.props.player.player import Player
 from engine.world.camera import Camera
 from engine.world.level_data import LevelData
@@ -63,13 +62,13 @@ class World:
         target_position = current_position + position_to_target * speed
         self.set_camera_position(target_position)
 
-    def add_bullet(self, bullet: Bullet):
+    def add_bullet(self, bullet):
         if isinstance(bullet.owner, Player):
             self.player_bullets.add(bullet)
         else:
             self.enemy_bullets.add(bullet)
 
-    def remove_bullet(self, bullet: Bullet):
+    def remove_bullet(self, bullet):
         if bullet in self.player_bullets:
             self.player_bullets.remove(bullet)
         elif bullet in self.enemy_bullets:

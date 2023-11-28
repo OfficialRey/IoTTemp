@@ -4,21 +4,21 @@ from engine.core.input_manager import InputManager
 from engine.core.vector import Vector
 from engine.graphics.textures.texture_animation import AnimationType
 from engine.graphics.textures.texture_manager import TextureManager
-from engine.props.types.entity import Entity
 from engine.props.player.cursor import Cursor
+from engine.props.types.unit import Unit
 
 
-class Player(Entity):
+class Player(Unit):
 
     def __init__(self, world, texture_manager: TextureManager):
-        super().__init__(world, texture_manager.player, 100, 20, 20, 200, 0.1)
+        super().__init__(world, texture_manager.player, 100, 20, 20, max_speed=200, acceleration=0.1)
         self.input_manager = None
         self.cursor = Cursor(texture_manager)
         self.cursor.play_animation(AnimationType.GENERIC)
         self.shot_delay = 0.5
         self.current_shot_timer = 0
 
-    def _act(self, delta_time: float) -> None:
+    def act(self, delta_time: float) -> None:
         self.cursor.update(delta_time)
 
         if self.current_shot_timer > 0:
