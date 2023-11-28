@@ -1,7 +1,7 @@
 from engine.graphics.textures.atlas import LevelAtlas, AnimationAtlas
 from engine.graphics.textures.texture_animation import AnimationType
 
-# Define Animations in Sprite Sheet
+# Define Animations of Sprite Sheet
 
 SINGLE_SPRITE = [AnimationType.GENERIC]
 
@@ -34,3 +34,6 @@ class TextureManager:
         # Widgets and Icons
         self.arrow_up = AnimationAtlas("widgets", "arrow_up.png", SINGLE_SPRITE, 16, 16)
         self.arrow_down = AnimationAtlas("widgets", "arrow_down.png", SINGLE_SPRITE, 16, 16)
+
+        # Bullets
+        self.bullets = AnimationAtlas("bullets", "bullets.png", SINGLE_SPRITE, 16, 16)

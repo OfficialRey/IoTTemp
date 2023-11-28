@@ -13,7 +13,7 @@ class World:
     def __init__(self, texture_manager: TextureManager, level_data: LevelData, window: Window, zoom: float):
         self.level_data = level_data
         self.camera = Camera(window, zoom)
-        self.player = Player(self, texture_manager)
+        self.player = Player(texture_manager)
         self.texture_atlas = self.level_data.texture_atlas
 
         self.units = pygame.sprite.Group()
@@ -61,15 +61,3 @@ class World:
         position_to_target = (position - current_position) / 10
         target_position = current_position + position_to_target * speed
         self.set_camera_position(target_position)
-
-    def add_bullet(self, bullet):
-        if isinstance(bullet.owner, Player):
-            self.player_bullets.add(bullet)
-        else:
-            self.enemy_bullets.add(bullet)
-
-    def remove_bullet(self, bullet):
-        if bullet in self.player_bullets:
-            self.player_bullets.remove(bullet)
-        elif bullet in self.enemy_bullets:
-            self.enemy_bullets.remove(bullet)

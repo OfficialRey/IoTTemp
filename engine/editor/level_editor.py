@@ -16,8 +16,6 @@ from engine.world.level_data import LevelData
 from tkinter import Tk
 from tkinter.filedialog import askopenfilename
 
-from engine.world.world import World
-
 DRAW_PERCENTAGE = 0.8
 BOX_OFFSET = 5
 GRAPHICS_PER_ROW = 20
@@ -74,7 +72,6 @@ class LevelEditor:
         width = 200
         height = 200
         self.level_data = LevelData(self.texture_atlas, world_name, width, height)
-        self.world = World(self.texture_manager, self.level_data, self.window, 5)
         self.n_textures_x = self.window.get_width() // self.texture_atlas.sprite_width
         self.n_textures_y = self.window.get_height() // self.texture_atlas.sprite_height
 
