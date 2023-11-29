@@ -24,8 +24,8 @@ class TextureManager:
 
     def __init__(self):
         self.level_textures = LevelAtlas("level", "level_textures.png", 16, 16)
-        self.centipede = AnimationAtlas("enemies", "centipede.png", CENTIPEDE, 16, 16, time=0.2, loop=True)
-        self.centipede_body = AnimationAtlas("enemies", "centipede.png", CENTIPEDE_BODY, 16, 16, time=0.2, loop=True)
+        self.centipede = AnimationAtlas("enemies", "centipede.png", CENTIPEDE, 16, 16, time=0.1, loop=True)
+        self.centipede_body = AnimationAtlas("enemies", "centipede.png", CENTIPEDE_BODY, 16, 16, time=0.1, loop=True)
 
         # Player
         self.cursor = AnimationAtlas("player", "target.png", CURSOR, 24, 24, time=0.2, loop=True)

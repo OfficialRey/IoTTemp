@@ -74,6 +74,10 @@ class TextureAnimation:
             texture.set_scale(scale)
         return scale
 
+    def offset_animation(self, value: float):
+        self.count = int(value / self.target_time)
+        self.timer = value % self.target_time
+
     def reset(self):
         self.timer = 0
         self.count = 0
