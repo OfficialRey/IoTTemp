@@ -5,7 +5,6 @@ from engine.graphics.textures.texture_manager import TextureManager
 from engine.props.enemy.data import UnitData
 from engine.props.enemy.enemy import Enemy
 from engine.props.enemy.storage.centipede.centipede_body import CentipedeBody
-from engine.props.player.player import Player
 
 
 class Centipede(Enemy):
@@ -26,6 +25,7 @@ class Centipede(Enemy):
         for i in range(length):
             previous_segment = CentipedeBody(self.body_texture, previous_segment,
                                              previous_segment.get_center_position() - Vector.random().normalize() * self.sprite_width)
+            previous_segment.offset_animation()
             self.body.append(previous_segment)
 
     def run_behaviour(self, world, delta_time: float):

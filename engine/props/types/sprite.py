@@ -1,4 +1,5 @@
 import math
+import random
 
 import pygame
 
@@ -35,6 +36,9 @@ class Sprite(Movable, pygame.sprite.Sprite):
 
     def get_center_position(self) -> Vector:
         return self.position + Vector(self.sprite_width // 2, self.sprite_height // 2)
+
+    def offset_animation(self):
+        self.current_animation.offset_animation(self.current_animation.target_time * random.random())
 
     def play_animation(self, animation_type):
         if self.current_animation.animation_type == animation_type:
