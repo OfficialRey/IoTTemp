@@ -5,6 +5,7 @@ from engine.core.vector import Vector
 from engine.graphics.textures.texture_animation import AnimationType
 from engine.graphics.textures.texture_manager import TextureManager
 from engine.props.bullet.bullet import BulletType
+from engine.props.enemy.data import UnitData
 from engine.props.player.cursor import Cursor
 from engine.props.types.shooting_unit import ShootingUnit
 from engine.world.camera import Camera
@@ -12,9 +13,9 @@ from engine.world.camera import Camera
 
 class Player(ShootingUnit):
 
-    def __init__(self, texture_manager: TextureManager):
-        super().__init__(texture_manager.player, texture_manager.bullets, 100, 20, 20, max_speed=200, acceleration=0.1,
-                         shot_delay=0.5)
+    def __init__(self, texture_manager: TextureManager, data: UnitData):
+        super().__init__(texture_manager.player, texture_manager.bullets, data.get_health(), data.get_attack(),
+                         data.get_defense(), data.get_shot_delay(), data.get_max_speed(), data.get_acceleration())
         self.input_manager = None
         self.cursor = Cursor(texture_manager)
         self.cursor.play_animation(AnimationType.GENERIC)

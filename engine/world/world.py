@@ -4,7 +4,8 @@ from engine.core.input_manager import InputManager
 from engine.core.vector import Vector
 from engine.core.window import Window
 from engine.graphics.textures.texture_manager import TextureManager
-from engine.props.enemy.storage.centipede.centipede import Centipede
+from engine.props.enemy.data import UnitData
+from engine.props.enemy.storage.centipede.centipede_head import Centipede
 from engine.props.player.player import Player
 from engine.util.constants import WHITE
 from engine.world.camera import Camera
@@ -14,27 +15,24 @@ from engine.world.level_data import LevelData
 class World:
 
     def __init__(self, texture_manager: TextureManager, level_data: LevelData, window: Window, zoom: float):
-        self.level_data = level_data
+
+        self.texture_manager = texture_manager
         self.camera = Camera(window, zoom)
-        self.player = Player(texture_manager)
+        self.set_camera_zoom(zoom)
+
+        self.level_data = level_data
+        self.player = Player(texture_manager, UnitData.PLAYER)
         self.texture_atlas = self.level_data.texture_atlas
 
         self.units = pygame.sprite.Group()
-        self.enemies = pygame.sprite.Group()
-        self.player_bullets = pygame.sprite.Group()
-        self.enemy_bullets = pygame.sprite.Group()
-
-        self.units.add(self.enemies)
         self.units.add(self.player)
 
-        self.enemies.add(Centipede(texture_manager))
+        self.units.add(Centipede(texture_manager))
 
         # centipede = Centipede(texture_manager)
         #
         # self.enemies.add(centipede)
         # self.units.add(centipede)
-
-        self.set_camera_zoom(zoom)
 
     def get_camera_zoom(self):
         return self.camera.get_zoom()
@@ -42,13 +40,9 @@ class World:
     def set_camera_zoom(self, zoom: float):
         self.camera.set_zoom(zoom)
 
-        target_width = int(self.texture_atlas.base_width * zoom)
-        target_height = int(self.texture_atlas.base_height * zoom)
-
-        self.texture_atlas.set_size(target_width, target_height)
-
-        for unit in self.units.sprites():
-            unit.set_size(target_width, target_height)
+        # Update every single animation atlas to adjust to zoom
+        for texture_atlas in self.texture_manager.game_textures:
+            texture_atlas.set_scale(zoom)
 
     def set_camera_position(self, position: Vector):
         if position.x + self.camera.resolution.x > self.level_data.width * self.texture_atlas.sprite_width:
@@ -70,7 +64,6 @@ class World:
     def render(self, window: Window):
         window.fill(WHITE)
         self._render_level(window)
-        self._render_player(window)
         self._render_units(window)
         pygame.display.flip()
 
@@ -89,9 +82,6 @@ class World:
                 if 0 <= x_pos < self.level_data.width and 0 <= y_pos < self.level_data.height:
                     window.surface.blit(self.level_data.get_texture(x_pos, y_pos).image,
                                         (x - camera_x % sprite_width, y - camera_y % sprite_height))
-
-    def _render_player(self, window: Window) -> None:
-        self.player.render(window.surface, self.camera)
 
     def _render_units(self, window: Window) -> None:
         for unit in self.units:

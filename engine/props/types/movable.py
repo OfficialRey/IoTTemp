@@ -3,8 +3,8 @@ from engine.core.vector import Vector
 
 class Movable:
 
-    def __init__(self, position: Vector = Vector(), velocity: Vector = Vector(), max_speed: float = 0,
-                 acceleration: float = 0):
+    def __init__(self, max_speed: float = 0, acceleration: float = 0, position: Vector = Vector(),
+                 velocity: Vector = Vector()):
         super().__init__()
         self.position = position
         self.velocity = velocity

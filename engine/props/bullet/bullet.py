@@ -14,7 +14,7 @@ class Bullet(Entity):
 
     def __init__(self, animation_atlas: AnimationAtlas, owner, bullet_type: BulletType,
                  position: Vector, velocity: Vector, max_speed: float = 0):
-        super().__init__(animation_atlas, position, velocity, max_speed)
+        super().__init__(animation_atlas, max_speed, 0, position, velocity)
         self.owner = owner
         self.max_speed = bullet_type.value[0]
         self.velocity = self.velocity.normalize() * self.max_speed

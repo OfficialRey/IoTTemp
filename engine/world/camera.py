@@ -11,11 +11,10 @@ class Camera(Movable):
         self.position = Vector()
         self._zoom = zoom
         self.window = window
-        self.resolution = Vector(window.resolution.x // zoom, window.resolution.y // zoom)
+        self.resolution = self.window.resolution
 
     def set_zoom(self, zoom: float):
         self._zoom = zoom
-        self.resolution = self.window.resolution
 
     def get_zoom(self):
         return self._zoom

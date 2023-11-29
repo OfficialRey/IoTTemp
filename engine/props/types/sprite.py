@@ -9,9 +9,9 @@ from engine.props.types.movable import Movable
 
 class Sprite(Movable, pygame.sprite.Sprite):
 
-    def __init__(self, animation_atlas: AnimationAtlas, position: Vector = Vector(), velocity: Vector = Vector(),
-                 max_speed: float = 0, acceleration: float = 0):
-        super().__init__(position, velocity, max_speed, acceleration)
+    def __init__(self, animation_atlas: AnimationAtlas, max_speed: float = 0, acceleration: float = 0,
+                 position: Vector = Vector(), velocity: Vector = Vector()):
+        super().__init__(max_speed, acceleration, position, velocity)
         self.animation_atlas = animation_atlas.copy()
         self.current_animation = self.animation_atlas.texture_animations[0]
         self.sprite_width, self.sprite_height = self.current_animation.get_texture().image.get_size()

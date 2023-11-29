@@ -14,6 +14,7 @@ class LevelAtlas:
     def __init__(self, path: str, file_name: str, sprite_width: int, sprite_height: int):
         self.image = pygame.image.load(os.path.join(get_resource_path(), os.path.join(path, file_name))).convert_alpha()
         self.path = path
+        self.file_name = file_name
 
         self.base_width = sprite_width
         self.base_height = sprite_height

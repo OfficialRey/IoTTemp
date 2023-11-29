@@ -15,7 +15,11 @@ class Texture:
     def reset(self):
         self.image = self.base_image.copy()
 
-    def set_scale(self, scale: Vector) -> pygame.Surface:
+    def set_scale(self, scale: Union[Vector, float, int]) -> pygame.Surface:
+        if scale == Vector(1, 1):
+            return self.image
+        if isinstance(scale, (float, int)):
+            scale = Vector(scale, scale)
         self.image = pygame.transform.scale(
             self.base_image,
             (self.base_image.get_width() * scale.x, self.base_image.get_height() * scale.y)

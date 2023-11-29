@@ -6,9 +6,9 @@ from engine.props.types.entity import Entity
 class Damageable(Entity):
 
     def __init__(self, animation_atlas: AnimationAtlas, max_health: int, attack: int, defense: int,
-                 position: Vector = Vector(), velocity: Vector = Vector(), max_speed: float = 0,
-                 acceleration: float = 0):
-        super().__init__(animation_atlas, position, velocity, max_speed, acceleration)
+                 max_speed: float = 0, acceleration: float = 0, position: Vector = Vector(),
+                 velocity: Vector = Vector()):
+        super().__init__(animation_atlas, max_speed, acceleration, position, velocity)
         self.max_health = max_health
         self.health = self.max_health
         self.attack = attack

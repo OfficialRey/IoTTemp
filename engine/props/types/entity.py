@@ -5,9 +5,10 @@ from engine.props.types.sprite import Sprite
 
 class Entity(Sprite):
 
-    def __init__(self, animation_atlas: AnimationAtlas, position: Vector = Vector(),
-                 velocity: Vector = Vector(), max_speed: float = 0, acceleration: float = 0):
-        super().__init__(animation_atlas, position, velocity, max_speed, acceleration)
+    def __init__(self, animation_atlas: AnimationAtlas, max_speed: float = 0, acceleration: float = 0,
+                 position: Vector = Vector(),
+                 velocity: Vector = Vector()):
+        super().__init__(animation_atlas, max_speed, acceleration, position, velocity)
 
     def update(self, delta_time: float):
         super().update(delta_time)

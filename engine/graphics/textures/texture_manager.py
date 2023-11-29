@@ -40,3 +40,21 @@ class TextureManager:
 
         # Bullets
         self.bullets = AnimationAtlas("bullets", "bullets.png", BULLETS, 16, 16)
+
+        self.game_textures = [
+            # Level
+            self.level_textures,
+
+            # Enemy
+            self.centipede,
+            self.centipede_body,
+
+            # Player
+            self.player, self.cursor,
+
+            # Calibration
+            self.calibrator,
+
+            # Bullets
+            self.bullets
+        ]

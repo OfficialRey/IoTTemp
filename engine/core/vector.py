@@ -1,4 +1,5 @@
 import math
+import random
 from typing import Tuple
 
 NUMBER_TYPE = (int, float, complex)
@@ -63,3 +64,7 @@ class Vector:
 
     def __str__(self):
         return "Vector{" f"{self.x}, {self.y}" "}"
+
+    @classmethod
+    def random(cls):
+        return Vector(random.random(), random.random())

@@ -12,8 +12,7 @@ class ShootingUnit(Unit):
     def __init__(self, animation_atlas: AnimationAtlas, bullet_atlas: AnimationAtlas, max_health: int, attack: int,
                  defense: int, shot_delay: float, max_speed: float, acceleration: float, position: Vector = Vector(),
                  velocity: Vector = Vector()):
-        super().__init__(animation_atlas, max_health, attack, defense, position, velocity, max_speed,
-                         acceleration)
+        super().__init__(animation_atlas, max_health, attack, defense, max_speed, acceleration, position, velocity)
         self.bullet_atlas = bullet_atlas
         self.shot_delay = shot_delay
         self.current_shot_timer = 0
@@ -43,4 +42,3 @@ class ShootingUnit(Unit):
 
     def set_size(self, width: int, height: int):
         super().set_size(width, height)
-        self.bullet_atlas.set_size(width, height)
