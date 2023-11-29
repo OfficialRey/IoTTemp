@@ -72,3 +72,18 @@ class Vector:
     @classmethod
     def up(cls):
         return Vector(0, -1)
+
+
+if __name__ == '__main__':
+    # Angle Test
+
+    for x, y in zip([i / 10 for i in range(11)], [i / 10 for i in range(10, -1, -1)]):
+        angle = Vector.up().angle(Vector(x, y))
+        print(x, y)
+        print(angle)
+    print()
+
+    for x, y in zip([-i / 10 for i in range(10, -1, -1)], [-i / 10 for i in range(11)]):
+        angle = Vector.up().angle(Vector(x, y))
+        print(x, y)
+        print(angle)

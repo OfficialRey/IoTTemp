@@ -88,12 +88,12 @@ class AnimationAtlas:
                                      self.sprite_width, animation_type, self.time, self.loop))
 
         # Mirror walking animation
-        if AnimationType.WALKING_W not in self.animation_types and AnimationType.WALKING_E in self.animation_types:
-            # Probably only east here. Expand to allow mirroring
-            animation = animations[self.animation_types.index(AnimationType.WALKING_E)]
-            animation = animation.copy()
-            animation.mirror()
-            animations.append(animation)
+        # if AnimationType.WALKING_W not in self.animation_types and AnimationType.WALKING_E in self.animation_types:
+        # Probably only east here. Expand to allow mirroring
+        #            animation = animations[self.animation_types.index(AnimationType.WALKING_E)]
+        #            animation = animation.copy()
+        #            animation.mirror()
+        #            animations.append(animation)
 
         return animations
 

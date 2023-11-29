@@ -20,7 +20,6 @@ class Bullet(Entity):
         self.velocity = self.velocity.normalize() * self.max_speed
         self.bullet_type = bullet_type
         self.life_time = 5
-        self._rotate_texture()
         self.play_animation(bullet_type.value[1])
 
     def update(self, world, delta_time: float) -> None:

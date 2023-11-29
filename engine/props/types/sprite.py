@@ -1,3 +1,5 @@
+import math
+
 import pygame
 
 from engine.core.vector import Vector
@@ -9,6 +11,8 @@ from engine.props.types.movable import Movable
 GENERIC_ANIMATIONS = [AnimationType.WALKING_N, AnimationType.WALKING_NE, AnimationType.WALKING_E,
                       AnimationType.WALKING_SE, AnimationType.WALKING_S, AnimationType.WALKING_SW,
                       AnimationType.WALKING_W, AnimationType.WALKING_NW]
+
+ANGLE_OFFSET = 360 / len(GENERIC_ANIMATIONS) * 0.5
 
 
 class Sprite(Movable, pygame.sprite.Sprite):
@@ -54,8 +58,7 @@ class Sprite(Movable, pygame.sprite.Sprite):
         self.set_scale(Vector(x_scale, y_scale))
 
     def animate_generic(self):
-        angle = self.velocity.normalize().angle(Vector.up())
-
-        # Find animation to play
-        index = int(angle / 45)
+        vector = Vector(self.velocity.x, -self.velocity.y)
+        angle = math.degrees(math.atan2(*vector.as_tuple()))
+        index = min(int((angle + ANGLE_OFFSET) / 45), len(GENERIC_ANIMATIONS) - 1)
         self.play_animation(GENERIC_ANIMATIONS[index])
