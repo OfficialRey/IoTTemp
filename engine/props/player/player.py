@@ -7,6 +7,7 @@ from engine.graphics.textures.texture_manager import TextureManager
 from engine.props.bullet.bullet import BulletType
 from engine.props.player.cursor import Cursor
 from engine.props.types.shooting_unit import ShootingUnit
+from engine.world.camera import Camera
 
 
 class Player(ShootingUnit):
@@ -32,6 +33,6 @@ class Player(ShootingUnit):
         if input_manager.left_click:
             self.shoot_bullet(BulletType.GENERIC, (self.cursor.position + camera.position) - self.position)
 
-    def render(self, surface: pygame.Surface, screen_position: Vector) -> None:
-        self.cursor.render(surface, self.cursor.position)
-        super().render(surface, screen_position)
+    def render(self, surface: pygame.Surface, camera: Camera) -> None:
+        self.cursor.render(surface, camera)
+        super().render(surface, camera)

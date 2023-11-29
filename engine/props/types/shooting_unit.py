@@ -4,6 +4,7 @@ from engine.core.vector import Vector
 from engine.graphics.textures.atlas import AnimationAtlas
 from engine.props.bullet.bullet import Bullet, BulletType
 from engine.props.types.unit import Unit
+from engine.world.camera import Camera
 
 
 class ShootingUnit(Unit):
@@ -30,16 +31,15 @@ class ShootingUnit(Unit):
             if bullet.life_time <= 0:
                 self.bullets.remove(bullet)
 
+        # Allow Auto Fire
         if self.current_shot_timer >= self.shot_delay:
             return
         self.current_shot_timer += delta_time
 
-    def render(self, surface: pygame.Surface, screen_position: Vector) -> None:
-        super().render(surface, screen_position)
-
-    def render_bullets(self, surface: pygame.Surface, world):
+    def render(self, surface: pygame.Surface, camera: Camera) -> None:
         for bullet in self.bullets:
-            bullet.render(surface, world.camera.get_relative_position(bullet))
+            bullet.render(surface, camera)
+        super().render(surface, camera)
 
     def set_size(self, width: int, height: int):
         super().set_size(width, height)

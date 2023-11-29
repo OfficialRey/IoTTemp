@@ -20,8 +20,8 @@ class Sprite(Movable, pygame.sprite.Sprite):
     def get_texture(self) -> Texture:
         return self.current_animation.get_texture()
 
-    def render(self, surface: pygame.Surface, screen_position: Vector) -> None:
-        render_position = screen_position - Vector(*self.get_texture().image.get_size()) / 2
+    def render(self, surface: pygame.Surface, camera) -> None:
+        render_position = camera.get_relative_position(self) - Vector(*self.get_texture().image.get_size()) / 2
         surface.blit(self.current_animation.get_texture().image,
                      render_position.as_tuple())
 
