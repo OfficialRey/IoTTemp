@@ -23,8 +23,6 @@ def receive_data():
         print("Invalid data received")
 
 def send_data(laser = False, rumble = False):
-    # laser = True
-    # rumble = False
     sound_number = 3
 
     data = struct.pack('<??i', laser, rumble, sound_number)
