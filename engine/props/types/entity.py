@@ -9,6 +9,3 @@ class Entity(Sprite):
                  position: Vector = Vector(),
                  velocity: Vector = Vector()):
         super().__init__(animation_atlas, max_speed, acceleration, position, velocity)
-
-    def update(self, delta_time: float):
-        super().update(delta_time)

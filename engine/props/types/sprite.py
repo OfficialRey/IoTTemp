@@ -6,6 +6,10 @@ from engine.graphics.textures.texture import Texture
 from engine.graphics.textures.texture_animation import AnimationType
 from engine.props.types.movable import Movable
 
+GENERIC_ANIMATIONS = [AnimationType.WALKING_N, AnimationType.WALKING_NE, AnimationType.WALKING_E,
+                      AnimationType.WALKING_SE, AnimationType.WALKING_S, AnimationType.WALKING_SW,
+                      AnimationType.WALKING_W, AnimationType.WALKING_NW]
+
 
 class Sprite(Movable, pygame.sprite.Sprite):
 
@@ -29,15 +33,17 @@ class Sprite(Movable, pygame.sprite.Sprite):
         return self.position + Vector(self.sprite_width // 2, self.sprite_height // 2)
 
     def play_animation(self, animation_type):
+        if self.current_animation.animation_type == animation_type:
+            return
         if isinstance(animation_type, AnimationType):
             self.current_animation = self.animation_atlas.get_animation(animation_type)
         elif isinstance(animation_type, int):
             self.current_animation = self.animation_atlas.texture_animations[animation_type]
         self.current_animation.reset()
 
-    def update(self, delta_time: float) -> None:
+    def update(self, world, delta_time: float) -> None:
         self.current_animation.update(delta_time)
-        super().update(delta_time)
+        super().update(world, delta_time)
 
     def set_scale(self, scale: Vector):
         self.animation_atlas.set_scale(scale)
@@ -46,3 +52,10 @@ class Sprite(Movable, pygame.sprite.Sprite):
         x_scale = width / self.base_width
         y_scale = height / self.base_height
         self.set_scale(Vector(x_scale, y_scale))
+
+    def animate_generic(self):
+        angle = self.velocity.normalize().angle(Vector.up())
+
+        # Find animation to play
+        index = int(angle / 45)
+        self.play_animation(GENERIC_ANIMATIONS[index])

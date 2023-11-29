@@ -4,22 +4,27 @@ from engine.core.vector import Vector
 from engine.graphics.textures.atlas import AnimationAtlas
 from engine.props.enemy.data import UnitData
 from engine.props.enemy.enemy import Enemy
+from engine.props.player.player import Player
 
 
 class CentipedeBody(Enemy):
 
     def __init__(self, animation_atlas: AnimationAtlas, previous_segment: Enemy, position: Vector):
-        super().__init__(animation_atlas, UnitData.CENTIPEDE_BODY)
+        super().__init__(animation_atlas, UnitData.CENTIPEDE_BODY, position)
         self.position = position
         self.previous_segment = previous_segment
 
-    def run_behaviour(self, delta_time: float):
+    def run_behaviour(self, delta_time: float, target: Player):
         # Accelerate towards previous segment
         me_to_segment = self.previous_segment.position - self.position
         acceleration = me_to_segment.normalize()
-        if me_to_segment.magnitude() < self.sprite_width:
-            acceleration *= 0.5
         self.accelerate(acceleration)
+        if me_to_segment.magnitude() < self.sprite_width * 0.8:
+            self.velocity *= 0.95
+        elif me_to_segment.magnitude() > self.sprite_width / 2:
+            self.velocity *= 1.15
+
+        self.animate_generic()
 
     def on_hit(self):
         pass

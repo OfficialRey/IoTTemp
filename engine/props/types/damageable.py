@@ -14,9 +14,6 @@ class Damageable(Entity):
         self.attack = attack
         self.defense = defense
 
-    def _act(self, delta_time: float) -> None:
-        pass
-
     def damage(self, value: float):
         self.damage_true(value * self.get_damage_multiplier())
 

@@ -5,12 +5,13 @@ from engine.graphics.textures.texture_manager import TextureManager
 from engine.props.enemy.data import UnitData
 from engine.props.enemy.enemy import Enemy
 from engine.props.enemy.storage.centipede.centipede_body import CentipedeBody
+from engine.props.player.player import Player
 
 
 class Centipede(Enemy):
 
-    def __init__(self, texture_manager: TextureManager):
-        super().__init__(texture_manager.centipede, UnitData.CENTIPEDE)
+    def __init__(self, texture_manager: TextureManager, position: Vector):
+        super().__init__(texture_manager.centipede, UnitData.CENTIPEDE, position)
         self.position = Vector(100, 100)
         self.body_texture = texture_manager.centipede_body
         self.body = []
@@ -24,14 +25,18 @@ class Centipede(Enemy):
         previous_segment = self
         for i in range(length):
             previous_segment = CentipedeBody(self.body_texture, previous_segment,
-                                             previous_segment.position - Vector.random().normalize() * self.sprite_width)
+                                             previous_segment.get_center_position() - Vector.random().normalize() * self.sprite_width)
             self.body.append(previous_segment)
 
-    def run_behaviour(self, delta_time: float):
-        self.accelerate(Vector(1, 0))
+    def run_behaviour(self, world, delta_time: float):
+        target = world.player
+
+        self.accelerate((target.get_center_position() - self.get_center_position()).normalize())
 
         for body in self.body:
-            body.act(delta_time)
+            body.update(world, delta_time)
+
+        self.animate_generic()
 
     def render(self, surface: pygame.Surface, camera) -> None:
         super().render(surface, camera)

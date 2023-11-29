@@ -21,13 +21,13 @@ class World:
         self.set_camera_zoom(zoom)
 
         self.level_data = level_data
-        self.player = Player(texture_manager, UnitData.PLAYER)
+        self.player: Player = Player(texture_manager, UnitData.PLAYER)
         self.texture_atlas = self.level_data.texture_atlas
 
         self.units = pygame.sprite.Group()
         self.units.add(self.player)
 
-        self.units.add(Centipede(texture_manager))
+        self.units.add(Centipede(texture_manager, Vector(0, 0)))
 
         # centipede = Centipede(texture_manager)
         #
@@ -94,7 +94,7 @@ class World:
 
     def _process_player(self, input_manager: InputManager, delta_time: float):
         self.player.handle_input(input_manager, self.camera)
-        self.player.update(delta_time)
+        self.player.update(self, delta_time)
 
         # Update Camera
         player_to_cursor = (self.player.cursor.position - self.camera.get_relative_position(
@@ -105,4 +105,4 @@ class World:
 
     def _process_units(self, delta_time: float):
         for unit in self.units.sprites():
-            unit.update(delta_time)
+            unit.update(self, delta_time)

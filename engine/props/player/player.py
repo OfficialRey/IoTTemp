@@ -20,19 +20,19 @@ class Player(ShootingUnit):
         self.cursor = Cursor(texture_manager)
         self.cursor.play_animation(AnimationType.GENERIC)
 
-    def act(self, delta_time: float) -> None:
-        super().act(delta_time)
-        self.cursor.update(delta_time)
+    def act(self, world, delta_time: float) -> None:
+        super().act(world, delta_time)
+        self.cursor.update(world, delta_time)
 
     # Format: [w, a, s, d, space, mouse_x, mouse_y, left_click, right_click]
 
     def handle_input(self, input_manager: InputManager, camera):
         position = Vector(input_manager.mouse_x, input_manager.mouse_y)
         self.cursor.set_position(position)
-        self.accelerate((self.cursor.position - camera.get_relative_position(self)))
+        self.accelerate((self.cursor.get_center_position() - camera.get_relative_position(self)))
 
         if input_manager.left_click:
-            self.shoot_bullet(BulletType.GENERIC, (self.cursor.position + camera.position) - self.position)
+            self.shoot_bullet(BulletType.GENERIC, (self.cursor.get_center_position() + camera.position) - self.position)
 
     def render(self, surface: pygame.Surface, camera: Camera) -> None:
         self.cursor.render(surface, camera)

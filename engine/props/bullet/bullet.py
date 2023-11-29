@@ -23,12 +23,8 @@ class Bullet(Entity):
         self._rotate_texture()
         self.play_animation(bullet_type.value[1])
 
-    def _rotate_texture(self):
-        # angle = self.velocity.normalize().angle(VECTOR_UP)
-        pass
-
-    def update(self, delta_time: float) -> None:
-        super().update(delta_time)
+    def update(self, world, delta_time: float) -> None:
+        super().update(world, delta_time)
 
         self.life_time -= delta_time
         if self.life_time > 0:

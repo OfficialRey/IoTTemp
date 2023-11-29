@@ -10,9 +10,9 @@ class Unit(Damageable):
                  velocity: Vector = Vector()):
         super().__init__(animation_atlas, max_health, attack, defense, max_speed, acceleration, position, velocity)
 
-    def update(self, delta_time: float):
-        self.act(delta_time)
-        super().update(delta_time)
+    def update(self, world, delta_time: float):
+        self.act(world, delta_time)
+        super().update(world, delta_time)
 
-    def act(self, delta_time: float):
+    def act(self, world, delta_time: float):
         raise NotImplementedError("Implement a behaviour for this prop!")

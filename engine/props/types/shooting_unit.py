@@ -24,9 +24,9 @@ class ShootingUnit(Unit):
             self.bullets.append(bullet)
             self.current_shot_timer = 0
 
-    def act(self, delta_time: float):
+    def act(self, world, delta_time: float):
         for bullet in self.bullets:
-            bullet.update(delta_time)
+            bullet.update(world, delta_time)
             if bullet.life_time <= 0:
                 self.bullets.remove(bullet)
 

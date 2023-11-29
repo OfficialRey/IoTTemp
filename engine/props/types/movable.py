@@ -16,5 +16,5 @@ class Movable:
         if self.velocity.magnitude() > self.max_speed:
             self.velocity = self.velocity.normalize() * self.max_speed
 
-    def update(self, delta_time: float) -> None:
+    def update(self, world, delta_time: float) -> None:
         self.position += self.velocity * delta_time
