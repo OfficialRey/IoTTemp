@@ -20,11 +20,13 @@ class ShootingUnit(Unit):
         self.current_shot_timer = 0
         self.bullets = []
 
-    def shoot_bullet(self, bullet_type: BulletType, direction: Vector):
+    def shoot_bullet(self, bullet_type: BulletType, direction: Vector) -> bool:
         if self.current_shot_timer >= self.shot_delay:
             bullet = Bullet(self.bullet_atlas, self, bullet_type, self.position, direction)
             self.bullets.append(bullet)
             self.current_shot_timer = 0
+            return True
+        return False
 
     def act(self, world, delta_time: float):
         for bullet in self.bullets:

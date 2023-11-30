@@ -25,8 +25,6 @@ class Unit(Damageable):
     def collides_with(self, other) -> bool:
         distance = self.get_center_position().distance(other.get_center_position())
         collision_radius = max(self.get_collision_radius(), other.get_collision_radius())
-        print(distance)
-        print(collision_radius)
         return distance <= collision_radius
 
     def register_bullet_hits(self, bullets: List[Bullet]):

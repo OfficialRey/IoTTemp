@@ -31,10 +31,10 @@ class World:
 
         self.units.add(Centipede(texture_manager, Vector(0, 0)))
 
-        # centipede = Centipede(texture_manager)
-        #
-        # self.enemies.add(centipede)
-        # self.units.add(centipede)
+        # Server Package Values
+        self.player_shot = False
+        self.player_damaged = False
+        self.enemy_killed = False
 
     def get_camera_zoom(self):
         return self.camera.get_zoom()
@@ -63,6 +63,51 @@ class World:
         target_position = current_position + position_to_target * speed
         self.set_camera_position(target_position)
 
+    def process(self, input_manager: InputManager, delta_time: float):
+        self._reset_package_values()
+        self._process_player(input_manager)
+        self._process_units(delta_time)
+        self._process_bullets()
+
+    def _reset_package_values(self):
+        self.player_shot = False
+        self.player_damaged = False
+        self.enemy_killed = False
+
+    def _process_player(self, input_manager: InputManager):
+        self.player.handle_input(input_manager, self.camera)
+
+        # Player just shot
+        if self.player.current_shot_timer == 0:
+            self.player_shot = True
+
+        # Update Camera
+        player_to_cursor = (self.player.cursor.position - self.camera.get_relative_position(
+            self.player)) / 4
+
+        position = (self.player.position + player_to_cursor) - self.camera.resolution / 2
+        self.set_camera_position_smooth(position)
+
+    def _process_units(self, delta_time: float):
+        for unit in self.units.sprites():
+            unit.update(self, delta_time)
+
+    def _process_bullets(self):
+        for unit in self.units.sprites():
+            if isinstance(unit, ShootingUnit):
+                bullets = unit.get_bullets()
+
+                if len(bullets) == 0:
+                    continue
+
+                for target in self.units.sprites():
+
+                    # Return if trying to attack own team
+                    if isinstance(unit, Player) and isinstance(target, Player) or \
+                            isinstance(unit, Enemy) and isinstance(target, Enemy):
+                        continue
+                    target.register_bullet_hits(bullets)
+
     def render(self, window: Window):
         window.fill(WHITE)
         self._render_level(window)
@@ -89,39 +134,3 @@ class World:
         for unit in self.units:
             if self.camera.is_visible(unit):
                 unit.render(window.surface, self.camera)
-
-    def process(self, input_manager: InputManager, delta_time: float):
-        self._process_player(input_manager)
-        self._process_units(delta_time)
-        self._process_bullets()
-
-    def _process_player(self, input_manager: InputManager):
-        self.player.handle_input(input_manager, self.camera)
-
-        # Update Camera
-        player_to_cursor = (self.player.cursor.position - self.camera.get_relative_position(
-            self.player)) / 4
-
-        position = (self.player.position + player_to_cursor) - self.camera.resolution / 2
-        self.set_camera_position_smooth(position)
-
-    def _process_units(self, delta_time: float):
-        for unit in self.units.sprites():
-            unit.update(self, delta_time)
-
-    def _process_bullets(self):
-        for unit in self.units.sprites():
-            if isinstance(unit, ShootingUnit):
-                bullets = unit.get_bullets()
-                print(bullets)
-
-                if len(bullets) == 0:
-                    continue
-
-                for target in self.units.sprites():
-
-                    # Return if trying to attack own team
-                    if isinstance(unit, Player) and isinstance(target, Player) or \
-                            isinstance(unit, Enemy) and isinstance(target, Enemy):
-                        continue
-                    target.register_bullet_hits(bullets)

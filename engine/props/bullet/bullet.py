@@ -7,7 +7,7 @@ from engine.props.types.entity import Entity
 
 class BulletType(Enum):
     # Speed, Animation, Size
-    GENERIC = (1000, 12, 1, 2)
+    GENERIC = (200, 12, 1, 2)
 
     def get_speed(self):
         return self.value[0]

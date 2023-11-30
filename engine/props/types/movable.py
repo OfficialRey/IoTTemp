@@ -17,4 +17,4 @@ class Movable:
             self.velocity = self.velocity.normalize() * self.max_speed
 
     def update(self, world, delta_time: float) -> None:
-        self.position += self.velocity * delta_time
+        self.position += self.velocity * delta_time * world.get_camera_zoom()
