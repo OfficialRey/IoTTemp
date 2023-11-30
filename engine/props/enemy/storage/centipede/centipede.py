@@ -1,3 +1,5 @@
+from typing import List
+
 import pygame
 
 from engine.core.vector import Vector
@@ -33,20 +35,32 @@ class Centipede(Enemy):
                 to_remove.append(segment)
 
         if len(to_remove) > 0:
-            print(self.segments)
-            print(to_remove)
-            self.segments.remove(to_remove)
+            self.segments.remove(*to_remove)
             self.split_centipede()
 
     def split_centipede(self):
-        for i in range(1, len(self.segments) - 1):
-            if self.segments[i].previous_segment is not self.segments[i - 1]:
-                # Found hole here, transform body to head
+        has_head = False
+        for i in range(len(self.segments) - 1):
+
+            # Remember if the chained segments have a head
+            if isinstance(self.segments[i], CentipedeHead):
+                has_head = True
+
+            # Case 1: Head got removed
+            if isinstance(self.segments[i], CentipedeBody) and not has_head:
                 self.segments[i] = CentipedeHead(self.head_texture, self.segments[i].position)
                 self.segments[i + 1].previous_segment = self.segments[i]
+                has_head = True
+                continue
+
+            # Case 2: Center part is destroyed
+            if isinstance(self.segments[i], CentipedeBody) and isinstance(self.segments[i + 1], CentipedeBody):
+                if self.segments[i + 1].previous_segment != self.segments[i]:
+                    self.segments[i] = CentipedeHead(self.head_texture, self.segments[i].position)
+                    self.segments[i + 1].previous_segment = self.segments[i]
 
     def _create_centipede(self):
-        length = 5
+        length = 20
 
         previous_segment = CentipedeHead(self.head_texture, self.position)
         self.segments = [previous_segment]
