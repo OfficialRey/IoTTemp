@@ -2,6 +2,8 @@ from engine.core.vector import Vector
 from engine.graphics.textures.atlas import AnimationAtlas
 from engine.props.types.entity import Entity
 
+FLASH_TIME = 0.5
+
 
 class Damageable(Entity):
 
@@ -19,6 +21,7 @@ class Damageable(Entity):
 
     def damage_true(self, value: float):
         self.health -= value
+        self.flash(FLASH_TIME)
 
     def get_damage_multiplier(self):
         return 100 / (100 + self.defense)

@@ -73,7 +73,7 @@ class TextureAnimation:
 
     def _update_flash_textures(self):
         for flash_texture in self.flash_textures:
-            flash_texture.colorize(0)
+            flash_texture.colorize(150)
 
     def get_texture(self) -> Texture:
         return self.textures[self.count]
