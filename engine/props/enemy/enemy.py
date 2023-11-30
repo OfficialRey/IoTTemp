@@ -1,10 +1,12 @@
+from abc import ABC
+
 from engine.core.vector import Vector
 from engine.graphics.textures.atlas import AnimationAtlas
-from engine.props.enemy.data import UnitData
+from engine.props.data import UnitData
 from engine.props.types.unit import Unit
 
 
-class Enemy(Unit):
+class Enemy(Unit, ABC):
 
     def __init__(self, animation_atlas: AnimationAtlas, enemy_data: UnitData, position: Vector):
         super().__init__(animation_atlas, enemy_data.get_health(), enemy_data.get_attack(), enemy_data.get_defense(),

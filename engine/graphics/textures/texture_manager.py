@@ -22,9 +22,11 @@ CENTIPEDE_BODY = [None, None, None, None, None, None, None, None,
 class TextureManager:
     # Class for loading and initializing all required textures of the game
 
+    # TODO: Somewhere here colors are overridden
+
     def __init__(self):
         self.level_textures = LevelAtlas("level", "level_textures.png", 16, 16)
-        self.centipede = AnimationAtlas("enemies", "centipede.png", CENTIPEDE, 16, 16, time=0.1, loop=True)
+        self.centipede_head = AnimationAtlas("enemies", "centipede.png", CENTIPEDE, 16, 16, time=0.1, loop=True)
         self.centipede_body = AnimationAtlas("enemies", "centipede.png", CENTIPEDE_BODY, 16, 16, time=0.1, loop=True)
 
         # Player
@@ -41,12 +43,12 @@ class TextureManager:
         # Bullets
         self.bullets = AnimationAtlas("bullets", "bullets.png", BULLETS, 16, 16, time=0.05)
 
-        self.game_textures = [
+        self.game_atlas = [
             # Level
             self.level_textures,
 
             # Enemy
-            self.centipede,
+            self.centipede_head,
             self.centipede_body,
 
             # Player
@@ -58,3 +60,11 @@ class TextureManager:
             # Bullets
             self.bullets
         ]
+
+    def count_textures(self):
+        count = 0
+        for atlas in self.game_atlas:
+            if isinstance(atlas, AnimationAtlas):
+                for animation in atlas.texture_animations:
+                    count += len(animation.textures)
+        return count

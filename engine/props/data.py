@@ -6,8 +6,10 @@ ANIMATION = 0
 class UnitData(Enum):
     # Syntax: Base Max Health, Base Attack, Base Defense, Shot Delay, Max Speed, Acceleration
 
+    NONE = (0, 0, 0, 0, 0, 0)
+
     CACO_DEMON = (12, 12, 0, 0, 12, 1)
-    CENTIPEDE = (30, 6, 0, 0, 1500, 20)
+    CENTIPEDE_HEAD = (30, 6, 0, 0, 1500, 20)
     CENTIPEDE_BODY = (12, 2, 0, 0, 1500, 20)
     PLAYER = (100, 20, 20, 0.2, 2700, 0.1)
 

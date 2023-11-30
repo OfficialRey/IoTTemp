@@ -1,5 +1,3 @@
-import random
-
 from engine.graphics.textures.atlas import LevelAtlas
 from engine.graphics.textures.texture import Texture
 

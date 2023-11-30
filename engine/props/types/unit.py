@@ -16,7 +16,12 @@ class Unit(Damageable):
 
     def update(self, world, delta_time: float):
         self.act(world, delta_time)
+        self._unit_update()
         super().update(world, delta_time)
+
+    def _unit_update(self):
+        if self.is_dead():
+            self.on_death()
 
     def act(self, world, delta_time: float):
         raise NotImplementedError("Implement a behaviour for this prop!")
@@ -32,6 +37,9 @@ class Unit(Damageable):
                 if self.collide_generic(bullet):
                     self.on_collision(bullet)
                     continue
+
+    def is_dead(self):
+        return self.health <= 0
 
     def run_behaviour(self, world, delta_time: float):
         raise NotImplementedError("Must implement generic behaviour")

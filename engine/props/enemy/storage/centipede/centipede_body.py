@@ -1,15 +1,13 @@
-import pygame
-
 from engine.core.vector import Vector
 from engine.graphics.textures.atlas import AnimationAtlas
 from engine.props.bullet.bullet import Bullet
-from engine.props.enemy.data import UnitData
+from engine.props.data import UnitData
 from engine.props.enemy.enemy import Enemy
 from engine.props.player.player import Player
 from engine.props.types.sprite import Sprite
 
 TIGHTNESS = 100
-DISTANCE_FACTOR = 0.75
+DISTANCE_FACTOR = 4
 
 
 class CentipedeBody(Enemy):
@@ -19,7 +17,7 @@ class CentipedeBody(Enemy):
         self.position = position
         self.previous_segment = previous_segment
 
-    def run_behaviour(self, delta_time: float, target: Player):
+    def run_behaviour(self, world, delta_time: float):
         # Accelerate towards previous segment
         me_to_segment = self.previous_segment.position - self.position
 

@@ -5,7 +5,7 @@ from engine.core.vector import Vector
 from engine.graphics.textures.texture_animation import AnimationType
 from engine.graphics.textures.texture_manager import TextureManager
 from engine.props.bullet.bullet import BulletType
-from engine.props.enemy.data import UnitData
+from engine.props.data import UnitData
 from engine.props.player.cursor import Cursor
 from engine.props.types.shooting_unit import ShootingUnit
 from engine.world.camera import Camera

@@ -15,7 +15,8 @@ GENERIC_ANIMATIONS = [AnimationType.WALKING_N, AnimationType.WALKING_NE, Animati
 
 ANGLE_OFFSET = 360 / len(GENERIC_ANIMATIONS) * 0.5
 
-HIT_BOX_FACTOR = 0.5
+HIT_BOX_FACTOR = 0.75
+FLASH_SPEED = 0.01
 
 
 class Sprite(Movable, pygame.sprite.Sprite):
@@ -32,15 +33,14 @@ class Sprite(Movable, pygame.sprite.Sprite):
     def flash(self, time: float):
         self.flash_time = time
 
-    def get_texture(self) -> Texture:
-        if self.flash_time > 0:
-            return self.current_animation.get_flash_texture()
-        return self.current_animation.get_texture()
+    def get_surface(self) -> pygame.Surface:
+        if self.flash_time > 0 and self.flash_time % FLASH_SPEED * 2 < FLASH_SPEED:
+            return self.current_animation.get_texture().flash_image
+        return self.current_animation.get_texture().image
 
     def render(self, surface: pygame.Surface, camera) -> None:
-        render_position = camera.get_relative_position(self) - Vector(*self.get_texture().image.get_size()) / 2
-        surface.blit(self.current_animation.get_texture().image,
-                     render_position.as_tuple())
+        render_position = camera.get_relative_position(self) - Vector(*self.get_surface().get_size()) / 2
+        surface.blit(self.get_surface(), render_position.as_tuple())
 
     def get_center_position(self) -> Vector:
         return self.position + Vector(self.sprite_width // 2, self.sprite_height // 2)
@@ -72,7 +72,7 @@ class Sprite(Movable, pygame.sprite.Sprite):
 
     # TODO: Fix animation system
     def animate_generic(self):
-        vector = Vector(self.velocity.x, -self.velocity.y)
+        vector = Vector(self.velocity.x, -self.velocity.y).normalize()
         angle = math.degrees(math.atan2(*vector.as_tuple()))
         index = min(int((angle + ANGLE_OFFSET) / 45), len(GENERIC_ANIMATIONS) - 1)
         self.play_animation(GENERIC_ANIMATIONS[index])

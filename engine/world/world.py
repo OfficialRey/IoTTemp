@@ -4,9 +4,9 @@ from engine.core.input_manager import InputManager
 from engine.core.vector import Vector
 from engine.core.window import Window
 from engine.graphics.textures.texture_manager import TextureManager
-from engine.props.enemy.data import UnitData
+from engine.props.data import UnitData
 from engine.props.enemy.enemy import Enemy
-from engine.props.enemy.storage.centipede.centipede_head import Centipede
+from engine.props.enemy.storage.centipede.centipede import Centipede
 from engine.props.player.player import Player
 from engine.props.types.shooting_unit import ShootingUnit
 from engine.util.constants import WHITE
@@ -20,7 +20,6 @@ class World:
 
         self.texture_manager = texture_manager
         self.camera = Camera(window, zoom)
-        self.set_camera_zoom(zoom)
 
         self.level_data = level_data
         self.player: Player = Player(texture_manager, UnitData.PLAYER)
@@ -35,6 +34,7 @@ class World:
         self.player_shot = False
         self.player_damaged = False
         self.enemy_killed = False
+        self.set_camera_zoom(zoom)
 
     def get_camera_zoom(self):
         return self.camera.get_zoom()
@@ -43,8 +43,10 @@ class World:
         self.camera.set_zoom(zoom)
 
         # Update every single animation atlas to adjust to zoom
-        for texture_atlas in self.texture_manager.game_textures:
+        for texture_atlas in self.texture_manager.game_atlas:
             texture_atlas.set_scale(zoom)
+        for unit in self.units:
+            unit.set_scale(zoom)
 
     def set_camera_position(self, position: Vector):
         if position.x + self.camera.resolution.x > self.level_data.width * self.texture_atlas.sprite_width:

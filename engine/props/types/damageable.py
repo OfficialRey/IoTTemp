@@ -2,7 +2,7 @@ from engine.core.vector import Vector
 from engine.graphics.textures.atlas import AnimationAtlas
 from engine.props.types.entity import Entity
 
-FLASH_TIME = 0.5
+FLASH_TIME = 0.2
 
 
 class Damageable(Entity):

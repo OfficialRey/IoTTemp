@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, List
 
 import pygame.image
 
@@ -10,15 +10,26 @@ MAX_COLOR = 255
 
 class Texture:
 
-    def __init__(self, base_image: pygame.Surface, image: pygame.Surface = None, scale: Vector = Vector(1, 1)):
+    def __init__(self, base_image: pygame.Surface, image: pygame.Surface = None, flash_image: pygame.Surface = None,
+                 scale: Vector = Vector(1, 1), mirror: List[bool] = None, flash_color_offset: List[int] = None):
+        if mirror is None:
+            mirror = [False, False]
+        if flash_color_offset is None:
+            flash_color_offset = [150, 0, 0, 0]
         self.base_image = base_image
         self.image = image if image is not None else base_image.copy()
+        self.flash_image = flash_image
         self.scale = scale
-        self.color_offsets = [0, 0, 0, 0]
+        self.flash_color_offset = flash_color_offset
+        self.mirror = mirror
+        if flash_image is None:
+            self.flash_image = self.image.copy()
+            self.colorize_flash_image(*self.flash_color_offset)
 
     def reset(self):
         self.image = self.base_image.copy()
-        self.colorize(*self.color_offsets)
+        self.flash_image = self.base_image.copy()
+        self.colorize_flash_image(*self.flash_color_offset)
 
     def set_scale(self, scale: Union[Vector, float, int]) -> pygame.Surface:
         if scale == Vector(1, 1):
@@ -29,52 +40,33 @@ class Texture:
             self.base_image,
             (self.base_image.get_width() * scale.x, self.base_image.get_height() * scale.y)
         )
-        self.colorize(*self.color_offsets)
+        self.flash_image = self.image.copy()
+        self.colorize_flash_image(*self.flash_color_offset)
         return self.image
 
-    def colorize(self, red_offset: int = 0, green_offset: int = 0, blue_offset: int = 0,
-                 alpha_offset: int = 0) -> pygame.Surface:
-        width, height = self.image.get_size()
+    # TODO: Improve performance
+    def colorize_flash_image(self, red_offset: int = 0, green_offset: int = 0, blue_offset: int = 0,
+                             alpha_offset: int = 0) -> pygame.Surface:
+        width, height = self.flash_image.get_size()
         for x in range(width):
             for y in range(height):
-                r, g, b, a = self.image.get_at((x, y))
+                r, g, b, a = self.flash_image.get_at((x, y))
                 red = min(MAX_COLOR, max(MIN_COLOR, r + red_offset))
                 green = min(MAX_COLOR, max(MIN_COLOR, g + green_offset))
                 blue = min(MAX_COLOR, max(MIN_COLOR, b + blue_offset))
                 alpha = min(MAX_COLOR, max(MIN_COLOR, a + alpha_offset))
-                self.image.set_at((x, y), pygame.Color(red, green, blue, alpha))
+                self.flash_image.set_at((x, y), pygame.Color(red, green, blue, alpha))
+        return self.flash_image
 
-        for i in range(len(self.color_offsets)):
-            self.color_offsets[i] += (red_offset, green_offset, blue_offset, alpha_offset)[i]
-
-        return self.image
-
-    def mirror(self, x_axis: bool = True, y_axis: bool = False):
-        width = self.image.get_width()
-        height = self.image.get_height()
-
-        new_pixels = [[pygame.Color(0, 0, 0) for _ in range(height)] for _ in range(width)]
-        pixels = pygame.PixelArray(self.image)
-        for x in range(width):
-            for y in range(height):
-                # Mirror image
-                color = pygame.Color(self.image.unmap_rgb(pixels[x][y]))
-                x_pos = x
-                y_pos = y
-                if x_axis:
-                    x_pos = width - x - 1
-                if y_axis:
-                    y_pos = height - y - 1
-                new_pixels[x_pos][y_pos] = color
-
-        for x in range(width):
-            for y in range(height):
-                pixels[x][y] = new_pixels[x][y]
-        del pixels
+    def mirror_texture(self, x_axis: bool = True, y_axis: bool = False):
+        self.mirror = [x_axis, y_axis]
+        self.image = pygame.transform.flip(self.image, x_axis, y_axis)
+        self.flash_image = pygame.transform.flip(self.flash_image, x_axis, y_axis)
         return self.image
 
     def copy(self):
-        return Texture(self.base_image, self.image)
+        return Texture(self.base_image.copy(), self.image.copy(), self.flash_image.copy(), self.scale, self.mirror,
+                       self.flash_color_offset)
 
     def is_empty(self) -> bool:
         pixels = pygame.PixelArray(self.image)
