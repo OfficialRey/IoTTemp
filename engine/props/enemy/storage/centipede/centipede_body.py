@@ -6,6 +6,9 @@ from engine.props.enemy.data import UnitData
 from engine.props.enemy.enemy import Enemy
 from engine.props.player.player import Player
 
+TIGHTNESS = 100
+DISTANCE_FACTOR = 0.75
+
 
 class CentipedeBody(Enemy):
 
@@ -19,9 +22,9 @@ class CentipedeBody(Enemy):
         me_to_segment = self.previous_segment.position - self.position
 
         distance = me_to_segment.magnitude()
-        target_distance = self.sprite_width * 0.5
+        target_distance = self.sprite_width * DISTANCE_FACTOR
         direction = me_to_segment.normalize()
-        acceleration = direction.inverse() + direction * distance / target_distance
+        acceleration = (direction.inverse() + direction * distance / target_distance) * TIGHTNESS
 
         self.accelerate(acceleration)
         self.animate_generic()
