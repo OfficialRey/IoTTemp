@@ -24,6 +24,26 @@ class Centipede(Enemy):
     def run_behaviour(self, world, delta_time: float):
         for segment in self.segments:
             segment.update(world, delta_time)
+        self.remove_dead_segments()
+
+    def remove_dead_segments(self):
+        to_remove = []
+        for segment in self.segments:
+            if segment.is_dead():
+                to_remove.append(segment)
+
+        if len(to_remove) > 0:
+            print(self.segments)
+            print(to_remove)
+            self.segments.remove(to_remove)
+            self.split_centipede()
+
+    def split_centipede(self):
+        for i in range(1, len(self.segments) - 1):
+            if self.segments[i].previous_segment is not self.segments[i - 1]:
+                # Found hole here, transform body to head
+                self.segments[i] = CentipedeHead(self.head_texture, self.segments[i].position)
+                self.segments[i + 1].previous_segment = self.segments[i]
 
     def _create_centipede(self):
         length = 5
