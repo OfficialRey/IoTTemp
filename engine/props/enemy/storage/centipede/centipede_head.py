@@ -40,7 +40,9 @@ class Centipede(Enemy):
         self.animate_generic()
 
     def render(self, surface: pygame.Surface, camera) -> None:
-        for body in self.body:
+        bodies = self.body.copy()
+        bodies.reverse()
+        for body in bodies:
             body.render(surface, camera)
         super().render(surface, camera)
 
