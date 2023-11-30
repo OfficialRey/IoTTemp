@@ -1,7 +1,6 @@
 from engine.core.vector import Vector
 from engine.graphics.textures.atlas import AnimationAtlas
 from engine.props.enemy.data import UnitData
-from engine.props.types.sprite import Sprite
 from engine.props.types.unit import Unit
 
 
@@ -13,18 +12,3 @@ class Enemy(Unit):
 
     def act(self, world, delta_time: float):
         self.run_behaviour(world, delta_time)
-
-    def run_behaviour(self, world, delta_time: float):
-        raise NotImplementedError("Must implement generic behaviour")
-
-    def on_hit(self):
-        raise NotImplementedError("Must implement on_hit behaviour")
-
-    def on_death(self):
-        raise NotImplementedError("Must implement on_death behaviour")
-
-    def on_attack(self):
-        raise NotImplementedError("Must implement on_attack behaviour")
-
-    def on_collision(self, other: Sprite):
-        raise NotImplementedError("Must implement collision behaviour")

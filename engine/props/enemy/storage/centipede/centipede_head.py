@@ -2,10 +2,12 @@ import pygame
 
 from engine.core.vector import Vector
 from engine.graphics.textures.texture_manager import TextureManager
+from engine.props.bullet.bullet import Bullet
 from engine.props.enemy.data import UnitData
 from engine.props.enemy.enemy import Enemy
 from engine.props.enemy.storage.centipede.centipede_body import CentipedeBody
-from engine.util.constants import RED
+from engine.props.player.player import Player
+from engine.props.types.sprite import Sprite
 
 
 class Centipede(Enemy):
@@ -46,6 +48,13 @@ class Centipede(Enemy):
             body.render(surface, camera)
         super().render(surface, camera)
 
+    def collide_generic(self, other) -> bool:
+        for body in self.body:
+            if body.collide_generic(other):
+                body.on_collision(other)
+                return False
+        return super().collide_generic(other)
+
     def on_hit(self):
         pass
 
@@ -54,3 +63,13 @@ class Centipede(Enemy):
 
     def on_attack(self):
         pass
+
+    def on_collision(self, other: Sprite):
+        if not isinstance(other, Bullet):
+            return
+        if not isinstance(other.owner, Player):
+            return
+
+        # The player shot me
+        self.damage(other.bullet_type.get_damage())
+        other.life_time = 0

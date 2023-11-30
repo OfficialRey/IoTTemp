@@ -15,6 +15,8 @@ GENERIC_ANIMATIONS = [AnimationType.WALKING_N, AnimationType.WALKING_NE, Animati
 
 ANGLE_OFFSET = 360 / len(GENERIC_ANIMATIONS) * 0.5
 
+HIT_BOX_FACTOR = 0.5
+
 
 class Sprite(Movable, pygame.sprite.Sprite):
 
@@ -25,6 +27,7 @@ class Sprite(Movable, pygame.sprite.Sprite):
         self.current_animation = self.animation_atlas.texture_animations[0]
         self.sprite_width, self.sprite_height = self.current_animation.get_texture().image.get_size()
         self.base_width, self.base_height = self.sprite_width, self.sprite_height
+        self.flash_time = 0
 
     def get_texture(self) -> Texture:
         return self.current_animation.get_texture()
@@ -74,4 +77,4 @@ class Sprite(Movable, pygame.sprite.Sprite):
         return distance <= collision_radius
 
     def get_collision_radius(self):
-        return (self.sprite_width + self.sprite_height) / 2
+        return (self.sprite_width + self.sprite_height) / 2 * HIT_BOX_FACTOR

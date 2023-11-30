@@ -2,9 +2,11 @@ import pygame
 
 from engine.core.vector import Vector
 from engine.graphics.textures.atlas import AnimationAtlas
+from engine.props.bullet.bullet import Bullet
 from engine.props.enemy.data import UnitData
 from engine.props.enemy.enemy import Enemy
 from engine.props.player.player import Player
+from engine.props.types.sprite import Sprite
 
 TIGHTNESS = 100
 DISTANCE_FACTOR = 0.75
@@ -37,3 +39,13 @@ class CentipedeBody(Enemy):
 
     def on_attack(self):
         pass
+
+    def on_collision(self, other: Sprite):
+        if not isinstance(other, Bullet):
+            return
+        if not isinstance(other.owner, Player):
+            return
+
+        # The player shot me
+        self.damage(other.bullet_type.get_damage())
+        other.life_time = 0

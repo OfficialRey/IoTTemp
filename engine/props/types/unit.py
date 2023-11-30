@@ -1,7 +1,5 @@
 from typing import List
 
-import pygame
-
 from engine.core.vector import Vector
 from engine.graphics.textures.atlas import AnimationAtlas
 from engine.props.bullet.bullet import Bullet
@@ -32,5 +30,20 @@ class Unit(Damageable):
         for bullet in bullets:
             if bullet.life_time > 0:
                 if self.collide_generic(bullet):
-                    self.damage(bullet.bullet_type.get_damage())
-                    bullet.life_time = 0
+                    self.on_collision(bullet)
+                    continue
+
+    def run_behaviour(self, world, delta_time: float):
+        raise NotImplementedError("Must implement generic behaviour")
+
+    def on_hit(self):
+        raise NotImplementedError("Must implement on_hit behaviour")
+
+    def on_death(self):
+        raise NotImplementedError("Must implement on_death behaviour")
+
+    def on_attack(self):
+        raise NotImplementedError("Must implement on_attack behaviour")
+
+    def on_collision(self, other: Sprite):
+        raise NotImplementedError("Must implement collision behaviour")
