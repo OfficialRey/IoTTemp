@@ -37,6 +37,3 @@ class CentipedeBody(Enemy):
 
     def on_attack(self):
         pass
-
-    def collides_with(self, other: pygame.sprite.Sprite):
-        pass

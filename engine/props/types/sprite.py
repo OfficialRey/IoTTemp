@@ -68,5 +68,10 @@ class Sprite(Movable, pygame.sprite.Sprite):
         index = min(int((angle + ANGLE_OFFSET) / 45), len(GENERIC_ANIMATIONS) - 1)
         self.play_animation(GENERIC_ANIMATIONS[index])
 
+    def collide_generic(self, other) -> bool:
+        distance = self.get_center_position().distance(other.get_center_position())
+        collision_radius = max(self.get_collision_radius(), other.get_collision_radius())
+        return distance <= collision_radius
+
     def get_collision_radius(self):
         return (self.sprite_width + self.sprite_height) / 2

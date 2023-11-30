@@ -6,6 +6,7 @@ from engine.core.vector import Vector
 from engine.graphics.textures.atlas import AnimationAtlas
 from engine.props.bullet.bullet import Bullet
 from engine.props.types.damageable import Damageable
+from engine.props.types.sprite import Sprite
 
 
 class Unit(Damageable):
@@ -22,11 +23,6 @@ class Unit(Damageable):
     def act(self, world, delta_time: float):
         raise NotImplementedError("Implement a behaviour for this prop!")
 
-    def collides_with(self, other) -> bool:
-        distance = self.get_center_position().distance(other.get_center_position())
-        collision_radius = max(self.get_collision_radius(), other.get_collision_radius())
-        return distance <= collision_radius
-
     def register_bullet_hits(self, bullets: List[Bullet]):
         # Ensure bullets exist
         if len(bullets) == 0:
@@ -34,6 +30,7 @@ class Unit(Damageable):
 
         # Calculate collision and damage
         for bullet in bullets:
-            if bullet.life_time >= 0:
-                if self.collides_with(bullet):
+            if bullet.life_time > 0:
+                if self.collide_generic(bullet):
                     self.damage(bullet.bullet_type.get_damage())
+                    bullet.life_time = 0

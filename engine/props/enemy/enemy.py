@@ -1,8 +1,7 @@
-import pygame.sprite
-
 from engine.core.vector import Vector
 from engine.graphics.textures.atlas import AnimationAtlas
 from engine.props.enemy.data import UnitData
+from engine.props.types.sprite import Sprite
 from engine.props.types.unit import Unit
 
 
@@ -27,5 +26,5 @@ class Enemy(Unit):
     def on_attack(self):
         raise NotImplementedError("Must implement on_attack behaviour")
 
-    def collides_with(self, other: pygame.sprite.Sprite):
+    def on_collision(self, other: Sprite):
         raise NotImplementedError("Must implement collision behaviour")
