@@ -17,12 +17,16 @@ class CentipedeBody(Enemy):
     def run_behaviour(self, delta_time: float, target: Player):
         # Accelerate towards previous segment
         me_to_segment = self.previous_segment.position - self.position
+        distance = me_to_segment.magnitude()
         acceleration = me_to_segment.normalize()
         self.accelerate(acceleration)
-        if me_to_segment.magnitude() < self.sprite_width * 0.8:
-            self.velocity *= 0.95
-        elif me_to_segment.magnitude() > self.sprite_width / 2:
-            self.velocity *= 1.15
+
+        # Too close to previous segment
+        if distance < self.sprite_width * 0.5:
+            self.accelerate(self.velocity.inverse().normalize() * 2)
+        # Too far from previous segment
+        elif distance > self.sprite_width:
+            self.accelerate(me_to_segment.normalize())
 
         self.animate_generic()
 

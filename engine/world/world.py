@@ -132,5 +132,4 @@ class World:
 
     def _render_units(self, window: Window) -> None:
         for unit in self.units:
-            if self.camera.is_visible(unit):
-                unit.render(window.surface, self.camera)
+            unit.render(window.surface, self.camera)

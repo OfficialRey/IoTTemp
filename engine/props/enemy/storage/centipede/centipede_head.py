@@ -5,6 +5,7 @@ from engine.graphics.textures.texture_manager import TextureManager
 from engine.props.enemy.data import UnitData
 from engine.props.enemy.enemy import Enemy
 from engine.props.enemy.storage.centipede.centipede_body import CentipedeBody
+from engine.util.constants import RED
 
 
 class Centipede(Enemy):
@@ -39,9 +40,9 @@ class Centipede(Enemy):
         self.animate_generic()
 
     def render(self, surface: pygame.Surface, camera) -> None:
-        super().render(surface, camera)
         for body in self.body:
             body.render(surface, camera)
+        super().render(surface, camera)
 
     def on_hit(self):
         pass

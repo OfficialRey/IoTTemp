@@ -11,6 +11,9 @@ class Vector:
         self.x = x
         self.y = y
 
+    def inverse(self):
+        return Vector(-self.x, -self.y)
+
     def magnitude(self) -> float:
         return math.sqrt(self.x ** 2 + self.y ** 2)
 

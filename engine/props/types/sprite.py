@@ -61,6 +61,7 @@ class Sprite(Movable, pygame.sprite.Sprite):
         y_scale = height / self.base_height
         self.set_scale(Vector(x_scale, y_scale))
 
+    # TODO: Fix animation system
     def animate_generic(self):
         vector = Vector(self.velocity.x, -self.velocity.y)
         angle = math.degrees(math.atan2(*vector.as_tuple()))
