@@ -59,23 +59,36 @@ class LevelAtlas:
 
 class AnimationAtlas:
 
-    def __init__(self, path: str, file_name: str, animation_types: List[AnimationType], sprite_width: int,
-                 sprite_height: int, time: float = 0.2, loop: bool = True, scale: Union[Vector, float] = 1):
-        self.path = path
-        self.file_name = file_name
-        self.surface = pygame.image.load(
-            os.path.join(get_resource_path(), os.path.join(path, file_name))).convert_alpha()
-        self.animation_types = animation_types
-        self.sprite_width, self.sprite_height = sprite_width, sprite_height
-        self.time = time
-        self.loop = loop
+    def __init__(self, path: str = None, file_name: str = None, animation_types: List[AnimationType] = None,
+                 sprite_width: int = None, sprite_height: int = None, time: float = 0.2, loop: bool = True,
+                 scale: Union[Vector, float] = 1, information: Tuple = None):
+        if information is not None:
+            # Format: animation_types, sprite_width, sprite_height, base_width, base_height, time, loop, texture_animations, scale
+            self.animation_types = information[0]
+            self.sprite_width = information[1]
+            self.sprite_height = information[2]
+            self.base_width = information[3]
+            self.base_height = information[4]
+            self.time = information[5]
+            self.loop = information[6]
+            self.texture_animations = [animation.copy() for animation in information[7]]
+            self.scale = information[8]
+        else:
+            self.path = path
+            self.file_name = file_name
+            self.surface = pygame.image.load(
+                os.path.join(get_resource_path(), os.path.join(path, file_name))).convert_alpha()
+            self.animation_types = animation_types
+            self.sprite_width, self.sprite_height = sprite_width, sprite_height
+            self.time = time
+            self.loop = loop
 
-        self.base_width = sprite_width
-        self.base_height = sprite_height
+            self.base_width = sprite_width
+            self.base_height = sprite_height
 
-        self.texture_animations = self._load_animations()
-        self.scale = Vector(1, 1)
-        self.set_scale(scale if isinstance(scale, Vector) else Vector(scale, scale))
+            self.texture_animations = self._load_animations()
+            self.scale = Vector(1, 1)
+            self.set_scale(scale if isinstance(scale, Vector) else Vector(scale, scale))
 
     def _load_animations(self) -> List[TextureAnimation]:
         animations = []
@@ -121,5 +134,7 @@ class AnimationAtlas:
         return None
 
     def copy(self):
-        return AnimationAtlas(self.path, self.file_name, self.animation_types, self.sprite_width, self.sprite_height,
-                              self.time, self.loop, self.scale)
+        # Format: animation_types, sprite_width, sprite_height, base_width, base_height, time, loop, texture_animations
+        return AnimationAtlas(information=(
+            self.animation_types, self.sprite_width, self.sprite_height, self.base_width, self.base_height, self.time,
+            self.loop, self.texture_animations, self.scale))

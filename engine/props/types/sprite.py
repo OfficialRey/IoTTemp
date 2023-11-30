@@ -29,7 +29,12 @@ class Sprite(Movable, pygame.sprite.Sprite):
         self.base_width, self.base_height = self.sprite_width, self.sprite_height
         self.flash_time = 0
 
+    def flash(self, time: float):
+        self.flash_time = time
+
     def get_texture(self) -> Texture:
+        if self.flash_time > 0:
+            return self.current_animation.get_flash_texture()
         return self.current_animation.get_texture()
 
     def render(self, surface: pygame.Surface, camera) -> None:
@@ -54,6 +59,7 @@ class Sprite(Movable, pygame.sprite.Sprite):
 
     def update(self, world, delta_time: float) -> None:
         self.current_animation.update(delta_time)
+        self.flash_time -= delta_time
         super().update(world, delta_time)
 
     def set_scale(self, scale: Vector):
