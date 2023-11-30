@@ -5,8 +5,10 @@ from engine.core.vector import Vector
 from engine.core.window import Window
 from engine.graphics.textures.texture_manager import TextureManager
 from engine.props.enemy.data import UnitData
+from engine.props.enemy.enemy import Enemy
 from engine.props.enemy.storage.centipede.centipede_head import Centipede
 from engine.props.player.player import Player
+from engine.props.types.shooting_unit import ShootingUnit
 from engine.util.constants import WHITE
 from engine.world.camera import Camera
 from engine.world.level_data import LevelData
@@ -89,12 +91,12 @@ class World:
                 unit.render(window.surface, self.camera)
 
     def process(self, input_manager: InputManager, delta_time: float):
-        self._process_player(input_manager, delta_time)
+        self._process_player(input_manager)
         self._process_units(delta_time)
+        self._process_bullets()
 
-    def _process_player(self, input_manager: InputManager, delta_time: float):
+    def _process_player(self, input_manager: InputManager):
         self.player.handle_input(input_manager, self.camera)
-        self.player.update(self, delta_time)
 
         # Update Camera
         player_to_cursor = (self.player.cursor.position - self.camera.get_relative_position(
@@ -106,3 +108,20 @@ class World:
     def _process_units(self, delta_time: float):
         for unit in self.units.sprites():
             unit.update(self, delta_time)
+
+    def _process_bullets(self):
+        for unit in self.units.sprites():
+            if isinstance(unit, ShootingUnit):
+                bullets = unit.get_bullets()
+                print(bullets)
+
+                if len(bullets) == 0:
+                    continue
+
+                for target in self.units.sprites():
+
+                    # Return if trying to attack own team
+                    if isinstance(unit, Player) and isinstance(target, Player) or \
+                            isinstance(unit, Enemy) and isinstance(target, Enemy):
+                        continue
+                    target.register_bullet_hits(bullets)

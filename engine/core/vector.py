@@ -4,8 +4,6 @@ from typing import Tuple
 
 NUMBER_TYPE = (int, float, complex)
 
-VECTOR_UP = (0, -1)
-
 
 class Vector:
 

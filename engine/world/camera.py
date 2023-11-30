@@ -3,7 +3,7 @@ from engine.core.window import Window
 from engine.props.types.movable import Movable
 from engine.props.types.sprite import Sprite
 
-VISIBLE_OFFSET = 16
+VISIBLE_OFFSET = 128
 
 
 class Camera(Movable):
@@ -23,8 +23,8 @@ class Camera(Movable):
 
     def is_visible(self, sprite: Sprite) -> bool:
         position = self.get_relative_position(sprite)
-        return VISIBLE_OFFSET <= position.x <= self.resolution.x + VISIBLE_OFFSET and \
-            VISIBLE_OFFSET <= position.y <= self.resolution.y + VISIBLE_OFFSET
+        return -VISIBLE_OFFSET <= position.x <= self.resolution.x + VISIBLE_OFFSET and \
+            -VISIBLE_OFFSET <= position.y <= self.resolution.y + VISIBLE_OFFSET
 
     def get_relative_position(self, movable: Movable) -> Vector:
         return movable.position - self.position

@@ -1,3 +1,5 @@
+from typing import List
+
 import pygame
 
 from engine.core.vector import Vector
@@ -42,3 +44,6 @@ class ShootingUnit(Unit):
 
     def set_size(self, width: int, height: int):
         super().set_size(width, height)
+
+    def get_bullets(self) -> List[Bullet]:
+        return self.bullets

@@ -1,13 +1,25 @@
 from enum import Enum
 
-from engine.core.vector import Vector, VECTOR_UP
+from engine.core.vector import Vector
 from engine.graphics.textures.atlas import AnimationAtlas
 from engine.props.types.entity import Entity
 
 
 class BulletType(Enum):
     # Speed, Animation, Size
-    GENERIC = (500, 12, 1)
+    GENERIC = (1000, 12, 1, 2)
+
+    def get_speed(self):
+        return self.value[0]
+
+    def get_animation(self):
+        return self.value[1]
+
+    def get_size(self):
+        return self.value[2]
+
+    def get_damage(self):
+        return self.value[3]
 
 
 class Bullet(Entity):

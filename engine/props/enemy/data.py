@@ -9,9 +9,9 @@ class UnitData(Enum):
     # Syntax: Base Max Health, Base Attack, Base Defense, Shot Delay, Max Speed, Acceleration
 
     CACO_DEMON = (12, 12, 0, 0, 12, 1)
-    CENTIPEDE = (30, 6, 0, 0, 200, 2)
-    CENTIPEDE_BODY = (12, 2, 0, 0, 200, 8)
-    PLAYER = (100, 20, 20, 0.5, 200, 0.01)
+    CENTIPEDE = (30, 6, 0, 0, 200, 6)
+    CENTIPEDE_BODY = (12, 2, 0, 0, 210, 12)
+    PLAYER = (100, 20, 20, 0.2, 400, 0.02)
 
     def get_health(self):
         return self.value[0]

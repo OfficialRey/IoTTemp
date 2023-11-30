@@ -29,7 +29,3 @@ class Enemy(Unit):
 
     def collides_with(self, other: pygame.sprite.Sprite):
         raise NotImplementedError("Must implement collision behaviour")
-
-    def collide_generic(self, other: pygame.sprite.Sprite):
-        # TODO: Handle collision
-        pass
