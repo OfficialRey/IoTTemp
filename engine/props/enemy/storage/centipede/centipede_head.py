@@ -14,7 +14,7 @@ class CentipedeHead(Enemy):
 
     def run_behaviour(self, world, delta_time: float):
         target = world.player
-        self.accelerate((target.get_center_position() - self.get_center_position()).normalize())
+        self.accelerate((target.get_center_position() - self.get_center_position()).normalize(), delta_time)
         self.animate_generic()
 
     def on_hit(self):

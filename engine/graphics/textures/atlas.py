@@ -6,12 +6,14 @@ import pygame
 from engine.core.vector import Vector
 from engine.graphics.textures.texture import Texture
 from engine.graphics.textures.texture_animation import AnimationType, TextureAnimation
+from engine.util.debug import print_debug
 from engine.util.resources import get_resource_path
 
 
 class LevelAtlas:
 
     def __init__(self, path: str, file_name: str, sprite_width: int, sprite_height: int):
+        print_debug(f"Creating level atlas {path}/{file_name}")
         self.image = pygame.image.load(os.path.join(get_resource_path(), os.path.join(path, file_name))).convert_alpha()
         self.path = path
         self.file_name = file_name
@@ -74,6 +76,7 @@ class AnimationAtlas:
             self.texture_animations = [animation.copy() for animation in information[7]]
             self.scale = information[8]
         else:
+            print_debug(f"Creating animation atlas {path}/{file_name}")
             self.path = path
             self.file_name = file_name
             self.surface = pygame.image.load(

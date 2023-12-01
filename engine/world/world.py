@@ -10,6 +10,7 @@ from engine.props.enemy.storage.centipede.centipede import Centipede
 from engine.props.player.player import Player
 from engine.props.types.unit import ShootingUnit
 from engine.util.constants import WHITE
+from engine.util.debug import print_debug
 from engine.world.camera import Camera
 from engine.world.level_data import LevelData
 
@@ -17,6 +18,7 @@ from engine.world.level_data import LevelData
 class World:
 
     def __init__(self, texture_manager: TextureManager, level_data: LevelData, window: Window, zoom: float):
+        print_debug("Creating world...")
 
         self.texture_manager = texture_manager
         self.camera = Camera(window, zoom)
@@ -67,7 +69,7 @@ class World:
 
     def process(self, input_manager: InputManager, delta_time: float):
         self._reset_package_values()
-        self._process_player(input_manager)
+        self._process_player(input_manager, delta_time)
         self._process_units(delta_time)
         self._process_bullets()
 
@@ -76,8 +78,8 @@ class World:
         self.player_damaged = False
         self.enemy_killed = False
 
-    def _process_player(self, input_manager: InputManager):
-        self.player.handle_input(input_manager, self.camera)
+    def _process_player(self, input_manager: InputManager, delta_time: float):
+        self.player.handle_input(input_manager, self.camera, delta_time)
 
         # Player just shot
         if self.player.current_shot_timer == 0:

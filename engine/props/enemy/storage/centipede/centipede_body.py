@@ -27,7 +27,7 @@ class CentipedeBody(Enemy):
         direction = me_to_segment.normalize()
         acceleration = (direction.inverse() + direction * distance / target_distance) * TIGHTNESS
 
-        self.accelerate(acceleration)
+        self.accelerate(acceleration, delta_time)
         self.animate_generic()
 
     def on_hit(self):

@@ -7,6 +7,7 @@ from engine.core.vector import Vector
 from engine.core.input_manager import InputManager
 from engine.core.window import Window
 from engine.util.constants import WHITE
+from engine.util.debug import print_debug
 from protocol.server_package import ServerPackage
 from sound.arduino_sound_list import ArduinoSoundData
 
@@ -22,6 +23,7 @@ class Engine:
 
     def __init__(self, communication: Communication, window_resolution: Vector = Vector(1920, 1080), max_fps: int = 60,
                  run_mode: RunMode = RunMode.COMPUTER):
+        print_debug("Creating engine...")
         self.window = Window(window_resolution)
         self.input_manager = InputManager()
         self.communication = communication
@@ -37,6 +39,9 @@ class Engine:
         pygame.mouse.set_visible(False)
 
     def run(self, world) -> None:
+        self.clock.tick(self.max_fps)
+        self.delta_time = 0
+        print_debug("Starting main loop...")
         while not self.done:
             self._create_package()
             self._check_events()

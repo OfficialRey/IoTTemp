@@ -26,10 +26,10 @@ class Player(ShootingUnit):
 
     # Format: [w, a, s, d, space, mouse_x, mouse_y, left_click, right_click]
 
-    def handle_input(self, input_manager: InputManager, camera):
+    def handle_input(self, input_manager: InputManager, camera, delta_time: float):
         position = Vector(input_manager.mouse_x, input_manager.mouse_y)
         self.cursor.set_position(position)
-        self.accelerate((self.cursor.get_center_position() - camera.get_relative_position(self)))
+        self.accelerate((self.cursor.get_center_position() - camera.get_relative_position(self)), delta_time)
 
         if input_manager.left_click:
             self.shoot_bullet(BulletType.GENERIC, (self.cursor.get_center_position() + camera.position) - self.position)
