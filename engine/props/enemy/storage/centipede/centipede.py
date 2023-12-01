@@ -1,5 +1,3 @@
-from typing import List
-
 import pygame
 
 from engine.core.vector import Vector
@@ -23,6 +21,17 @@ class Centipede(Enemy):
 
         self._create_centipede()
 
+    def _create_centipede(self):
+        length = 30
+
+        previous_segment = CentipedeHead(self.head_texture, self.position)
+        self.segments = [previous_segment]
+        for i in range(1, length):
+            previous_segment = CentipedeBody(self.body_texture, previous_segment, previous_segment.position)
+            previous_segment.offset_animation()
+            previous_segment.velocity = Vector()
+            self.segments.append(previous_segment)
+
     def run_behaviour(self, world, delta_time: float):
         for segment in self.segments:
             segment.update(world, delta_time)
@@ -39,35 +48,13 @@ class Centipede(Enemy):
             self.split_centipede()
 
     def split_centipede(self):
-        has_head = False
         for i in range(len(self.segments) - 1):
-
-            # Remember if the chained segments have a head
-            if isinstance(self.segments[i], CentipedeHead):
-                has_head = True
-
-            # Case 1: Head got removed
-            if isinstance(self.segments[i], CentipedeBody) and not has_head:
-                self.segments[i] = CentipedeHead(self.head_texture, self.segments[i].position)
-                self.segments[i + 1].previous_segment = self.segments[i]
-                has_head = True
-                continue
-
-            # Case 2: Center part is destroyed
-            if isinstance(self.segments[i], CentipedeBody) and isinstance(self.segments[i + 1], CentipedeBody):
-                if self.segments[i + 1].previous_segment != self.segments[i]:
-                    self.segments[i] = CentipedeHead(self.head_texture, self.segments[i].position)
+            current_segment = self.segments[i]
+            if isinstance(current_segment, CentipedeBody):
+                # Create new head
+                if not current_segment.has_head():
+                    self.segments[i] = CentipedeHead(self.head_texture, current_segment.position)
                     self.segments[i + 1].previous_segment = self.segments[i]
-
-    def _create_centipede(self):
-        length = 20
-
-        previous_segment = CentipedeHead(self.head_texture, self.position)
-        self.segments = [previous_segment]
-        for i in range(length):
-            previous_segment = CentipedeBody(self.body_texture, previous_segment, previous_segment.position)
-            previous_segment.offset_animation()
-            self.segments.append(previous_segment)
 
     def render(self, surface: pygame.Surface, camera) -> None:
         segments = self.segments.copy()
@@ -80,6 +67,9 @@ class Centipede(Enemy):
             if segment.collide_generic(other):
                 segment.on_collision(other)
                 return False
+
+    def is_dead(self):
+        return len(self.segments) == 0
 
     def on_hit(self):
         pass

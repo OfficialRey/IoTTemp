@@ -3,6 +3,7 @@ from engine.graphics.textures.atlas import AnimationAtlas
 from engine.props.bullet.bullet import Bullet
 from engine.props.data import UnitData
 from engine.props.enemy.enemy import Enemy
+from engine.props.enemy.storage.centipede.centipede_head import CentipedeHead
 from engine.props.player.player import Player
 from engine.props.types.sprite import Sprite
 
@@ -47,3 +48,23 @@ class CentipedeBody(Enemy):
         # The player shot me
         self.damage(other.bullet_type.get_damage())
         other.life_time = 0
+
+    def has_head(self):
+        """
+        Trace back segment chain to check if this centipede has a head
+        """
+
+        # Cannot have a head if segment chain ends here
+        if self.is_dead() or self.previous_segment.is_dead():
+            return False
+
+        # Previous segment is the head
+        if isinstance(self.previous_segment, CentipedeHead):
+            return True
+
+        # Look further
+        if isinstance(self.previous_segment, CentipedeBody):
+            return self.previous_segment.has_head()
+
+        # Unknown state
+        return False

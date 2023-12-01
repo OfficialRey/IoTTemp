@@ -8,7 +8,7 @@ from engine.props.data import UnitData
 from engine.props.enemy.enemy import Enemy
 from engine.props.enemy.storage.centipede.centipede import Centipede
 from engine.props.player.player import Player
-from engine.props.types.shooting_unit import ShootingUnit
+from engine.props.types.unit import ShootingUnit
 from engine.util.constants import WHITE
 from engine.world.camera import Camera
 from engine.world.level_data import LevelData

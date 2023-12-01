@@ -6,6 +6,7 @@ from engine.core.communication import Communication
 from engine.core.vector import Vector
 from engine.core.input_manager import InputManager
 from engine.core.window import Window
+from engine.util.constants import WHITE
 from protocol.server_package import ServerPackage
 from sound.arduino_sound_list import ArduinoSoundData
 

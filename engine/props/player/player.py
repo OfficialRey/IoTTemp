@@ -7,7 +7,7 @@ from engine.graphics.textures.texture_manager import TextureManager
 from engine.props.bullet.bullet import BulletType
 from engine.props.data import UnitData
 from engine.props.player.cursor import Cursor
-from engine.props.types.shooting_unit import ShootingUnit
+from engine.props.types.unit import ShootingUnit
 from engine.world.camera import Camera
 
 
@@ -21,7 +21,7 @@ class Player(ShootingUnit):
         self.cursor.play_animation(AnimationType.GENERIC)
 
     def act(self, world, delta_time: float) -> None:
-        super().act(world, delta_time)
+        super().run_behaviour(world, delta_time)
         self.cursor.update(world, delta_time)
 
     # Format: [w, a, s, d, space, mouse_x, mouse_y, left_click, right_click]
