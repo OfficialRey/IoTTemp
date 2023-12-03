@@ -29,9 +29,6 @@ class Window:
     def fill(self, color: Tuple[int, int, int]) -> None:
         self.surface.fill(color, (0, 0, *self.resolution.as_tuple()))
 
-    def show_cursor(self, visibility: bool = True) -> None:
-        pygame.mouse.set_visible(visibility)
-
     def get_width(self):
         return self.surface.get_width()
 

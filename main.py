@@ -25,4 +25,4 @@ def start(level_editor: bool = False):
 
 
 if __name__ == '__main__':
-    start(True)
+    start(False)

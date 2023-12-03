@@ -19,6 +19,7 @@ class Menu:
     def render(self, window: Window):
         for widget in self.widgets:
             widget.render(window.surface)
+        pygame.display.flip()
 
     def add_widget(self, widget: Widget):
         if widget not in self.widgets:

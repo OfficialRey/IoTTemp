@@ -1,6 +1,7 @@
 from engine.core.communication import Communication
 from engine.core.engine import Engine
 from engine.graphics.textures.texture_manager import TextureManager
+from engine.util.debug import print_debug
 from engine.world.level_data import LevelData
 from engine.world.world import World
 
@@ -27,7 +28,7 @@ class TopDownGame:
             7
         )
 
-        print(f"Textures: {self.texture_manager.count_textures()}")
+        print_debug(f"Loaded {self.texture_manager.count_textures()} textures into memory...")
 
     def run(self):
         self.engine.run(self.world)

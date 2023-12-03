@@ -6,6 +6,8 @@ from engine.core.communication import Communication
 from engine.core.vector import Vector
 from engine.core.input_manager import InputManager
 from engine.core.window import Window
+from engine.menu.menu import Menu
+from engine.menu.storage.start_menu import StartMenu
 from engine.sound.arduino_sound_list import ArduinoSoundData
 from engine.util.debug import print_debug
 from protocol.server_package import ServerPackage
@@ -35,6 +37,8 @@ class Engine:
         self.target_delta_time = 1 / self.max_fps
         self.delta_time = self.target_delta_time
 
+        self.current_menu: Menu = StartMenu(self)
+
         pygame.mouse.set_visible(False)
 
     def run(self, world) -> None:
@@ -43,6 +47,15 @@ class Engine:
         self.delta_time = 0
         print_debug("Starting main loop...")
         while not self.done:
+
+            while self.current_menu is not None:
+                self.current_menu.render(self.window)
+                self.current_menu.run()
+
+                # Fix clock working improperly
+                self.clock.tick(self.max_fps)
+                self.delta_time = 0
+
             self._create_package()
             self._check_events()
 
