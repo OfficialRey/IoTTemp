@@ -39,8 +39,6 @@ class Engine:
 
         self.current_menu: Menu = StartMenu(self)
 
-        pygame.mouse.set_visible(False)
-
     def run(self, world) -> None:
         # Reset clock and set delta time to 0 to not use loading time as calculation time
         self.clock.tick(self.max_fps)

@@ -4,12 +4,14 @@ import pygame.event
 
 from engine.core.window import Window
 from engine.graphics.gui.widget import Widget
+from engine.util.util import show_cursor
 
 
 class Menu:
 
     def __init__(self):
         self.widgets: List[Widget] = []
+        show_cursor()
 
     def run(self):
         for event in pygame.event.get():
