@@ -34,9 +34,9 @@ class TextureAnimation:
 
     def __init__(self, surface: pygame.Surface = None, sprite_width: int = 1,
                  animation_type: AnimationType = None, time: float = 0.2, loop: bool = True,
-                 scale: Vector = Vector(1, 1), information: Tuple = None):
+                 scale: Vector = Vector(1, 1), has_flash_image: bool = False, information: Tuple = None):
         if information is not None:
-            # Format: surface, sprite_width, animation_type, target_time, loop, textures, scale
+            # Format: surface, sprite_width, animation_type, target_time, loop, textures, scale, has_flash_image
             self.surface = information[0].copy()
             self.sprite_width = information[1]
             self.animation_type = information[2]
@@ -44,6 +44,7 @@ class TextureAnimation:
             self.loop = information[4]
             self.textures = [texture.copy() for texture in information[5]]
             self.scale = information[6]
+            self.has_flash_image = information[7]
             self.sprite_height = self.surface.get_height()
         else:
             self.surface = surface
@@ -52,6 +53,7 @@ class TextureAnimation:
             self.target_time = time
             self.loop = loop
             self.sprite_height = self.surface.get_height()
+            self.has_flash_image = has_flash_image
 
             self.textures = self._load_textures()
             self.scale = self.set_scale(scale)
@@ -63,7 +65,8 @@ class TextureAnimation:
         textures = []
         for x in range(self.surface.get_width() // self.sprite_width):
             texture = Texture(
-                self.surface.subsurface((x * self.sprite_width, 0, self.sprite_width, self.sprite_height)))
+                self.surface.subsurface((x * self.sprite_width, 0, self.sprite_width, self.sprite_height)),
+                has_flash_image=self.has_flash_image)
             if not texture.is_empty():
                 textures.append(texture)
         return textures
@@ -100,12 +103,7 @@ class TextureAnimation:
             texture.mirror_texture(x_axis, y_axis)
 
     def copy(self):
-        # Format: surface, sprite_width, animation_type, target_time, loop, textures, scale
+        # Format: surface, sprite_width, animation_type, target_time, loop, textures, scale, has_flash_image
         return TextureAnimation(information=(
             self.surface, self.sprite_width, self.animation_type, self.target_time, self.loop, self.textures,
-            self.scale))
-
-
-def test_color_change(texture, flash_texture):
-    print(texture.image.get_at((8, 8)))
-    print(flash_texture.image.get_at((8, 8)))
+            self.scale, self.has_flash_image))

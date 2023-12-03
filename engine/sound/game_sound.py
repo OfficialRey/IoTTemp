@@ -8,9 +8,13 @@ from engine.util.resources import get_resource_path
 
 
 class GameSound(Enum):
-    # Format: File Name
+    # GUI
+
     GUI_HOVER = "gui_hover.wav",
     GUI_CONFIRM = "gui_confirm.wav",
+
+    # SHOOTING
+    PLASMA = "plasma.wav",
 
     def get_file_name(self):
         return self.value[0]

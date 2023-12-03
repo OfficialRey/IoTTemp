@@ -8,6 +8,7 @@ from engine.props.bullet.bullet import BulletType
 from engine.props.data import UnitData
 from engine.props.player.cursor import Cursor
 from engine.props.types.unit import ShootingUnit
+from engine.sound.game_sound import SoundEngine
 from engine.world.camera import Camera
 
 
@@ -32,7 +33,7 @@ class Player(ShootingUnit):
         self.accelerate((self.cursor.get_center_position() - camera.get_relative_position(self)), delta_time)
 
         if input_manager.left_click:
-            self.shoot_bullet(BulletType.GENERIC, (self.cursor.get_center_position() + camera.position) - self.position)
+            self.shoot_bullet(BulletType.PLASMA, (self.cursor.get_center_position() + camera.position) - self.position)
 
     def render(self, surface: pygame.Surface, camera: Camera) -> None:
         self.cursor.render(surface, camera)

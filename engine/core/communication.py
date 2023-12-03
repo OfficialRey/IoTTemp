@@ -37,4 +37,3 @@ class Communication:
     def establish_connection(self):
         while not self.connected:
             self.connected = True
-            pass

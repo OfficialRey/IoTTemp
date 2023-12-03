@@ -3,11 +3,12 @@ from enum import Enum
 from engine.core.vector import Vector
 from engine.graphics.textures.atlas import AnimationAtlas
 from engine.props.types.entity import Entity
+from engine.sound.game_sound import GameSound
 
 
 class BulletType(Enum):
-    # Speed, Animation, Size
-    GENERIC = (8000, 12, 1, 2)
+    # Speed, Animation, Size, Damage, GameSound
+    PLASMA = (8000, 12, 1, 2, GameSound.PLASMA)
 
     def get_speed(self):
         return self.value[0]
@@ -20,6 +21,9 @@ class BulletType(Enum):
 
     def get_damage(self):
         return self.value[3]
+
+    def get_sound_type(self):
+        return self.value[4]
 
 
 class Bullet(Entity):

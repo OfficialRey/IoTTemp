@@ -11,7 +11,8 @@ MAX_COLOR = 255
 class Texture:
 
     def __init__(self, base_image: pygame.Surface, image: pygame.Surface = None, flash_image: pygame.Surface = None,
-                 scale: Vector = Vector(1, 1), mirror: List[bool] = None, flash_color_offset: List[int] = None):
+                 scale: Vector = Vector(1, 1), mirror: List[bool] = None, flash_color_offset: List[int] = None,
+                 has_flash_image: bool = False):
         if mirror is None:
             mirror = [False, False]
         if flash_color_offset is None:
@@ -19,6 +20,7 @@ class Texture:
         self.base_image = base_image
         self.image = image if image is not None else base_image.copy()
         self.flash_image = flash_image
+        self.has_flash_image = has_flash_image
         self.scale = scale
         self.flash_color_offset = flash_color_offset
         self.mirror = mirror
@@ -47,6 +49,8 @@ class Texture:
     # TODO: Improve performance
     def colorize_flash_image(self, red_offset: int = 0, green_offset: int = 0, blue_offset: int = 0,
                              alpha_offset: int = 0) -> pygame.Surface:
+        if not self.has_flash_image:
+            return self.flash_image
         width, height = self.flash_image.get_size()
         for x in range(width):
             for y in range(height):
@@ -66,7 +70,7 @@ class Texture:
 
     def copy(self):
         return Texture(self.base_image.copy(), self.image.copy(), self.flash_image.copy(), self.scale, self.mirror,
-                       self.flash_color_offset)
+                       self.flash_color_offset, self.has_flash_image)
 
     def is_empty(self) -> bool:
         pixels = pygame.PixelArray(self.image)

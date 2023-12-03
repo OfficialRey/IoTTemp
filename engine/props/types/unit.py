@@ -7,6 +7,7 @@ from engine.graphics.textures.atlas import AnimationAtlas
 from engine.props.bullet.bullet import Bullet, BulletType
 from engine.props.types.damageable import Damageable
 from engine.props.types.sprite import Sprite
+from engine.sound.game_sound import SoundEngine, GameSound
 from engine.world.camera import Camera
 
 
