@@ -23,7 +23,6 @@ class InputEnum(Enum):
 class InputManager:
 
     def __init__(self):
-        pygame.init()
         self.w = 0
         self.a = 0
         self.s = 0

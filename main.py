@@ -10,7 +10,6 @@ from game.game import TopDownGame
 def init():
     # Initialise required fields
     set_application_path(os.path.dirname(__file__))
-    pygame.init()
     pygame.display.init()
 
 

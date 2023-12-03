@@ -3,6 +3,8 @@ from typing import Tuple
 
 import pygame
 
+from engine.sound.game_sound import SoundEngine, GameSound
+
 WHITE = (255, 255, 255)
 
 BORDER_SIZE = 5
@@ -22,9 +24,16 @@ class Widget(ABC):
             x_pos, y_pos = pygame.mouse.get_pos()
             if self.area.x <= x_pos <= self.area.x + self.area.width and \
                     self.area.y <= y_pos <= self.area.y + self.area.height:
-                self.hovered = True
+                self.set_hover(True)
             else:
-                self.hovered = False
+                self.set_hover(False)
+
+    def set_hover(self, value: bool):
+        if self.hovered == value:
+            return
+        self.hovered = value
+        if self.hovered:
+            self.on_hover()
 
     def set_area(self, area: Tuple[int, int, int, int]):
         self.area = pygame.Rect(area)
@@ -32,6 +41,9 @@ class Widget(ABC):
                                        area[2] + BORDER_SIZE * 2, area[2] + BORDER_SIZE * 2)
 
     def render(self, surface: pygame.Surface):
+        raise NotImplementedError()
+
+    def on_hover(self):
         raise NotImplementedError()
 
 
@@ -42,6 +54,7 @@ class Label(Widget):
                  background_color: Tuple[int, int, int] = None, border_color: Tuple[int, int, int] = None,
                  hover_color: Tuple[int, int, int] = None, font: str = "comicsansms"):
         super().__init__(area)
+        pygame.font.init()
         self.text = text
         self.font = font
         self.sys_font = pygame.font.SysFont(font, self.area.height)
@@ -99,8 +112,9 @@ class Button(Label, ABC):
     def __init__(self, area: Tuple[int, int, int, int] = (0, 0, 0, 0), text: str = None,
                  font_color: Tuple[int, int, int] = WHITE, background_color: Tuple[int, int, int] = None,
                  border_color: Tuple[int, int, int] = None, hover_color: Tuple[int, int, int] = None,
-                 font: str = "comicsansms"):
+                 font: str = "comicsansms", sound_engine: SoundEngine = None):
         super().__init__(area, text, font_color, background_color, border_color, hover_color, font)
+        self.sound_engine = sound_engine
 
     def render(self, surface: pygame.Surface) -> None:
         if not self.enabled:
@@ -118,7 +132,12 @@ class Button(Label, ABC):
             self.on_release()
 
     def on_press(self):
-        raise NotImplementedError()
+        if self.sound_engine is not None:
+            self.sound_engine.play_sound(GameSound.GUI_CONFIRM)
 
     def on_release(self):
         raise NotImplementedError()
+
+    def on_hover(self):
+        if self.sound_engine is not None:
+            self.sound_engine.play_sound(GameSound.GUI_HOVER)

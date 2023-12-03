@@ -8,7 +8,8 @@ from engine.core.input_manager import InputManager
 from engine.core.window import Window
 from engine.menu.menu import Menu
 from engine.menu.storage.start_menu import StartMenu
-from engine.sound.arduino_sound_list import ArduinoSoundData
+from engine.sound.arduino_sound import ArduinoSoundData
+from engine.sound.game_sound import SoundEngine
 from engine.util.debug import print_debug
 from protocol.server_package import ServerPackage
 
@@ -27,6 +28,7 @@ class Engine:
         print_debug("Creating engine...")
         self.window = Window(window_resolution)
         self.input_manager = InputManager()
+        self.sound_engine = SoundEngine()
         self.communication = communication
         self.inputs = self.input_manager.read()
         self.done = False

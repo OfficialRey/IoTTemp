@@ -13,7 +13,7 @@ class StartMenu(Menu):
                 1 - BORDER_DISTANCE * 2)
 
         self.add_widget(StartButton((start_x, 100, width, 100), engine))
-        self.add_widget(QuitButton((start_x, 300, width, 100)))
+        self.add_widget(QuitButton((start_x, 300, width, 100), engine))
 
 
 class PauseMenu(Menu):
