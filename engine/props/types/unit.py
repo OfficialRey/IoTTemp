@@ -7,7 +7,7 @@ from engine.graphics.textures.atlas import AnimationAtlas
 from engine.props.bullet.bullet import Bullet, BulletType
 from engine.props.types.damageable import Damageable
 from engine.props.types.sprite import Sprite
-from engine.sound.game_sound import SoundEngine, GameSound
+from engine.props.weapon.weapon import Weapon
 from engine.world.camera import Camera
 
 
@@ -59,18 +59,18 @@ class Unit(Damageable):
 
 
 class ShootingUnit(Unit):
-    def __init__(self, animation_atlas: AnimationAtlas, bullet_atlas: AnimationAtlas, max_health: int, attack: int,
+    def __init__(self, animation_atlas: AnimationAtlas, weapon: Weapon, max_health: int, attack: int,
                  defense: int, shot_delay: float, max_speed: float, acceleration: float, position: Vector = Vector(),
                  velocity: Vector = Vector()):
         super().__init__(animation_atlas, max_health, attack, defense, max_speed, acceleration, position, velocity)
-        self.bullet_atlas = bullet_atlas
+        self.weapon = weapon
         self.shot_delay = shot_delay
         self.current_shot_timer = 0
         self.bullets = []
 
     def shoot_bullet(self, bullet_type: BulletType, direction: Vector) -> bool:
         if self.current_shot_timer >= self.shot_delay:
-            bullet = Bullet(self.bullet_atlas, self, bullet_type, self.position, direction)
+            bullet = Bullet(self.weapon.animation_atlas, self, bullet_type, self.position, direction)
             self.bullets.append(bullet)
             self.current_shot_timer = 0
             return True

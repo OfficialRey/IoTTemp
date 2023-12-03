@@ -11,7 +11,7 @@ class UnitData(Enum):
     CACO_DEMON = (12, 12, 0, 0, 12, 1)
     CENTIPEDE_HEAD = (30, 6, 0, 0, 1500, 1200)
     CENTIPEDE_BODY = (12, 2, 0, 0, 1500, 1200)
-    PLAYER = (100, 20, 20, 0.2, 2700, 6)
+    PLAYER = (100, 0, 0, 0.05, 2700, 6)
 
     def get_health(self):
         return self.value[0]

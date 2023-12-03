@@ -8,14 +8,14 @@ from engine.props.bullet.bullet import BulletType
 from engine.props.data import UnitData
 from engine.props.player.cursor import Cursor
 from engine.props.types.unit import ShootingUnit
-from engine.sound.game_sound import SoundEngine
+from engine.props.weapon.weapon import WeaponManager
 from engine.world.camera import Camera
 
 
 class Player(ShootingUnit):
 
-    def __init__(self, texture_manager: TextureManager, data: UnitData):
-        super().__init__(texture_manager.player, texture_manager.bullets, data.get_health(), data.get_attack(),
+    def __init__(self, texture_manager: TextureManager, weapon_manager: WeaponManager, data: UnitData):
+        super().__init__(texture_manager.player, weapon_manager.laser_gun, data.get_health(), data.get_attack(),
                          data.get_defense(), data.get_shot_delay(), data.get_max_speed(), data.get_acceleration())
         self.input_manager = None
         self.cursor = Cursor(texture_manager)
@@ -33,7 +33,7 @@ class Player(ShootingUnit):
         self.accelerate((self.cursor.get_center_position() - camera.get_relative_position(self)), delta_time)
 
         if input_manager.left_click:
-            self.shoot_bullet(BulletType.PLASMA, (self.cursor.get_center_position() + camera.position) - self.position)
+            self.shoot_bullet(BulletType.LASER, (self.cursor.get_center_position() + camera.position) - self.position)
 
     def render(self, surface: pygame.Surface, camera: Camera) -> None:
         self.cursor.render(surface, camera)

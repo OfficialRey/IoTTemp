@@ -1,4 +1,5 @@
 import os.path
+
 from typing import List, Tuple, Union
 
 import pygame
@@ -35,7 +36,7 @@ class LevelAtlas:
         for texture in self.textures:
             texture.set_scale(scale)
         texture = self.textures[0]
-        self.sprite_width, self.sprite_height = texture.image.get_size()
+        self.sprite_width, self.sprite_height = texture.get_image().get_size()
 
     def set_size(self, width: int, height: int):
         x_scale = width / self.base_width
@@ -62,10 +63,11 @@ class LevelAtlas:
 class AnimationAtlas:
 
     def __init__(self, path: str = None, file_name: str = None, animation_types: List[AnimationType] = None,
-                 sprite_width: int = None, sprite_height: int = None, time: float = 0.2, loop: bool = True,
-                 scale: Union[Vector, float] = 1, has_flash_image: bool = False, information: Tuple = None):
+                 sprite_width: int = None, sprite_height: int = None, animation_time: float = 0.2, loop: bool = True,
+                 scale: Union[Vector, float] = 1, has_flash_image: bool = False, information: Tuple = None,
+                 rotation_precision: int = 360):
         if information is not None:
-            # Format: animation_types, sprite_width, sprite_height, base_width, base_height, time, loop, texture_animations, scale, has_flash_image
+            # Format: animation_types, sprite_width, sprite_height, base_width, base_height, time, loop, texture_animations, scale, has_flash_image, rotation_precision
             self.animation_types = information[0]
             self.sprite_width = information[1]
             self.sprite_height = information[2]
@@ -76,6 +78,7 @@ class AnimationAtlas:
             self.texture_animations = [animation.copy() for animation in information[7]]
             self.scale = information[8]
             self.has_flash_image = information[9]
+            self.rotation_precision = information[10]
         else:
             print_debug(f"Creating animation atlas {path}/{file_name}")
             self.path = path
@@ -84,8 +87,9 @@ class AnimationAtlas:
                 os.path.join(get_resource_path(), os.path.join(path, file_name))).convert_alpha()
             self.animation_types = animation_types
             self.sprite_width, self.sprite_height = sprite_width, sprite_height
-            self.time = time
+            self.time = animation_time
             self.loop = loop
+            self.rotation_precision = rotation_precision
 
             self.base_width = sprite_width
             self.base_height = sprite_height
@@ -104,7 +108,7 @@ class AnimationAtlas:
                     TextureAnimation(self.surface.subsurface((0, i * self.sprite_height, self.surface.get_width(),
                                                               self.sprite_height)),
                                      self.sprite_width, animation_type, self.time, self.loop,
-                                     has_flash_image=self.has_flash_image))
+                                     has_flash_image=self.has_flash_image, rotation_precision=self.rotation_precision))
         return animations
 
     def set_scale(self, scale: Vector):
@@ -116,6 +120,10 @@ class AnimationAtlas:
         x_scale = width / self.base_width
         y_scale = height / self.base_height
         self.set_scale(Vector(x_scale, y_scale))
+
+    def rotate(self, rotation: float):
+        for texture_animation in self.texture_animations:
+            texture_animation.rotate(rotation)
 
     def update(self, delta_time: float):
         for animation in self.texture_animations:
@@ -131,7 +139,7 @@ class AnimationAtlas:
         return None
 
     def copy(self):
-        # Format: animation_types, sprite_width, sprite_height, base_width, base_height, time, loop, texture_animations, has_flash_image
+        # Format: animation_types, sprite_width, sprite_height, base_width, base_height, time, loop, texture_animations, has_flash_image, rotation_precision
         return AnimationAtlas(information=(
             self.animation_types, self.sprite_width, self.sprite_height, self.base_width, self.base_height, self.time,
-            self.loop, self.texture_animations, self.scale, self.has_flash_image))
+            self.loop, self.texture_animations, self.scale, self.has_flash_image, self.rotation_precision))

@@ -1,12 +1,12 @@
 import math
 import random
+import time
 
 import pygame
 
 from engine.core.vector import Vector
 from engine.graphics.textures.atlas import AnimationAtlas
-from engine.graphics.textures.texture import Texture
-from engine.graphics.textures.texture_animation import AnimationType
+from engine.graphics.textures.texture_animation import AnimationType, TextureAnimation
 from engine.props.types.movable import Movable
 
 GENERIC_ANIMATIONS = [AnimationType.WALKING_N, AnimationType.WALKING_NE, AnimationType.WALKING_E,
@@ -24,9 +24,9 @@ class Sprite(Movable, pygame.sprite.Sprite):
     def __init__(self, animation_atlas: AnimationAtlas, max_speed: float = 0, acceleration: float = 0,
                  position: Vector = Vector(), velocity: Vector = Vector()):
         super().__init__(max_speed, acceleration, position, velocity)
-        self.animation_atlas = animation_atlas.copy()
-        self.current_animation = self.animation_atlas.texture_animations[0]
-        self.sprite_width, self.sprite_height = self.current_animation.get_texture().image.get_size()
+        self.animation_atlas = animation_atlas
+        self.current_animation: TextureAnimation = self.animation_atlas.texture_animations[0]
+        self.sprite_width, self.sprite_height = self.current_animation.get_texture().get_image().get_size()
         self.base_width, self.base_height = self.sprite_width, self.sprite_height
         self.flash_time = 0
 
@@ -36,7 +36,7 @@ class Sprite(Movable, pygame.sprite.Sprite):
     def get_surface(self) -> pygame.Surface:
         if self.flash_time > 0 and self.flash_time % FLASH_SPEED * 2 < FLASH_SPEED:
             return self.current_animation.get_texture().flash_image
-        return self.current_animation.get_texture().image
+        return self.current_animation.get_texture().get_image()
 
     def render(self, surface: pygame.Surface, camera) -> None:
         render_position = camera.get_relative_position(self) - Vector(*self.get_surface().get_size()) / 2
@@ -70,11 +70,17 @@ class Sprite(Movable, pygame.sprite.Sprite):
         y_scale = height / self.base_height
         self.set_scale(Vector(x_scale, y_scale))
 
-    # TODO: Fix animation system
-    def animate_generic(self):
+    def rotate_sprite(self, rotation: float):
+        self.animation_atlas.rotate(rotation)
+
+    def get_rotation_degrees(self):
         vector = Vector(self.velocity.x, -self.velocity.y).normalize()
-        angle = math.degrees(math.atan2(*vector.as_tuple()))
-        index = min(int((angle + ANGLE_OFFSET) / 45), len(GENERIC_ANIMATIONS) - 1)
+        return math.degrees(math.atan2(*vector.as_tuple()))
+
+    # TODO: Fix animation system
+
+    def animate_generic(self):
+        index = min(int((self.get_rotation_degrees() + ANGLE_OFFSET) / 45), len(GENERIC_ANIMATIONS) - 1)
         self.play_animation(GENERIC_ANIMATIONS[index])
 
     def collide_generic(self, other) -> bool:

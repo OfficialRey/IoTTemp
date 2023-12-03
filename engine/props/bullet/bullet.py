@@ -1,3 +1,5 @@
+import math
+import time
 from enum import Enum
 
 from engine.core.vector import Vector
@@ -7,8 +9,8 @@ from engine.sound.game_sound import GameSound
 
 
 class BulletType(Enum):
-    # Speed, Animation, Size, Damage, GameSound
-    PLASMA = (8000, 12, 1, 2, GameSound.PLASMA)
+    # Speed, Animation, Rotation Offset, Size, Damage, GameSound
+    LASER = (8000, 15, 90, 5, 1, GameSound.LASER)
 
     def get_speed(self):
         return self.value[0]
@@ -16,14 +18,17 @@ class BulletType(Enum):
     def get_animation(self):
         return self.value[1]
 
-    def get_size(self):
+    def get_rotation_offset(self):
         return self.value[2]
 
-    def get_damage(self):
+    def get_size(self):
         return self.value[3]
 
-    def get_sound_type(self):
+    def get_attack(self):
         return self.value[4]
+
+    def get_sound_type(self):
+        return self.value[5]
 
 
 class Bullet(Entity):
@@ -42,5 +47,11 @@ class Bullet(Entity):
         super().update(world, delta_time)
 
         self.life_time -= delta_time
-        if self.life_time > 0:
-            return
+
+    def fix_rotation(self):
+        vector = Vector(self.velocity.x, -self.velocity.y).normalize()
+        angle = math.degrees(math.atan2(*vector.as_tuple()))
+        self.rotate_sprite(self.bullet_type.get_rotation_offset() - angle)
+
+    def get_attack(self):
+        return self.owner.attack + self.bullet_type.get_attack()

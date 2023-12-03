@@ -26,6 +26,7 @@ class Engine:
     def __init__(self, communication: Communication, window_resolution: Vector = Vector(1920, 1080), max_fps: int = 60,
                  run_mode: RunMode = RunMode.COMPUTER):
         print_debug("Creating engine...")
+
         self.window = Window(window_resolution)
         self.input_manager = InputManager()
         self.sound_engine = SoundEngine()

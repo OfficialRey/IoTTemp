@@ -34,9 +34,10 @@ class TextureAnimation:
 
     def __init__(self, surface: pygame.Surface = None, sprite_width: int = 1,
                  animation_type: AnimationType = None, time: float = 0.2, loop: bool = True,
-                 scale: Vector = Vector(1, 1), has_flash_image: bool = False, information: Tuple = None):
+                 scale: Vector = Vector(1, 1), has_flash_image: bool = False, information: Tuple = None,
+                 rotation_precision: int = 360):
         if information is not None:
-            # Format: surface, sprite_width, animation_type, target_time, loop, textures, scale, has_flash_image
+            # Format: surface, sprite_width, animation_type, target_time, loop, textures, scale, has_flash_image, rotation_precision
             self.surface = information[0].copy()
             self.sprite_width = information[1]
             self.animation_type = information[2]
@@ -45,6 +46,7 @@ class TextureAnimation:
             self.textures = [texture.copy() for texture in information[5]]
             self.scale = information[6]
             self.has_flash_image = information[7]
+            self.rotation_precision = information[8]
             self.sprite_height = self.surface.get_height()
         else:
             self.surface = surface
@@ -54,6 +56,7 @@ class TextureAnimation:
             self.loop = loop
             self.sprite_height = self.surface.get_height()
             self.has_flash_image = has_flash_image
+            self.rotation_precision = rotation_precision
 
             self.textures = self._load_textures()
             self.scale = self.set_scale(scale)
@@ -66,7 +69,7 @@ class TextureAnimation:
         for x in range(self.surface.get_width() // self.sprite_width):
             texture = Texture(
                 self.surface.subsurface((x * self.sprite_width, 0, self.sprite_width, self.sprite_height)),
-                has_flash_image=self.has_flash_image)
+                has_flash_image=self.has_flash_image, rotation_precision=self.rotation_precision)
             if not texture.is_empty():
                 textures.append(texture)
         return textures
@@ -90,6 +93,10 @@ class TextureAnimation:
             texture.set_scale(scale)
         return scale
 
+    def rotate(self, rotation: float):
+        for texture in self.textures:
+            texture.rotate(rotation)
+
     def offset_animation(self, value: float):
         self.count = int(value / self.target_time)
         self.timer = value % self.target_time
@@ -103,7 +110,7 @@ class TextureAnimation:
             texture.mirror_texture(x_axis, y_axis)
 
     def copy(self):
-        # Format: surface, sprite_width, animation_type, target_time, loop, textures, scale, has_flash_image
+        # Format: surface, sprite_width, animation_type, target_time, loop, textures, scale, has_flash_image, rotation_precision
         return TextureAnimation(information=(
             self.surface, self.sprite_width, self.animation_type, self.target_time, self.loop, self.textures,
-            self.scale, self.has_flash_image))
+            self.scale, self.has_flash_image, self.rotation_precision))

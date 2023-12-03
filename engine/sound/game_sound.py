@@ -14,7 +14,7 @@ class GameSound(Enum):
     GUI_CONFIRM = "gui_confirm.wav",
 
     # SHOOTING
-    PLASMA = "plasma.wav",
+    LASER = "laser.wav",
 
     def get_file_name(self):
         return self.value[0]

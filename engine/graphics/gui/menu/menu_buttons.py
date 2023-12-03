@@ -31,7 +31,6 @@ class QuitButton(Button):
                          sound_engine=engine.sound_engine)
 
     def on_press(self):
-        super().on_press()
         exit(0)
 
     def on_release(self):

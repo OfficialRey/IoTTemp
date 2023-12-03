@@ -33,5 +33,5 @@ class CentipedeHead(Enemy):
             return
 
         # The player shot me
-        self.damage(other.bullet_type.get_damage())
+        self.damage(other.get_attack())
         other.life_time = 0

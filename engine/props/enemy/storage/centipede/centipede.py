@@ -87,7 +87,7 @@ class Centipede(Enemy):
             return
 
         # The player shot me
-        self.damage(other.bullet_type.get_damage())
+        self.damage(other.bullet_type.get_attack())
         other.life_time = 0
 
     def set_scale(self, scale: Vector):

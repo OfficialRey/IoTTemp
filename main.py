@@ -1,4 +1,6 @@
 import os
+import sys
+import trace
 
 import pygame
 
@@ -24,4 +26,7 @@ def start(level_editor: bool = False):
 
 
 if __name__ == '__main__':
+    import cProfile
+
+    cProfile.run("start(False)")
     start(False)

@@ -15,4 +15,4 @@ class Cursor(Sprite):
         self.position = position
 
     def render(self, surface: pygame.Surface, camera) -> None:
-        surface.blit(self.current_animation.get_texture().image, self.position.as_tuple())
+        surface.blit(self.current_animation.get_texture().get_image(), self.position.as_tuple())

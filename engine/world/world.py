@@ -9,6 +9,7 @@ from engine.props.enemy.enemy import Enemy
 from engine.props.enemy.storage.centipede.centipede import Centipede
 from engine.props.player.player import Player
 from engine.props.types.unit import ShootingUnit
+from engine.props.weapon.weapon import WeaponManager
 from engine.util.constants import WHITE
 from engine.util.debug import print_debug
 from engine.world.camera import Camera
@@ -17,20 +18,21 @@ from engine.world.level_data import LevelData
 
 class World:
 
-    def __init__(self, texture_manager: TextureManager, level_data: LevelData, window: Window, zoom: float):
+    def __init__(self, window: Window, zoom: float):
         print_debug("Creating world...")
 
-        self.texture_manager = texture_manager
+        self.texture_manager = TextureManager()
+        self.weapon_manager = WeaponManager(self.texture_manager)
         self.camera = Camera(window, zoom)
 
-        self.level_data = level_data
-        self.player: Player = Player(texture_manager, UnitData.PLAYER)
+        self.level_data = LevelData(self.texture_manager.level_textures, "Test", 512, 512)
+        self.player: Player = Player(self.texture_manager, self.weapon_manager, UnitData.PLAYER)
         self.texture_atlas = self.level_data.texture_atlas
 
         self.units = pygame.sprite.Group()
         self.units.add(self.player)
 
-        self.units.add(Centipede(texture_manager, Vector(0, 0)))
+        self.units.add(Centipede(self.texture_manager, Vector(0, 0)))
 
         # Server Package Values
         self.player_shot = False
@@ -131,7 +133,7 @@ class World:
                 x_pos = (x + camera_x) // sprite_width
                 y_pos = (y + camera_y) // sprite_height
                 if 0 <= x_pos < self.level_data.width and 0 <= y_pos < self.level_data.height:
-                    window.surface.blit(self.level_data.get_texture(x_pos, y_pos).image,
+                    window.surface.blit(self.level_data.get_texture(x_pos, y_pos).get_image(),
                                         (x - camera_x % sprite_width, y - camera_y % sprite_height))
 
     def _render_units(self, window: Window) -> None:
