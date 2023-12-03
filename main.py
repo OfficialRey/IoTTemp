@@ -25,5 +25,4 @@ def start(level_editor: bool = False):
 
 
 if __name__ == '__main__':
-    import cProfile
-    cProfile.run("start(False)")
+    start(True)

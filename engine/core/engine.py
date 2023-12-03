@@ -6,10 +6,9 @@ from engine.core.communication import Communication
 from engine.core.vector import Vector
 from engine.core.input_manager import InputManager
 from engine.core.window import Window
-from engine.util.constants import WHITE
+from engine.sound.arduino_sound_list import ArduinoSoundData
 from engine.util.debug import print_debug
 from protocol.server_package import ServerPackage
-from sound.arduino_sound_list import ArduinoSoundData
 
 MILLI_SECONDS = 1000
 
@@ -39,6 +38,7 @@ class Engine:
         pygame.mouse.set_visible(False)
 
     def run(self, world) -> None:
+        # Reset clock and set delta time to 0 to not use loading time as calculation time
         self.clock.tick(self.max_fps)
         self.delta_time = 0
         print_debug("Starting main loop...")

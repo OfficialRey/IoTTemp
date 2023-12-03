@@ -43,7 +43,7 @@ class TextureManager:
         # Bullets
         self.bullets = AnimationAtlas("bullets", "bullets.png", BULLETS, 16, 16, time=0.05)
 
-        self.game_atlas = [
+        self.game_textures = [
             # Level
             self.level_textures,
 
@@ -61,9 +61,13 @@ class TextureManager:
             self.bullets
         ]
 
+    def scale_textures(self, scale):
+        for texture_atlas in self.game_textures:
+            texture_atlas.set_scale(scale)
+
     def count_textures(self):
         count = 0
-        for atlas in self.game_atlas:
+        for atlas in self.game_textures:
             if isinstance(atlas, AnimationAtlas):
                 for animation in atlas.texture_animations:
                     count += len(animation.textures)

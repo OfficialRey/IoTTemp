@@ -5,7 +5,7 @@ from pygame.math import clamp
 
 from engine.core.vector import Vector
 from engine.core.window import Window
-from engine.editor.editor_widget import LevelEditorSelectTextureButton, LevelEditorScrollTextureButton
+from engine.graphics.gui.editor.editor_widget import LevelEditorScrollTextureButton, LevelEditorSelectTextureButton
 from engine.graphics.gui.widget import Button
 from engine.graphics.textures.atlas import LevelAtlas
 from engine.graphics.textures.texture_animation import AnimationType
@@ -39,6 +39,7 @@ class LevelEditor:
         # Editor Parameters
         self.done = False
         self.texture_manager = TextureManager()
+        self.texture_manager.scale_textures(5)
         self.texture_atlas = self.texture_manager.level_textures
         self.level_data = None
         self.world = None
@@ -134,9 +135,9 @@ class LevelEditor:
     def check_events(self):
         for event in pygame.event.get():
             for button in self.buttons:
-                button.act(event)
+                button.update(event)
             for button in self.scroll_buttons:
-                button.act(event)
+                button.update(event)
             if event.type == pygame.QUIT:
                 exit()
 
