@@ -1,12 +1,12 @@
 import math
-import random
-import time
+from typing import Union
 
 import pygame
 
 from engine.core.vector import Vector
-from engine.graphics.textures.atlas import AnimationAtlas
-from engine.graphics.textures.texture_animation import AnimationType, TextureAnimation
+from engine.graphics.animation.animation import AnimationType
+from engine.graphics.animation.animation_manager import AnimationManager
+from engine.graphics.atlas.animation import AnimationAtlas
 from engine.props.types.movable import Movable
 
 GENERIC_ANIMATIONS = [AnimationType.WALKING_N, AnimationType.WALKING_NE, AnimationType.WALKING_E,
@@ -16,27 +16,24 @@ GENERIC_ANIMATIONS = [AnimationType.WALKING_N, AnimationType.WALKING_NE, Animati
 ANGLE_OFFSET = 360 / len(GENERIC_ANIMATIONS) * 0.5
 
 HIT_BOX_FACTOR = 0.75
-FLASH_SPEED = 0.01
 
 
 class Sprite(Movable, pygame.sprite.Sprite):
 
     def __init__(self, animation_atlas: AnimationAtlas, max_speed: float = 0, acceleration: float = 0,
-                 position: Vector = Vector(), velocity: Vector = Vector()):
+                 position: Vector = Vector(), velocity: Vector = Vector(),
+                 animation_type: AnimationType = AnimationType.GENERIC):
         super().__init__(max_speed, acceleration, position, velocity)
         self.animation_atlas = animation_atlas
-        self.current_animation: TextureAnimation = self.animation_atlas.texture_animations[0]
-        self.sprite_width, self.sprite_height = self.current_animation.get_texture().get_image().get_size()
+        self.animation_manager = AnimationManager(self.animation_atlas, animation_type)
+        self.sprite_width, self.sprite_height = self.animation_atlas.base_width, self.animation_atlas.base_height
         self.base_width, self.base_height = self.sprite_width, self.sprite_height
-        self.flash_time = 0
 
-    def flash(self, time: float):
-        self.flash_time = time
+    def flash_image(self, flash_time: float):
+        self.animation_manager.flash_image(flash_time)
 
     def get_surface(self) -> pygame.Surface:
-        if self.flash_time > 0 and self.flash_time % FLASH_SPEED * 2 < FLASH_SPEED:
-            return self.current_animation.get_texture().flash_image
-        return self.current_animation.get_texture().get_image()
+        return self.animation_manager.get_surface(self.animation_atlas)
 
     def render(self, surface: pygame.Surface, camera) -> None:
         render_position = camera.get_relative_position(self) - Vector(*self.get_surface().get_size()) / 2
@@ -46,20 +43,10 @@ class Sprite(Movable, pygame.sprite.Sprite):
         return self.position + Vector(self.sprite_width // 2, self.sprite_height // 2)
 
     def offset_animation(self):
-        self.current_animation.offset_animation(self.current_animation.target_time * random.random())
-
-    def play_animation(self, animation_type):
-        if self.current_animation.animation_type == animation_type:
-            return
-        if isinstance(animation_type, AnimationType):
-            self.current_animation = self.animation_atlas.get_animation(animation_type)
-        elif isinstance(animation_type, int):
-            self.current_animation = self.animation_atlas.texture_animations[animation_type]
-        self.current_animation.reset()
+        self.animation_manager.offset_animation()
 
     def update(self, world, delta_time: float) -> None:
-        self.current_animation.update(delta_time)
-        self.flash_time -= delta_time
+        self.animation_manager.update(delta_time)
         super().update(world, delta_time)
 
     def set_scale(self, scale: Vector):
@@ -70,18 +57,19 @@ class Sprite(Movable, pygame.sprite.Sprite):
         y_scale = height / self.base_height
         self.set_scale(Vector(x_scale, y_scale))
 
-    def rotate_sprite(self, rotation: float):
-        self.animation_atlas.rotate(rotation)
+    def set_rotation(self, rotation: float):
+        self.animation_manager.set_rotation(rotation)
 
-    def get_rotation_degrees(self):
+    def get_rotation(self):
+        return self.animation_manager.get_rotation()
+
+    def get_velocity_rotation(self):
         vector = Vector(self.velocity.x, -self.velocity.y).normalize()
         return math.degrees(math.atan2(*vector.as_tuple()))
 
-    # TODO: Fix animation system
-
     def animate_generic(self):
-        index = min(int((self.get_rotation_degrees() + ANGLE_OFFSET) / 45), len(GENERIC_ANIMATIONS) - 1)
-        self.play_animation(GENERIC_ANIMATIONS[index])
+        index = min(int((self.get_velocity_rotation() + ANGLE_OFFSET) / 45), len(GENERIC_ANIMATIONS) - 1)
+        self.animation_manager.update_animation_type(GENERIC_ANIMATIONS[index])
 
     def collide_generic(self, other) -> bool:
         distance = self.get_center_position().distance(other.get_center_position())
@@ -90,3 +78,9 @@ class Sprite(Movable, pygame.sprite.Sprite):
 
     def get_collision_radius(self):
         return (self.sprite_width + self.sprite_height) / 2 * HIT_BOX_FACTOR
+
+    def play_animation(self, animation_type: Union[int, AnimationType]):
+        if isinstance(animation_type, AnimationType):
+            self.animation_manager.update_animation_type(animation_type)
+        elif isinstance(animation_type, int):
+            self.animation_manager.update_animation_index(animation_type)

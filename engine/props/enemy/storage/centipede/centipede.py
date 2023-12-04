@@ -22,7 +22,7 @@ class Centipede(Enemy):
         self._create_centipede()
 
     def _create_centipede(self):
-        length = 20
+        length = 5
 
         previous_segment = CentipedeHead(self.head_texture, self.position)
         self.segments = [previous_segment]

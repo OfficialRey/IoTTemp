@@ -2,7 +2,7 @@ import pygame
 
 from engine.core.input_manager import InputManager
 from engine.core.vector import Vector
-from engine.graphics.textures.texture_animation import AnimationType
+from engine.graphics.animation.animation import AnimationType
 from engine.graphics.textures.texture_manager import TextureManager
 from engine.props.bullet.bullet import BulletType
 from engine.props.data import UnitData

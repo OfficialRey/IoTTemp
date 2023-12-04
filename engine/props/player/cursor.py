@@ -2,7 +2,7 @@ import pygame
 
 from engine.core.vector import Vector
 from engine.graphics.textures.texture_manager import TextureManager
-from engine.props.types.entity import Sprite
+from engine.props.types.sprite import Sprite
 
 
 class Cursor(Sprite):
@@ -15,4 +15,4 @@ class Cursor(Sprite):
         self.position = position
 
     def render(self, surface: pygame.Surface, camera) -> None:
-        surface.blit(self.current_animation.get_texture().get_image(), self.position.as_tuple())
+        surface.blit(self.get_surface(), self.position.as_tuple())

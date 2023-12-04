@@ -37,8 +37,7 @@ class Engine:
 
         self.clock = pygame.time.Clock()
         self.max_fps = max_fps
-        self.target_delta_time = 1 / self.max_fps
-        self.delta_time = self.target_delta_time
+        self.delta_time = 0
 
         self.current_menu: Menu = StartMenu(self)
 

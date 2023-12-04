@@ -1,5 +1,6 @@
-from engine.graphics.textures.atlas import LevelAtlas, AnimationAtlas
-from engine.graphics.textures.texture_animation import AnimationType
+from engine.graphics.animation.animation import AnimationType
+from engine.graphics.atlas.animation import AnimationAtlas
+from engine.graphics.atlas.level import LevelAtlas
 
 # Define Animations of Sprite Sheet
 
@@ -22,18 +23,16 @@ CENTIPEDE_BODY = [None, None, None, None, None, None, None, None,
 class TextureManager:
     # Class for loading and initializing all required textures of the game
 
-    # TODO: Somewhere here colors are overridden
-
     def __init__(self):
         self.level_textures = LevelAtlas("level", "level_textures.png", 16, 16)
-        self.centipede_head = AnimationAtlas("enemies", "centipede.png", CENTIPEDE, 16, 16, animation_time=0.1, loop=True,
-                                             has_flash_image=True)
-        self.centipede_body = AnimationAtlas("enemies", "centipede.png", CENTIPEDE_BODY, 16, 16, animation_time=0.1, loop=True,
-                                             has_flash_image=True)
+        self.centipede_head = AnimationAtlas("enemies", "centipede.png", CENTIPEDE, 16, 16, animation_time=0.1,
+                                             loop=True)
+        self.centipede_body = AnimationAtlas("enemies", "centipede.png", CENTIPEDE_BODY, 16, 16, animation_time=0.1,
+                                             loop=True)
 
         # Player
         self.cursor = AnimationAtlas("player", "target.png", CURSOR, 24, 24, animation_time=0.2, loop=True)
-        self.player = AnimationAtlas("player", "player.png", PLAYER, 16, 16, animation_time=0.2, loop=True, has_flash_image=True)
+        self.player = AnimationAtlas("player", "player.png", PLAYER, 16, 16, animation_time=0.2, loop=True)
 
         # Calibration
         self.calibrator = AnimationAtlas("calibration", "calibration.png", SINGLE_SPRITE, 16, 16)
@@ -43,7 +42,8 @@ class TextureManager:
         self.arrow_down = AnimationAtlas("widgets", "arrow_down.png", SINGLE_SPRITE, 16, 16)
 
         # Bullets
-        self.bullets = AnimationAtlas("bullets", "bullets.png", BULLETS, 16, 16, animation_time=0.05, rotation_precision=2)
+        self.bullets = AnimationAtlas("bullets", "bullets.png", BULLETS, 16, 16, animation_time=0.05,
+                                      rotation_precision=360)
 
         self.game_textures = [
             # Level
@@ -71,6 +71,5 @@ class TextureManager:
         count = 0
         for atlas in self.game_textures:
             if isinstance(atlas, AnimationAtlas):
-                for animation in atlas.texture_animations:
-                    count += len(animation.textures)
+                count += len(atlas.textures)
         return count

@@ -1,4 +1,4 @@
-from engine.graphics.textures.atlas import LevelAtlas
+from engine.graphics.atlas.level import LevelAtlas
 from engine.graphics.textures.texture import Texture
 
 

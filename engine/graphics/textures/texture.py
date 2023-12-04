@@ -13,10 +13,9 @@ FLASH_COLOR_OFFSET = 150, 0, 0, 0
 
 class Texture:
 
-    def __init__(self, base_image: pygame.Surface, rotation_precision: int = 2):
-        self.base_image = base_image.copy()
+    def __init__(self, base_image: pygame.Surface, rotation_precision: int = 360):
+        self.base_image = base_image
         self.rotation_precision = rotation_precision
-        self.current_rotation = 0
 
         self.images = []
         self.flash_images = []
@@ -34,7 +33,7 @@ class Texture:
         for rotation in range(0, FULL_ROTATION, self.rotation_precision):
             image = pygame.transform.rotate(self.base_image.copy(), rotation)
             self.images.append(image)
-            self.flash_images.append(image)
+            self.flash_images.append(image.copy())
 
     def _colorize_flash_images(self):
         for i in range(len(self.flash_images)):
@@ -54,23 +53,17 @@ class Texture:
                                          (flash_image.get_width() * image_scale.x,
                                           flash_image.get_height() * image_scale.y))
 
-    def set_rotation(self, rotation: float):
-        self.current_rotation = rotation
-
-    def get_rotation(self):
-        return self.current_rotation
-
     def mirror_texture(self, x_axis: bool = True, y_axis: bool = False):
         flip = x_axis, y_axis
         for i in range(len(self.images)):
             self.images[i] = pygame.transform.flip(self.images[i], *flip)
             self.flash_images[i] = pygame.transform.flip(self.flash_images[i], *flip)
 
-    def get_image(self):
-        return self.images[int(self.current_rotation / self.rotation_precision)]
+    def get_image(self, rotation: int = 0):
+        return self.images[int(rotation / self.rotation_precision)]
 
-    def get_flash_image(self):
-        return self.flash_images[int(self.current_rotation / self.rotation_precision)]
+    def get_flash_image(self, rotation: int = 0):
+        return self.flash_images[int(rotation / self.rotation_precision)]
 
     def is_empty(self) -> bool:
         pixels = pygame.PixelArray(self.base_image)

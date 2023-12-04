@@ -1,10 +1,10 @@
 import math
-import time
+
 from enum import Enum
 
 from engine.core.vector import Vector
-from engine.graphics.textures.atlas import AnimationAtlas
-from engine.props.types.entity import Entity
+from engine.graphics.atlas.animation import AnimationAtlas
+from engine.props.types.sprite import Sprite
 from engine.sound.game_sound import GameSound
 
 
@@ -31,7 +31,7 @@ class BulletType(Enum):
         return self.value[5]
 
 
-class Bullet(Entity):
+class Bullet(Sprite):
 
     def __init__(self, animation_atlas: AnimationAtlas, owner, bullet_type: BulletType,
                  position: Vector, velocity: Vector, max_speed: float = 0):
@@ -51,7 +51,7 @@ class Bullet(Entity):
     def fix_rotation(self):
         vector = Vector(self.velocity.x, -self.velocity.y).normalize()
         angle = math.degrees(math.atan2(*vector.as_tuple()))
-        self.rotate_sprite(self.bullet_type.get_rotation_offset() - angle)
+        self.set_rotation(self.bullet_type.get_rotation_offset() - angle)
 
     def get_attack(self):
         return self.owner.attack + self.bullet_type.get_attack()

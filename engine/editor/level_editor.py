@@ -5,10 +5,10 @@ from pygame.math import clamp
 
 from engine.core.vector import Vector
 from engine.core.window import Window
+from engine.graphics.animation.animation import AnimationType
+from engine.graphics.atlas.level import LevelAtlas
 from engine.graphics.gui.editor.editor_widget import LevelEditorScrollTextureButton, LevelEditorSelectTextureButton
 from engine.graphics.gui.widget import Button
-from engine.graphics.textures.atlas import LevelAtlas
-from engine.graphics.textures.texture_animation import AnimationType
 from engine.graphics.textures.texture_manager import TextureManager
 from engine.util.constants import RED, WHITE, BLACK
 from engine.world.level_data import LevelData

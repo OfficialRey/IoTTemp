@@ -1,6 +1,6 @@
 from enum import Enum
 
-from engine.graphics.textures.atlas import AnimationAtlas
+from engine.graphics.atlas.animation import AnimationAtlas
 from engine.graphics.textures.texture_manager import TextureManager
 from engine.props.bullet.bullet import BulletType
 from engine.sound.game_sound import SoundEngine
@@ -15,7 +15,7 @@ class Weapon:
 
     def __init__(self, name: str, animation_atlas: AnimationAtlas, bullet_type: BulletType):
         self.name = name
-        self.animation_atlas = animation_atlas.copy()
+        self.animation_atlas = animation_atlas
         self.animation_atlas.set_scale(bullet_type.get_size())
         self.bullet_type = bullet_type
 

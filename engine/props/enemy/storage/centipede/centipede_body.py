@@ -1,5 +1,5 @@
 from engine.core.vector import Vector
-from engine.graphics.textures.atlas import AnimationAtlas
+from engine.graphics.atlas.animation import AnimationAtlas
 from engine.props.bullet.bullet import Bullet
 from engine.props.data import UnitData
 from engine.props.enemy.enemy import Enemy

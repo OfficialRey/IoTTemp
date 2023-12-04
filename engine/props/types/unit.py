@@ -3,7 +3,7 @@ from typing import List
 import pygame
 
 from engine.core.vector import Vector
-from engine.graphics.textures.atlas import AnimationAtlas
+from engine.graphics.atlas.animation import AnimationAtlas
 from engine.props.bullet.bullet import Bullet, BulletType
 from engine.props.types.damageable import Damageable
 from engine.props.types.sprite import Sprite
