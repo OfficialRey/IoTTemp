@@ -30,10 +30,11 @@ class Player(ShootingUnit):
     def handle_input(self, input_manager: InputManager, camera, delta_time: float):
         position = Vector(input_manager.mouse_x, input_manager.mouse_y)
         self.cursor.set_position(position)
-        self.accelerate((self.cursor.get_center_position() - camera.get_relative_position(self)), delta_time)
+        self.accelerate((self.cursor.center_position - camera.get_relative_position(self)), delta_time)
 
+        print(self.cursor.center_position)
         if input_manager.left_click:
-            self.shoot_bullet(BulletType.LASER, (self.cursor.get_center_position() + camera.position) - self.position)
+            self.shoot_bullet(BulletType.LASER, (self.cursor.center_position - camera.get_relative_position(self)))
 
     def render(self, surface: pygame.Surface, camera: Camera) -> None:
         self.cursor.render(surface, camera)

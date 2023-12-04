@@ -13,14 +13,14 @@ DISTANCE_FACTOR = 4
 
 class CentipedeBody(Enemy):
 
-    def __init__(self, atlas: AnimationAtlas, previous_segment: Enemy, position: Vector):
-        super().__init__(atlas, UnitData.CENTIPEDE_BODY, position)
-        self.position = position
+    def __init__(self, atlas: AnimationAtlas, previous_segment: Enemy, center_position: Vector):
+        super().__init__(atlas, UnitData.CENTIPEDE_BODY, center_position)
+        self.position = center_position
         self.previous_segment = previous_segment
 
     def run_behaviour(self, world, delta_time: float):
         # Accelerate towards previous segment
-        me_to_segment = self.previous_segment.position - self.position
+        me_to_segment = self.previous_segment.center_position - self.position
 
         distance = me_to_segment.magnitude()
         target_distance = self.sprite_width * DISTANCE_FACTOR

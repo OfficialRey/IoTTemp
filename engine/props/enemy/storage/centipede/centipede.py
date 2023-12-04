@@ -13,8 +13,8 @@ from engine.props.types.sprite import Sprite
 
 class Centipede(Enemy):
 
-    def __init__(self, texture_manager: TextureManager, position: Vector):
-        super().__init__(texture_manager.centipede_head, UnitData.NONE, position)
+    def __init__(self, texture_manager: TextureManager, center_position: Vector):
+        super().__init__(texture_manager.centipede_head, UnitData.NONE, center_position)
         self.head_texture = texture_manager.centipede_head
         self.body_texture = texture_manager.centipede_body
         self.segments = []
@@ -24,10 +24,10 @@ class Centipede(Enemy):
     def _create_centipede(self):
         length = 5
 
-        previous_segment = CentipedeHead(self.head_texture, self.position)
+        previous_segment = CentipedeHead(self.head_texture, self.center_position)
         self.segments = [previous_segment]
         for i in range(1, length):
-            previous_segment = CentipedeBody(self.body_texture, previous_segment, previous_segment.position)
+            previous_segment = CentipedeBody(self.body_texture, previous_segment, previous_segment.center_position)
             previous_segment.offset_animation()
             previous_segment.velocity = Vector()
             self.segments.append(previous_segment)

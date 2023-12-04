@@ -39,6 +39,9 @@ class Vector:
     def as_tuple(self) -> Tuple[float, float]:
         return self.x, self.y
 
+    def as_int(self):
+        return Vector(int(self.x), int(self.y))
+
     def __add__(self, other):
         if isinstance(other, Vector):
             return Vector(self.x + other.x, self.y + other.y)

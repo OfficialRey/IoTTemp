@@ -15,9 +15,9 @@ from engine.world.camera import Camera
 class Unit(Damageable):
 
     def __init__(self, atlas: AnimationAtlas, max_health: int, attack: int, defense: int,
-                 max_speed: float = 0, acceleration: float = 0, position: Vector = Vector(),
+                 max_speed: float = 0, acceleration: float = 0, center_position: Vector = Vector(),
                  velocity: Vector = Vector()):
-        super().__init__(atlas, max_health, attack, defense, max_speed, acceleration, position, velocity)
+        super().__init__(atlas, max_health, attack, defense, max_speed, acceleration, center_position, velocity)
 
     def update(self, world, delta_time: float):
         self.run_behaviour(world, delta_time)
@@ -61,9 +61,9 @@ class Unit(Damageable):
 
 class ShootingUnit(Unit, ABC):
     def __init__(self, atlas: AnimationAtlas, weapon: Weapon, max_health: int, attack: int,
-                 defense: int, shot_delay: float, max_speed: float, acceleration: float, position: Vector = Vector(),
+                 defense: int, shot_delay: float, max_speed: float, acceleration: float, center_position: Vector = Vector(),
                  velocity: Vector = Vector()):
-        super().__init__(atlas, max_health, attack, defense, max_speed, acceleration, position, velocity)
+        super().__init__(atlas, max_health, attack, defense, max_speed, acceleration, center_position, velocity)
         self.weapon = weapon
         self.shot_delay = shot_delay
         self.current_shot_timer = 0
@@ -71,7 +71,7 @@ class ShootingUnit(Unit, ABC):
 
     def shoot_bullet(self, bullet_type: BulletType, direction: Vector) -> bool:
         if self.current_shot_timer >= self.shot_delay:
-            bullet = Bullet(self.weapon.animation_atlas, self, bullet_type, self.position, direction)
+            bullet = Bullet(self.weapon.animation_atlas, self, bullet_type, self.center_position, direction)
             self.bullets.append(bullet)
             self.current_shot_timer = 0
             return True

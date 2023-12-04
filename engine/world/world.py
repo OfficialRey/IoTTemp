@@ -25,7 +25,7 @@ class World:
         self.weapon_manager = WeaponManager(self.texture_manager)
         self.camera = Camera(window, zoom)
 
-        self.level_data = LevelData(self.texture_manager.level_textures, "Test", 512, 512)
+        self.level_data = LevelData(self.texture_manager.level_textures, "Test", 20, 20)
         self.player: Player = Player(self.texture_manager, self.weapon_manager, UnitData.PLAYER)
         self.texture_atlas = self.level_data.texture_atlas
 
@@ -51,21 +51,21 @@ class World:
             texture_atlas.scale_textures(Vector(zoom, zoom))
 
     def set_camera_position(self, position: Vector):
+        position.x = max(self.camera.resolution.x / 2,
+                         min(self.level_data.width * self.texture_atlas.get_texture_width() - self.camera.resolution.x / 2,
+                             position.x))
+
         if position.x + self.camera.resolution.x > self.level_data.width * self.texture_atlas.sprite_width:
             position.x = self.level_data.width * self.texture_atlas.sprite_width - self.camera.resolution.x
         if position.y + self.camera.resolution.y > self.level_data.height * self.texture_atlas.sprite_height:
             position.y = self.level_data.height * self.texture_atlas.sprite_height - self.camera.resolution.y
+
+        # Clamp values
         if position.x < 0:
             position.x = 0
         if position.y < 0:
             position.y = 0
         self.camera.position = position
-
-    def set_camera_position_smooth(self, position: Vector, speed: float = 0.6):
-        current_position = self.camera.position
-        position_to_target = (position - current_position) / 10
-        target_position = current_position + position_to_target * speed
-        self.set_camera_position(target_position)
 
     def process(self, input_manager: InputManager, delta_time: float):
         self._reset_package_values()
@@ -86,11 +86,11 @@ class World:
             self.player_shot = True
 
         # Update Camera
-        player_to_cursor = (self.player.cursor.position - self.camera.get_relative_position(
+        player_to_cursor = (self.player.cursor.center_position - self.camera.get_relative_position(
             self.player)) / 4
 
-        position = (self.player.position + player_to_cursor) - self.camera.resolution / 2
-        self.set_camera_position_smooth(position)
+        position = (self.player.center_position + player_to_cursor)
+        self.camera.set_position_smooth(self.level_data, position)
 
     def _process_units(self, delta_time: float):
         for unit in self.units.sprites():
@@ -120,8 +120,7 @@ class World:
 
     def _render_level(self, window: Window) -> None:
         zoom = self.get_camera_zoom()
-        camera_x = int(self.camera.position.x)
-        camera_y = int(self.camera.position.y)
+        camera_x, camera_y = self.camera.get_position().as_int().as_tuple()
 
         sprite_width, sprite_height = self.level_data.texture_atlas.get_texture_size()
 

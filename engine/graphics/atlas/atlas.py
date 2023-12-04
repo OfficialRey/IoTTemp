@@ -28,8 +28,14 @@ class Atlas(ABC):
             texture.scale_texture(scale)
         self.sprite_scale *= scale
 
+    def get_texture_width(self):
+        return int(self.sprite_width * self.sprite_scale.x)
+
+    def get_texture_height(self):
+        return int(self.sprite_height * self.sprite_scale.y)
+
     def get_texture_size(self) -> Tuple[int, int]:
-        return int(self.sprite_width * self.sprite_scale.x), int(self.sprite_height * self.sprite_scale.y)
+        return self.get_texture_width(), self.get_texture_height()
 
     def count_surfaces(self):
         count = 0

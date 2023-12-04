@@ -34,8 +34,8 @@ class BulletType(Enum):
 class Bullet(Sprite):
 
     def __init__(self, atlas: Atlas, owner, bullet_type: BulletType,
-                 position: Vector, velocity: Vector, max_speed: float = 0):
-        super().__init__(atlas, max_speed, 0, position, velocity)
+                 center_position: Vector, velocity: Vector, max_speed: float = 0):
+        super().__init__(atlas, max_speed, 0, center_position, velocity)
         self.owner = owner
         self.max_speed = bullet_type.value[0]
         self.velocity = self.velocity.normalize() * self.max_speed

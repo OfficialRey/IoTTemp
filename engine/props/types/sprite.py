@@ -22,13 +22,12 @@ HIT_BOX_FACTOR = 0.75
 class Sprite(Movable, pygame.sprite.Sprite):
 
     def __init__(self, atlas: Atlas, max_speed: float = 0, acceleration: float = 0,
-                 position: Vector = Vector(), velocity: Vector = Vector(),
+                 center_position: Vector = Vector(), velocity: Vector = Vector(),
                  animation_type: AnimationType = AnimationType.GENERIC):
-        super().__init__(max_speed, acceleration, position, velocity)
+        super().__init__(max_speed, acceleration, center_position, velocity)
         self.atlas = atlas
         self.animation_manager = AnimationManager(self.atlas, animation_type)
-        self.sprite_width, self.sprite_height = self.atlas.sprite_width, self.atlas.sprite_height
-        self.base_width, self.base_height = self.sprite_width, self.sprite_height
+        self.sprite_width, self.sprite_height = self.atlas.get_texture_size()
 
     def flash_image(self, flash_time: float):
         self.animation_manager.flash_image(flash_time)
@@ -40,8 +39,8 @@ class Sprite(Movable, pygame.sprite.Sprite):
         render_position = camera.get_relative_position(self) - Vector(*self.get_surface().get_size()) / 2
         surface.blit(self.get_surface(), render_position.as_tuple())
 
-    def get_center_position(self) -> Vector:
-        return self.position + Vector(self.sprite_width // 2, self.sprite_height // 2)
+    def get_render_position(self) -> Vector:
+        return self.center_position - Vector(self.sprite_width // 2, self.sprite_height // 2)
 
     def offset_animation(self):
         self.animation_manager.offset_animation()
@@ -49,14 +48,6 @@ class Sprite(Movable, pygame.sprite.Sprite):
     def update(self, world, delta_time: float) -> None:
         self.animation_manager.update(delta_time)
         super().update(world, delta_time)
-
-    def set_scale(self, scale: Vector):
-        self.atlas.set_scale(scale)
-
-    def set_size(self, width: int, height: int):
-        x_scale = width / self.base_width
-        y_scale = height / self.base_height
-        self.set_scale(Vector(x_scale, y_scale))
 
     def set_rotation(self, rotation: float):
         self.animation_manager.set_rotation(rotation)
@@ -73,7 +64,7 @@ class Sprite(Movable, pygame.sprite.Sprite):
         self.animation_manager.update_animation_type(GENERIC_ANIMATIONS[index])
 
     def collide_generic(self, other) -> bool:
-        distance = self.get_center_position().distance(other.get_center_position())
+        distance = self.center_position.distance(other.center_position)
         collision_radius = max(self.get_collision_radius(), other.get_collision_radius())
         return distance <= collision_radius
 

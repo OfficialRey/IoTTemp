@@ -9,12 +9,12 @@ from engine.props.types.sprite import Sprite
 
 class CentipedeHead(Enemy):
 
-    def __init__(self, atlas: AnimationAtlas, position: Vector):
-        super().__init__(atlas, UnitData.CENTIPEDE_HEAD, position)
+    def __init__(self, atlas: AnimationAtlas, center_position: Vector):
+        super().__init__(atlas, UnitData.CENTIPEDE_HEAD, center_position)
 
     def run_behaviour(self, world, delta_time: float):
         target = world.player
-        self.accelerate((target.get_center_position() - self.get_center_position()).normalize(), delta_time)
+        self.accelerate((target.center_position - self.center_position).normalize(), delta_time)
         self.animate_generic()
 
     def on_hit(self):
