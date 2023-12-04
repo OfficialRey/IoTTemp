@@ -16,7 +16,6 @@ class Weapon:
     def __init__(self, name: str, animation_atlas: AnimationAtlas, bullet_type: BulletType):
         self.name = name
         self.animation_atlas = animation_atlas
-        self.animation_atlas.set_scale(bullet_type.get_size())
         self.bullet_type = bullet_type
 
     def get_bullet_type(self):

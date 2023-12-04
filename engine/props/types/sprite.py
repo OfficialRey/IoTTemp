@@ -7,6 +7,7 @@ from engine.core.vector import Vector
 from engine.graphics.animation.animation import AnimationType
 from engine.graphics.animation.animation_manager import AnimationManager
 from engine.graphics.atlas.animation import AnimationAtlas
+from engine.graphics.atlas.atlas import Atlas
 from engine.props.types.movable import Movable
 
 GENERIC_ANIMATIONS = [AnimationType.WALKING_N, AnimationType.WALKING_NE, AnimationType.WALKING_E,
@@ -20,20 +21,20 @@ HIT_BOX_FACTOR = 0.75
 
 class Sprite(Movable, pygame.sprite.Sprite):
 
-    def __init__(self, animation_atlas: AnimationAtlas, max_speed: float = 0, acceleration: float = 0,
+    def __init__(self, atlas: Atlas, max_speed: float = 0, acceleration: float = 0,
                  position: Vector = Vector(), velocity: Vector = Vector(),
                  animation_type: AnimationType = AnimationType.GENERIC):
         super().__init__(max_speed, acceleration, position, velocity)
-        self.animation_atlas = animation_atlas
-        self.animation_manager = AnimationManager(self.animation_atlas, animation_type)
-        self.sprite_width, self.sprite_height = self.animation_atlas.base_width, self.animation_atlas.base_height
+        self.atlas = atlas
+        self.animation_manager = AnimationManager(self.atlas, animation_type)
+        self.sprite_width, self.sprite_height = self.atlas.sprite_width, self.atlas.sprite_height
         self.base_width, self.base_height = self.sprite_width, self.sprite_height
 
     def flash_image(self, flash_time: float):
         self.animation_manager.flash_image(flash_time)
 
     def get_surface(self) -> pygame.Surface:
-        return self.animation_manager.get_surface(self.animation_atlas)
+        return self.animation_manager.get_surface(self.atlas)
 
     def render(self, surface: pygame.Surface, camera) -> None:
         render_position = camera.get_relative_position(self) - Vector(*self.get_surface().get_size()) / 2
@@ -50,7 +51,7 @@ class Sprite(Movable, pygame.sprite.Sprite):
         super().update(world, delta_time)
 
     def set_scale(self, scale: Vector):
-        self.animation_atlas.set_scale(scale)
+        self.atlas.set_scale(scale)
 
     def set_size(self, width: int, height: int):
         x_scale = width / self.base_width

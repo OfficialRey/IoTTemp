@@ -4,14 +4,15 @@ import pygame
 
 from engine.graphics.animation.animation import AnimationType, AnimationData
 from engine.graphics.atlas.animation import AnimationAtlas
+from engine.graphics.atlas.atlas import Atlas
 from engine.graphics.textures.texture import Texture
 
 
 class AnimationManager:
 
-    def __init__(self, animation_atlas: AnimationAtlas, animation_type: AnimationType = AnimationType.GENERIC,
+    def __init__(self, atlas: Atlas, animation_type: AnimationType = AnimationType.GENERIC,
                  flash_speed: float = 0.05):
-        self.animation_atlas = animation_atlas
+        self.atlas = atlas
         self.animation_data = None
 
         self.flash_time = 0
@@ -31,10 +32,11 @@ class AnimationManager:
             self.animation_data = animation_data
 
     def update_animation_type(self, animation_type: AnimationType):
-        self.update_animation_data(self.animation_atlas.get_animation_data(animation_type))
+        if isinstance(self.atlas, AnimationAtlas):
+            self.update_animation_data(self.atlas.get_animation_data(animation_type))
 
     def update_animation_index(self, index: int):
-        self.update_animation_type(self.animation_atlas.animation_types[index])
+        self.update_animation_data(self.atlas.animation_data[index])
 
     def set_rotation(self, rotation: float):
         self.rotation = rotation
@@ -62,11 +64,11 @@ class AnimationManager:
         self.count = int(value % self.animation_data.length)
         self.timer = value % self.animation_data.animation_time
 
-    def get_texture(self, animation_atlas: AnimationAtlas) -> Texture:
-        return animation_atlas.textures[self.animation_data.start_index + self.count]
+    def get_texture(self, atlas: Atlas) -> Texture:
+        return atlas.textures[self.animation_data.start_index + self.count]
 
-    def get_surface(self, animation_atlas: AnimationAtlas) -> pygame.Surface:
-        texture = self.get_texture(animation_atlas)
+    def get_surface(self, atlas: Atlas) -> pygame.Surface:
+        texture = self.get_texture(atlas)
         if self.flash_time > 0 and self.flash_time % self.flash_speed * 2 < self.flash_speed:
             return texture.get_flash_image(self.rotation)
         return texture.get_image(self.rotation)

@@ -1,3 +1,4 @@
+from abc import ABC
 from typing import List
 
 import pygame
@@ -13,10 +14,10 @@ from engine.world.camera import Camera
 
 class Unit(Damageable):
 
-    def __init__(self, animation_atlas: AnimationAtlas, max_health: int, attack: int, defense: int,
+    def __init__(self, atlas: AnimationAtlas, max_health: int, attack: int, defense: int,
                  max_speed: float = 0, acceleration: float = 0, position: Vector = Vector(),
                  velocity: Vector = Vector()):
-        super().__init__(animation_atlas, max_health, attack, defense, max_speed, acceleration, position, velocity)
+        super().__init__(atlas, max_health, attack, defense, max_speed, acceleration, position, velocity)
 
     def update(self, world, delta_time: float):
         self.run_behaviour(world, delta_time)
@@ -58,11 +59,11 @@ class Unit(Damageable):
         raise NotImplementedError("Must implement collision behaviour")
 
 
-class ShootingUnit(Unit):
-    def __init__(self, animation_atlas: AnimationAtlas, weapon: Weapon, max_health: int, attack: int,
+class ShootingUnit(Unit, ABC):
+    def __init__(self, atlas: AnimationAtlas, weapon: Weapon, max_health: int, attack: int,
                  defense: int, shot_delay: float, max_speed: float, acceleration: float, position: Vector = Vector(),
                  velocity: Vector = Vector()):
-        super().__init__(animation_atlas, max_health, attack, defense, max_speed, acceleration, position, velocity)
+        super().__init__(atlas, max_health, attack, defense, max_speed, acceleration, position, velocity)
         self.weapon = weapon
         self.shot_delay = shot_delay
         self.current_shot_timer = 0

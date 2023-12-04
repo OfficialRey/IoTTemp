@@ -3,14 +3,14 @@ import math
 from enum import Enum
 
 from engine.core.vector import Vector
-from engine.graphics.atlas.animation import AnimationAtlas
+from engine.graphics.atlas.atlas import Atlas
 from engine.props.types.sprite import Sprite
 from engine.sound.game_sound import GameSound
 
 
 class BulletType(Enum):
     # Speed, Animation, Rotation Offset, Size, Damage, GameSound
-    LASER = (8000, 15, 90, 5, 1, GameSound.LASER)
+    LASER = (8000, 15, 90, 1, 1, GameSound.LASER)
 
     def get_speed(self):
         return self.value[0]
@@ -33,15 +33,16 @@ class BulletType(Enum):
 
 class Bullet(Sprite):
 
-    def __init__(self, animation_atlas: AnimationAtlas, owner, bullet_type: BulletType,
+    def __init__(self, atlas: Atlas, owner, bullet_type: BulletType,
                  position: Vector, velocity: Vector, max_speed: float = 0):
-        super().__init__(animation_atlas, max_speed, 0, position, velocity)
+        super().__init__(atlas, max_speed, 0, position, velocity)
         self.owner = owner
         self.max_speed = bullet_type.value[0]
         self.velocity = self.velocity.normalize() * self.max_speed
         self.bullet_type = bullet_type
         self.life_time = 5
-        self.play_animation(bullet_type.value[1])
+        self.animation_manager.update_animation_data(atlas.get_animation_data(self.bullet_type))
+        self.set_rotation(self.bullet_type.get_rotation_offset() - self.get_velocity_rotation())
 
     def update(self, world, delta_time: float) -> None:
         super().update(world, delta_time)

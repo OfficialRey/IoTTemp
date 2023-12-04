@@ -93,4 +93,4 @@ class Centipede(Enemy):
     def set_scale(self, scale: Vector):
         super().set_scale(scale)
         for segment in self.segments:
-            segment.set_scale(scale)
+            segment.scale_texture(scale)

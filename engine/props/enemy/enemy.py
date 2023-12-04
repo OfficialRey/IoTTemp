@@ -8,8 +8,8 @@ from engine.props.types.unit import Unit
 
 class Enemy(Unit, ABC):
 
-    def __init__(self, animation_atlas: AnimationAtlas, enemy_data: UnitData, position: Vector):
-        super().__init__(animation_atlas, enemy_data.get_health(), enemy_data.get_attack(),
+    def __init__(self, atlas: AnimationAtlas, enemy_data: UnitData, position: Vector):
+        super().__init__(atlas, enemy_data.get_health(), enemy_data.get_attack(),
                          enemy_data.get_defense(), enemy_data.get_max_speed(), enemy_data.get_acceleration(), position)
 
     def act(self, world, delta_time: float):

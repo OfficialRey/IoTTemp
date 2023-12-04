@@ -7,10 +7,10 @@ FLASH_TIME = 0.2
 
 class Damageable(Sprite):
 
-    def __init__(self, animation_atlas: AnimationAtlas, max_health: int, attack: int, defense: int,
+    def __init__(self, atlas: AnimationAtlas, max_health: int, attack: int, defense: int,
                  max_speed: float = 0, acceleration: float = 0, position: Vector = Vector(),
                  velocity: Vector = Vector()):
-        super().__init__(animation_atlas, max_speed, acceleration, position, velocity)
+        super().__init__(atlas, max_speed, acceleration, position, velocity)
         self.max_health = max_health
         self.health = self.max_health
         self.attack = attack

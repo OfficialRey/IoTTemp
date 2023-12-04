@@ -1,12 +1,14 @@
 from engine.graphics.animation.animation import AnimationType
 from engine.graphics.atlas.animation import AnimationAtlas
+from engine.graphics.atlas.bullet import BulletAtlas
 from engine.graphics.atlas.level import LevelAtlas
+from engine.props.bullet.bullet import BulletType
 
 # Define Animations of Sprite Sheet
 
 SINGLE_SPRITE = [AnimationType.GENERIC]
 
-BULLETS = [AnimationType.GENERIC for _ in range(25)]
+BULLETS = [element for element in BulletType]
 
 PLAYER = [AnimationType.IDLE, AnimationType.WALKING_E, None, AnimationType.ATTACK, AnimationType.DAMAGED,
           AnimationType.DEATH]
@@ -42,8 +44,8 @@ class TextureManager:
         self.arrow_down = AnimationAtlas("widgets", "arrow_down.png", SINGLE_SPRITE, 16, 16)
 
         # Bullets
-        self.bullets = AnimationAtlas("bullets", "bullets.png", BULLETS, 16, 16, animation_time=0.05,
-                                      rotation_precision=360)
+        self.bullets = BulletAtlas("bullets", "bullets.png", 16, 16, BULLETS,
+                                   animation_time=0.05, rotation_precision=10)
 
         self.game_textures = [
             # Level
@@ -65,11 +67,10 @@ class TextureManager:
 
     def scale_textures(self, scale):
         for texture_atlas in self.game_textures:
-            texture_atlas.set_scale(scale)
+            texture_atlas.scale_textures(scale)
 
     def count_textures(self):
         count = 0
         for atlas in self.game_textures:
-            if isinstance(atlas, AnimationAtlas):
-                count += len(atlas.textures)
+            count += atlas.count_surfaces()
         return count

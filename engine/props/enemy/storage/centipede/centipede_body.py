@@ -13,8 +13,8 @@ DISTANCE_FACTOR = 4
 
 class CentipedeBody(Enemy):
 
-    def __init__(self, animation_atlas: AnimationAtlas, previous_segment: Enemy, position: Vector):
-        super().__init__(animation_atlas, UnitData.CENTIPEDE_BODY, position)
+    def __init__(self, atlas: AnimationAtlas, previous_segment: Enemy, position: Vector):
+        super().__init__(atlas, UnitData.CENTIPEDE_BODY, position)
         self.position = position
         self.previous_segment = previous_segment
 

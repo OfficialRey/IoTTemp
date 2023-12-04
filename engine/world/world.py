@@ -48,7 +48,7 @@ class World:
 
         # Update every single animation atlas to adjust to zoom
         for texture_atlas in self.texture_manager.game_textures:
-            texture_atlas.set_scale(zoom)
+            texture_atlas.scale_textures(Vector(zoom, zoom))
 
     def set_camera_position(self, position: Vector):
         if position.x + self.camera.resolution.x > self.level_data.width * self.texture_atlas.sprite_width:

@@ -9,8 +9,8 @@ from engine.props.types.sprite import Sprite
 
 class CentipedeHead(Enemy):
 
-    def __init__(self, animation_atlas: AnimationAtlas, position: Vector):
-        super().__init__(animation_atlas, UnitData.CENTIPEDE_HEAD, position)
+    def __init__(self, atlas: AnimationAtlas, position: Vector):
+        super().__init__(atlas, UnitData.CENTIPEDE_HEAD, position)
 
     def run_behaviour(self, world, delta_time: float):
         target = world.player
