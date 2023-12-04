@@ -22,7 +22,7 @@ class Centipede(Enemy):
         self._create_centipede()
 
     def _create_centipede(self):
-        length = 5
+        length = 20
 
         previous_segment = CentipedeHead(self.head_texture, self.center_position)
         self.segments = [previous_segment]
@@ -53,7 +53,7 @@ class Centipede(Enemy):
             if isinstance(current_segment, CentipedeBody):
                 # Create new head
                 if not current_segment.has_head():
-                    self.segments[i] = CentipedeHead(self.head_texture, current_segment.position)
+                    self.segments[i] = CentipedeHead(self.head_texture, current_segment.center_position)
                     self.segments[i + 1].previous_segment = self.segments[i]
 
     def render(self, surface: pygame.Surface, camera) -> None:
@@ -89,8 +89,3 @@ class Centipede(Enemy):
         # The player shot me
         self.damage(other.bullet_type.get_attack())
         other.life_time = 0
-
-    def set_scale(self, scale: Vector):
-        super().set_scale(scale)
-        for segment in self.segments:
-            segment.scale_texture(scale)

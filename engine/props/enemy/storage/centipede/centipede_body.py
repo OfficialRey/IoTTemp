@@ -8,22 +8,21 @@ from engine.props.player.player import Player
 from engine.props.types.sprite import Sprite
 
 TIGHTNESS = 100
-DISTANCE_FACTOR = 4
+DISTANCE_FACTOR = 1.2
 
 
 class CentipedeBody(Enemy):
 
     def __init__(self, atlas: AnimationAtlas, previous_segment: Enemy, center_position: Vector):
         super().__init__(atlas, UnitData.CENTIPEDE_BODY, center_position)
-        self.position = center_position
         self.previous_segment = previous_segment
 
     def run_behaviour(self, world, delta_time: float):
         # Accelerate towards previous segment
-        me_to_segment = self.previous_segment.center_position - self.position
+        me_to_segment = self.previous_segment.center_position - self.center_position
 
         distance = me_to_segment.magnitude()
-        target_distance = self.atlas.get_texture_width() * DISTANCE_FACTOR
+        target_distance = self.get_collision_radius() * DISTANCE_FACTOR
         direction = me_to_segment.normalize()
         acceleration = (direction.inverse() + direction * distance / target_distance) * TIGHTNESS
 
