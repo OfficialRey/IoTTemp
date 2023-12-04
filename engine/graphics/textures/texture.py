@@ -13,8 +13,7 @@ FLASH_COLOR_OFFSET = 150, 0, 0, 0
 
 class Texture:
 
-    def __init__(self, base_image: pygame.Surface, rotation_precision: int = 360):
-
+    def __init__(self, base_image: pygame.Surface, rotation_precision: int = 2):
         self.base_image = base_image.copy()
         self.rotation_precision = rotation_precision
         self.current_rotation = 0

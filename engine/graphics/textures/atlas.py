@@ -1,6 +1,6 @@
 import os.path
 
-from typing import List, Tuple, Union
+from typing import List, Tuple
 
 import pygame
 
@@ -57,89 +57,77 @@ class LevelAtlas:
         return textures
 
     def __getitem__(self, item: int) -> Texture:
-        return self.textures[item].copy()
+        return self.textures[item]
+
+
+class AnimationData:
+
+    def __init__(self, animation_type: AnimationType, start_index: int, end_index: int, animation_time: float):
+        self.animation_type = animation_type
+        self.start_index = start_index
+        self.stop_index = end_index
+        self.animation_time = animation_time
 
 
 class AnimationAtlas:
 
-    def __init__(self, path: str = None, file_name: str = None, animation_types: List[AnimationType] = None,
-                 sprite_width: int = None, sprite_height: int = None, animation_time: float = 0.2, loop: bool = True,
-                 scale: Union[Vector, float] = 1, has_flash_image: bool = False, information: Tuple = None,
+    def __init__(self, path: str, file_name: str, animation_types: List[AnimationType],
+                 sprite_width: int, sprite_height: int, animation_time: float = 0.2, loop: bool = True,
                  rotation_precision: int = 360):
-        if information is not None:
-            # Format: animation_types, sprite_width, sprite_height, base_width, base_height, time, loop, texture_animations, scale, has_flash_image, rotation_precision
-            self.animation_types = information[0]
-            self.sprite_width = information[1]
-            self.sprite_height = information[2]
-            self.base_width = information[3]
-            self.base_height = information[4]
-            self.time = information[5]
-            self.loop = information[6]
-            self.texture_animations = [animation.copy() for animation in information[7]]
-            self.scale = information[8]
-            self.has_flash_image = information[9]
-            self.rotation_precision = information[10]
-        else:
-            print_debug(f"Creating animation atlas {path}/{file_name}")
-            self.path = path
-            self.file_name = file_name
-            self.surface = pygame.image.load(
-                os.path.join(get_resource_path(), os.path.join(path, file_name))).convert_alpha()
-            self.animation_types = animation_types
-            self.sprite_width, self.sprite_height = sprite_width, sprite_height
-            self.time = animation_time
-            self.loop = loop
-            self.rotation_precision = rotation_precision
 
-            self.base_width = sprite_width
-            self.base_height = sprite_height
+        print_debug(f"Creating animation atlas {path}/{file_name}")
 
-            self.has_flash_image = has_flash_image
-            self.texture_animations = self._load_animations()
-            self.scale = Vector(1, 1)
-            self.set_scale(scale if isinstance(scale, Vector) else Vector(scale, scale))
+        self.surface = pygame.image.load(
+            os.path.join(get_resource_path(), os.path.join(path, file_name))).convert_alpha()
 
-    def _load_animations(self) -> List[TextureAnimation]:
-        animations = []
+        self.animation_types = animation_types
+        self.sprite_width, self.sprite_height = sprite_width, sprite_height
+        self.animation_time = animation_time
+        self.loop = loop
+        self.rotation_precision = rotation_precision
+
+        self.base_width = sprite_width
+        self.base_height = sprite_height
+
+        self.textures = []
+        self.animation_data = []
+
+    def _load_animations(self):
+        self.textures = []
+
         for i in range(len(self.animation_types)):
             animation_type = self.animation_types[i]
             if animation_type is not None:
-                animations.append(
-                    TextureAnimation(self.surface.subsurface((0, i * self.sprite_height, self.surface.get_width(),
-                                                              self.sprite_height)),
-                                     self.sprite_width, animation_type, self.time, self.loop,
-                                     has_flash_image=self.has_flash_image, rotation_precision=self.rotation_precision))
-        return animations
+                surface = self.surface.subsurface(
+                    (0, i * self.sprite_height, self.surface.get_width(), self.sprite_height))
+                textures = self._split_row(surface)
+                animation_data = AnimationData(animation_type, len(self.textures), len(self.textures) + len(textures),
+                                               self.animation_time)
+
+                self.textures.append(textures)
+                self.animation_data.append(animation_data)
+
+    def _clean_animation_types(self):
+        clean_animation_types = []
+        for animation_type in self.animation_types:
+            if animation_type is not None:
+                clean_animation_types.append(animation_type)
+        self.animation_types = clean_animation_types
+
+    def _split_row(self, surface: pygame.Surface) -> List[Texture]:
+        textures = []
+        for x in range(surface.get_width() // self.sprite_width):
+            texture = Texture(
+                surface.subsurface((x * self.sprite_width, 0, self.sprite_width, self.sprite_height)))
+            if not texture.is_empty():
+                textures.append(texture)
+        return textures
 
     def set_scale(self, scale: Vector):
-        self.scale = scale
-        for texture_animation in self.texture_animations:
-            texture_animation.set_scale(scale)
+        for texture in self.textures:
+            texture.set_scale(scale)
 
     def set_size(self, width: int, height: int):
         x_scale = width / self.base_width
         y_scale = height / self.base_height
         self.set_scale(Vector(x_scale, y_scale))
-
-    def rotate(self, rotation: float):
-        for texture_animation in self.texture_animations:
-            texture_animation.rotate(rotation)
-
-    def update(self, delta_time: float):
-        for animation in self.texture_animations:
-            animation.update(delta_time)
-
-    def get_texture(self, index: AnimationType) -> Texture:
-        return self.texture_animations[index.value].get_texture()
-
-    def get_animation(self, animation_type: AnimationType):
-        for animation in self.texture_animations:
-            if animation.animation_type == animation_type:
-                return animation
-        return None
-
-    def copy(self):
-        # Format: animation_types, sprite_width, sprite_height, base_width, base_height, time, loop, texture_animations, has_flash_image, rotation_precision
-        return AnimationAtlas(information=(
-            self.animation_types, self.sprite_width, self.sprite_height, self.base_width, self.base_height, self.time,
-            self.loop, self.texture_animations, self.scale, self.has_flash_image, self.rotation_precision))
