@@ -1,103 +1,77 @@
-from typing import Union, List
+from typing import Union
 
 import pygame.image
 
+from pygame.transform import scale
+
 from engine.core.vector import Vector
+from engine.util.constants import FULL_ROTATION
+from engine.util.util import colorize_image
 
-MIN_COLOR = 0
-MAX_COLOR = 255
-
-FULL_ROTATION = 360
+FLASH_COLOR_OFFSET = 150, 0, 0, 0
 
 
 class Texture:
 
-    def __init__(self, base_image: pygame.Surface, images: List[pygame.Surface] = None,
-                 flash_image: pygame.Surface = None,
-                 scale: Vector = Vector(1, 1), mirror: List[bool] = None, flash_color_offset: List[int] = None,
-                 has_flash_image: bool = False, rotation_precision: int = 360):
-        if mirror is None:
-            mirror = [False, False]
-        if flash_color_offset is None:
-            flash_color_offset = [150, 0, 0, 0]
+    def __init__(self, base_image: pygame.Surface, rotation_precision: int = 360):
 
         self.base_image = base_image.copy()
-        self.flash_image = flash_image.copy() if flash_image is not None else flash_image
         self.rotation_precision = rotation_precision
         self.current_rotation = 0
 
-        # Load images or recreate if not existing
-        if images is not None:
-            self.images = [image.copy() for image in images]
-        else:
-            self.images = self._load_images()
-            self._cache_rotations()
+        self.images = []
+        self.flash_images = []
 
-        self.has_flash_image = has_flash_image
-        self.scale = scale
-        self.flash_color_offset = flash_color_offset
-        self.mirror = mirror
+        self._initialise()
 
-        if flash_image is None:
-            self.flash_image = self.images[0].copy()
-            self.colorize_flash_image(*self.flash_color_offset)
+    def _initialise(self):
+        self._load_images()
+        self._colorize_flash_images()
 
-    def _load_images(self) -> List[pygame.Surface]:
-        images = []
+    def _load_images(self):
+        self.images = []
+        self.flash_images = []
+
         for rotation in range(0, FULL_ROTATION, self.rotation_precision):
             image = pygame.transform.rotate(self.base_image.copy(), rotation)
-            images.append(image)
-        return images
+            self.images.append(image)
+            self.flash_images.append(image)
 
-    def _cache_rotations(self):
-        for i in range(len(self.images)):
-            rotation = i * self.rotation_precision
-            self.images[i] = pygame.transform.rotate(self.images[i], rotation)
+    def _colorize_flash_images(self):
+        for i in range(len(self.flash_images)):
+            self.flash_images[i] = colorize_image(self.flash_images[i], *FLASH_COLOR_OFFSET)
 
-    def reset(self):
-        self.images = self._load_images()
-        self._cache_rotations()
-        self.flash_image = self.base_image.copy()
-        self.colorize_flash_image(*self.flash_color_offset)
-
-    def set_scale(self, scale: Union[Vector, float, int]):
-        if scale == Vector(1, 1):
+    def set_scale(self, image_scale: Union[Vector, float, int]):
+        if image_scale == Vector(1, 1):
             return self.images
-        if isinstance(scale, (float, int)):
-            scale = Vector(scale, scale)
-        for i in range(len(self.images)):
-            self.images[i] = pygame.transform.scale(
-                self.base_image, (self.base_image.get_width() * scale.x, self.base_image.get_height() * scale.y))
-        self.flash_image = self.images[0].copy()
-        self._cache_rotations()
-        self.colorize_flash_image(*self.flash_color_offset)
+        if isinstance(image_scale, (float, int)):
+            image_scale = Vector(image_scale, image_scale)
 
-    def rotate(self, rotation: float):
+        for i in range(len(self.images)):
+            image = self.images[i]
+            flash_image = self.flash_images[i]
+            self.images[i] = scale(image, (image.get_width() * image_scale.x, image.get_height() * image_scale.y))
+            self.flash_images[i] = scale(flash_image,
+                                         (flash_image.get_width() * image_scale.x,
+                                          flash_image.get_height() * image_scale.y))
+
+    def set_rotation(self, rotation: float):
         self.current_rotation = rotation
 
-    def colorize_flash_image(self, red_offset: int = 0, green_offset: int = 0, blue_offset: int = 0,
-                             alpha_offset: int = 0) -> pygame.Surface:
-        if not self.has_flash_image:
-            return self.flash_image
-        width, height = self.flash_image.get_size()
-        for x in range(width):
-            for y in range(height):
-                r, g, b, a = self.flash_image.get_at((x, y))
-                red = min(MAX_COLOR, max(MIN_COLOR, r + red_offset))
-                green = min(MAX_COLOR, max(MIN_COLOR, g + green_offset))
-                blue = min(MAX_COLOR, max(MIN_COLOR, b + blue_offset))
-                alpha = min(MAX_COLOR, max(MIN_COLOR, a + alpha_offset))
-                self.flash_image.set_at((x, y), pygame.Color(red, green, blue, alpha))
-        return self.flash_image
+    def get_rotation(self):
+        return self.current_rotation
 
     def mirror_texture(self, x_axis: bool = True, y_axis: bool = False):
-        self.mirror = [x_axis, y_axis]
+        flip = x_axis, y_axis
         for i in range(len(self.images)):
-            self.images[i] = pygame.transform.flip(self.images[i], x_axis, y_axis)
-        self.flash_image = pygame.transform.flip(self.flash_image, x_axis, y_axis)
+            self.images[i] = pygame.transform.flip(self.images[i], *flip)
+            self.flash_images[i] = pygame.transform.flip(self.flash_images[i], *flip)
 
     def get_image(self):
         return self.images[int(self.current_rotation / self.rotation_precision)]
+
+    def get_flash_image(self):
+        return self.flash_images[int(self.current_rotation / self.rotation_precision)]
 
     def is_empty(self) -> bool:
         pixels = pygame.PixelArray(self.base_image)
@@ -108,7 +82,3 @@ class Texture:
                     return False
         del pixels
         return True
-
-    def copy(self):
-        return Texture(self.base_image, self.images, self.flash_image, self.scale, self.mirror,
-                       self.flash_color_offset, self.has_flash_image, self.rotation_precision)

@@ -1,6 +1,10 @@
 from engine.core.vector import Vector
 
 # Colors
+
+MIN_COLOR = 0
+MAX_COLOR = 255
+
 TRANSPARENCY = 0, 0, 0
 
 WHITE = 255, 255, 255
@@ -12,5 +16,4 @@ BLUE = 0, 0, 255
 
 YELLOW = 255, 255, 0
 
-# Vectors
-VECTOR_UP = Vector(0, -1)
+FULL_ROTATION = 360

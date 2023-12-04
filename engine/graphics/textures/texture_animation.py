@@ -95,7 +95,7 @@ class TextureAnimation:
 
     def rotate(self, rotation: float):
         for texture in self.textures:
-            texture.rotate(rotation)
+            texture.set_rotation(rotation)
 
     def offset_animation(self, value: float):
         self.count = int(value / self.target_time)
