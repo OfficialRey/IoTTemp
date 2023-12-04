@@ -23,7 +23,7 @@ class CentipedeBody(Enemy):
         me_to_segment = self.previous_segment.center_position - self.position
 
         distance = me_to_segment.magnitude()
-        target_distance = self.sprite_width * DISTANCE_FACTOR
+        target_distance = self.atlas.get_texture_width() * DISTANCE_FACTOR
         direction = me_to_segment.normalize()
         acceleration = (direction.inverse() + direction * distance / target_distance) * TIGHTNESS
 

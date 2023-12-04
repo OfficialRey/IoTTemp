@@ -1,3 +1,4 @@
+from engine.core.vector import Vector
 from engine.graphics.animation.animation import AnimationType
 from engine.graphics.atlas.animation import AnimationAtlas
 from engine.graphics.atlas.bullet import BulletAtlas
@@ -34,6 +35,7 @@ class TextureManager:
 
         # Player
         self.cursor = AnimationAtlas("player", "target.png", CURSOR, 24, 24, animation_time=0.2, loop=True)
+        self.cursor.scale_textures(Vector(2, 2))
         self.player = AnimationAtlas("player", "player.png", PLAYER, 16, 16, animation_time=0.2, loop=True)
 
         # Calibration
@@ -56,7 +58,7 @@ class TextureManager:
             self.centipede_body,
 
             # Player
-            self.player, self.cursor,
+            self.player,
 
             # Calibration
             self.calibrator,

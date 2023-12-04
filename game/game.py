@@ -19,7 +19,7 @@ class TopDownGame:
 
     def __init__(self):
         self.communication = Communication(UDP_IP, UDP_PORT, RECEIVER_IP, RECEIVER_PORT, RECEIVER_BUFFER_SIZE)
-        self.engine = Engine(self.communication, max_fps=90)
+        self.engine = Engine(self.communication, max_fps=144)
 
         self.world = World(
             self.engine.window,

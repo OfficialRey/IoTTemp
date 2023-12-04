@@ -48,6 +48,7 @@ class AnimationManager:
         self.flash_time = flash_time
 
     def update(self, delta_time: float):
+        self.flash_time -= delta_time
         self.timer += delta_time
         if self.timer >= self.animation_data.animation_time:
             self.count += 1

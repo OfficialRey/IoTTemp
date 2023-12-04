@@ -7,6 +7,7 @@ from engine.graphics.textures.texture_manager import TextureManager
 from engine.props.bullet.bullet import BulletType
 from engine.props.data import UnitData
 from engine.props.player.cursor import Cursor
+from engine.props.types.sprite import Sprite
 from engine.props.types.unit import ShootingUnit
 from engine.props.weapon.weapon import WeaponManager
 from engine.world.camera import Camera
@@ -21,9 +22,9 @@ class Player(ShootingUnit):
         self.cursor = Cursor(texture_manager)
         self.cursor.play_animation(AnimationType.GENERIC)
 
-    def act(self, world, delta_time: float) -> None:
-        super().run_behaviour(world, delta_time)
+    def update(self, world, delta_time: float) -> None:
         self.cursor.update(world, delta_time)
+        super().update(world, delta_time)
 
     # Format: [w, a, s, d, space, mouse_x, mouse_y, left_click, right_click]
 
@@ -32,10 +33,22 @@ class Player(ShootingUnit):
         self.cursor.set_position(position)
         self.accelerate((self.cursor.center_position - camera.get_relative_position(self)), delta_time)
 
-        print(self.cursor.center_position)
         if input_manager.left_click:
-            self.shoot_bullet(BulletType.LASER, (self.cursor.center_position - camera.get_relative_position(self)))
+            self.shoot_bullet(BulletType.LASER,
+                              (self.cursor.get_render_position() - self.get_render_position(camera)))
 
     def render(self, surface: pygame.Surface, camera: Camera) -> None:
         self.cursor.render(surface, camera)
         super().render(surface, camera)
+
+    def on_hit(self):
+        pass
+
+    def on_death(self):
+        pass
+
+    def on_attack(self):
+        pass
+
+    def on_collision(self, other: Sprite):
+        pass

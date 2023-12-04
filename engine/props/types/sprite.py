@@ -9,6 +9,7 @@ from engine.graphics.animation.animation_manager import AnimationManager
 from engine.graphics.atlas.animation import AnimationAtlas
 from engine.graphics.atlas.atlas import Atlas
 from engine.props.types.movable import Movable
+from engine.util.constants import BLACK, WHITE, RED
 
 GENERIC_ANIMATIONS = [AnimationType.WALKING_N, AnimationType.WALKING_NE, AnimationType.WALKING_E,
                       AnimationType.WALKING_SE, AnimationType.WALKING_S, AnimationType.WALKING_SW,
@@ -16,7 +17,7 @@ GENERIC_ANIMATIONS = [AnimationType.WALKING_N, AnimationType.WALKING_NE, Animati
 
 ANGLE_OFFSET = 360 / len(GENERIC_ANIMATIONS) * 0.5
 
-HIT_BOX_FACTOR = 0.75
+HIT_BOX_FACTOR = 0.4
 
 
 class Sprite(Movable, pygame.sprite.Sprite):
@@ -27,7 +28,7 @@ class Sprite(Movable, pygame.sprite.Sprite):
         super().__init__(max_speed, acceleration, center_position, velocity)
         self.atlas = atlas
         self.animation_manager = AnimationManager(self.atlas, animation_type)
-        self.sprite_width, self.sprite_height = self.atlas.get_texture_size()
+        self.animation_manager.update_animation_type(AnimationType.GENERIC)
 
     def flash_image(self, flash_time: float):
         self.animation_manager.flash_image(flash_time)
@@ -36,11 +37,16 @@ class Sprite(Movable, pygame.sprite.Sprite):
         return self.animation_manager.get_surface(self.atlas)
 
     def render(self, surface: pygame.Surface, camera) -> None:
-        render_position = camera.get_relative_position(self) - Vector(*self.get_surface().get_size()) / 2
-        surface.blit(self.get_surface(), render_position.as_tuple())
+        surface.blit(self.get_surface(), self.get_render_position(camera).as_tuple())
+        # self.draw_debug(surface, camera)
 
-    def get_render_position(self) -> Vector:
-        return self.center_position - Vector(self.sprite_width // 2, self.sprite_height // 2)
+    def get_render_position(self, camera=None) -> Vector:
+        if camera is not None:
+            return camera.get_relative_position(self) - self.get_render_offset()
+        return self.center_position - self.get_render_offset()
+
+    def get_render_offset(self) -> Vector:
+        return Vector(self.atlas.get_texture_width() // 2, self.atlas.get_texture_height() // 2)
 
     def offset_animation(self):
         self.animation_manager.offset_animation()
@@ -69,10 +75,16 @@ class Sprite(Movable, pygame.sprite.Sprite):
         return distance <= collision_radius
 
     def get_collision_radius(self):
-        return (self.sprite_width + self.sprite_height) / 2 * HIT_BOX_FACTOR
+        return (self.atlas.get_texture_width() + self.atlas.get_texture_height()) / 2 * HIT_BOX_FACTOR
 
     def play_animation(self, animation_type: Union[int, AnimationType]):
         if isinstance(animation_type, AnimationType):
             self.animation_manager.update_animation_type(animation_type)
         elif isinstance(animation_type, int):
             self.animation_manager.update_animation_index(animation_type)
+
+    def draw_debug(self, surface: pygame.Surface, camera):
+        pygame.draw.circle(surface, BLACK, (self.center_position - camera.get_position()).as_tuple(),
+                           self.get_collision_radius() / 2)
+        pygame.draw.circle(surface, WHITE, (self.center_position - camera.get_position()).as_tuple(), 3)
+        pygame.draw.circle(surface, RED, self.get_render_position(camera).as_tuple(), 3)

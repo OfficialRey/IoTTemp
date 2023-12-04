@@ -14,4 +14,4 @@ class Cursor(Sprite):
         self.center_position = position
 
     def render(self, surface: pygame.Surface, camera) -> None:
-        surface.blit(self.get_surface(), self.get_render_position().as_tuple())
+        surface.blit(self.get_surface(), self.get_render_position(None).as_tuple())

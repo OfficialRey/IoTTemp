@@ -61,7 +61,8 @@ class Unit(Damageable):
 
 class ShootingUnit(Unit, ABC):
     def __init__(self, atlas: AnimationAtlas, weapon: Weapon, max_health: int, attack: int,
-                 defense: int, shot_delay: float, max_speed: float, acceleration: float, center_position: Vector = Vector(),
+                 defense: int, shot_delay: float, max_speed: float, acceleration: float,
+                 center_position: Vector = Vector(),
                  velocity: Vector = Vector()):
         super().__init__(atlas, max_health, attack, defense, max_speed, acceleration, center_position, velocity)
         self.weapon = weapon
@@ -92,9 +93,6 @@ class ShootingUnit(Unit, ABC):
         for bullet in self.bullets:
             bullet.render(surface, camera)
         super().render(surface, camera)
-
-    def set_size(self, width: int, height: int):
-        super().set_size(width, height)
 
     def get_bullets(self) -> List[Bullet]:
         return self.bullets
