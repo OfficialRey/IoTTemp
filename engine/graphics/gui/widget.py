@@ -127,13 +127,20 @@ class Button(Label, ABC):
             return
 
         if self.hovered and event.type == pygame.MOUSEBUTTONDOWN:
-            self.on_press()
+            self._on_press()
         elif event.type == pygame.MOUSEBUTTONUP:
-            self.on_release()
+            self._on_release()
 
-    def on_press(self):
+    def _on_press(self):
         if self.sound_engine is not None:
             self.sound_engine.play_sound(GameSound.GUI_CONFIRM)
+        self.on_press()
+
+    def _on_release(self):
+        self.on_release()
+
+    def on_press(self):
+        raise NotImplementedError()
 
     def on_release(self):
         raise NotImplementedError()

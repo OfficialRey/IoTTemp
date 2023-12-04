@@ -16,7 +16,6 @@ class StartButton(Button):
         self.engine = engine
 
     def on_press(self):
-        super().on_press()
         self.engine.current_menu = None
         show_cursor(False)
 
