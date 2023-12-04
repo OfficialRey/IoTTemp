@@ -8,7 +8,7 @@ from engine.props.data import UnitData
 from engine.props.enemy.enemy import Enemy
 from engine.props.enemy.storage.centipede.centipede import Centipede
 from engine.props.player.player import Player
-from engine.props.types.unit import ShootingUnit
+from engine.props.types.unit import ShootingUnit, Unit
 from engine.props.weapon.weapon import WeaponManager
 from engine.util.constants import WHITE
 from engine.util.debug import print_debug
@@ -105,12 +105,12 @@ class World:
                     continue
 
                 for target in self.units.sprites():
-
-                    # Return if trying to attack own team
-                    if isinstance(unit, Player) and isinstance(target, Player) or \
-                            isinstance(unit, Enemy) and isinstance(target, Enemy):
-                        continue
-                    target.register_bullet_hits(bullets)
+                    if isinstance(target, Unit):
+                        # Return if trying to attack own team
+                        if isinstance(unit, Player) and isinstance(target, Player) or \
+                                isinstance(unit, Enemy) and isinstance(target, Enemy):
+                            continue
+                        target.register_bullet_hits(bullets)
 
     def render(self, window: Window):
         window.fill(WHITE)
@@ -135,4 +135,6 @@ class World:
 
     def _render_units(self, window: Window) -> None:
         for unit in self.units:
-            unit.render(window.surface, self.camera)
+            if unit is not self.player:
+                unit.render(window.surface, self.camera)
+        self.player.render(window.surface, self.camera)

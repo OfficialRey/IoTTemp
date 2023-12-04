@@ -8,6 +8,7 @@ from engine.props.enemy.enemy import Enemy
 from engine.props.enemy.storage.centipede.centipede_body import CentipedeBody
 from engine.props.enemy.storage.centipede.centipede_head import CentipedeHead
 from engine.props.player.player import Player
+from engine.props.types.collision import CollisionInformation
 from engine.props.types.sprite import Sprite
 
 
@@ -22,12 +23,14 @@ class Centipede(Enemy):
         self._create_centipede()
 
     def _create_centipede(self):
-        length = 20
+        length = 50
 
         previous_segment = CentipedeHead(self.head_texture, self.center_position)
         self.segments = [previous_segment]
         for i in range(1, length):
-            previous_segment = CentipedeBody(self.body_texture, previous_segment, previous_segment.center_position)
+            previous_segment = CentipedeBody(self.body_texture, previous_segment,
+                                             previous_segment.center_position + Vector(-1,
+                                                                                       0) * self.get_collision_radius())
             previous_segment.offset_animation()
             previous_segment.velocity = Vector()
             self.segments.append(previous_segment)
@@ -62,11 +65,13 @@ class Centipede(Enemy):
         for segment in segments:
             segment.render(surface, camera)
 
-    def collide_generic(self, other) -> bool:
+    def collide_generic(self, other) -> CollisionInformation:
         for segment in self.segments:
-            if segment.collide_generic(other):
-                segment.on_collision(other)
-                return False
+            collision_info = segment.collide_generic(other)
+            if collision_info.hit:
+                segment.on_collision(other, collision_info)
+                return collision_info
+        return CollisionInformation()
 
     def is_dead(self):
         return len(self.segments) == 0
@@ -80,12 +85,12 @@ class Centipede(Enemy):
     def on_attack(self):
         pass
 
-    def on_collision(self, other: Sprite):
+    def on_collision(self, other: Sprite, collision_info: CollisionInformation):
         if not isinstance(other, Bullet):
             return
         if not isinstance(other.owner, Player):
             return
 
         # The player shot me
-        self.damage(other.bullet_type.get_attack())
+        self.damage(other.bullet_type.get_attack(), collision_info)
         other.life_time = 0

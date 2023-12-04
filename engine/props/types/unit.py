@@ -6,6 +6,7 @@ import pygame
 from engine.core.vector import Vector
 from engine.graphics.atlas.animation import AnimationAtlas
 from engine.props.bullet.bullet import Bullet, BulletType
+from engine.props.types.collision import CollisionInformation
 from engine.props.types.damageable import Damageable
 from engine.props.types.sprite import Sprite
 from engine.props.weapon.weapon import Weapon
@@ -36,8 +37,9 @@ class Unit(Damageable):
         # Calculate collision and damage
         for bullet in bullets:
             if bullet.life_time > 0:
-                if self.collide_generic(bullet):
-                    self.on_collision(bullet)
+                collision_info = self.collide_generic(bullet)
+                if collision_info.hit:
+                    self.on_collision(bullet, collision_info)
                     continue
 
     def is_dead(self):
@@ -55,7 +57,7 @@ class Unit(Damageable):
     def on_attack(self):
         raise NotImplementedError("Must implement on_attack behaviour")
 
-    def on_collision(self, other: Sprite):
+    def on_collision(self, other: Sprite, collision_info: CollisionInformation):
         raise NotImplementedError("Must implement collision behaviour")
 
 

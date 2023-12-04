@@ -28,6 +28,12 @@ class Atlas(ABC):
             texture.scale_texture(scale)
         self.sprite_scale *= scale
 
+    def get_average_radius(self):
+        return self.get_average_texture_size() / 2
+
+    def get_average_texture_size(self):
+        return (self.get_texture_width() + self.get_texture_height()) / 2
+
     def get_texture_width(self):
         return int(self.sprite_width * self.sprite_scale.x)
 

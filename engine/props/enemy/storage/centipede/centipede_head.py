@@ -4,6 +4,7 @@ from engine.props.bullet.bullet import Bullet
 from engine.props.data import UnitData
 from engine.props.enemy.enemy import Enemy
 from engine.props.player.player import Player
+from engine.props.types.collision import CollisionInformation
 from engine.props.types.sprite import Sprite
 
 
@@ -26,12 +27,12 @@ class CentipedeHead(Enemy):
     def on_attack(self):
         pass
 
-    def on_collision(self, other: Sprite):
+    def on_collision(self, other: Sprite, collision_info: CollisionInformation):
         if not isinstance(other, Bullet):
             return
         if not isinstance(other.owner, Player):
             return
 
         # The player shot me
-        self.damage(other.get_attack())
+        self.damage(other.get_attack(), collision_info)
         other.life_time = 0

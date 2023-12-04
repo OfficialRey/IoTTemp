@@ -5,10 +5,12 @@ from engine.props.data import UnitData
 from engine.props.enemy.enemy import Enemy
 from engine.props.enemy.storage.centipede.centipede_head import CentipedeHead
 from engine.props.player.player import Player
+from engine.props.types.collision import CollisionInformation
 from engine.props.types.sprite import Sprite
 
-TIGHTNESS = 100
+TIGHTNESS = 50
 DISTANCE_FACTOR = 1.2
+PREVIOUS_INFLUENCE = 0.1
 
 
 class CentipedeBody(Enemy):
@@ -24,7 +26,10 @@ class CentipedeBody(Enemy):
         distance = me_to_segment.magnitude()
         target_distance = self.get_collision_radius() * DISTANCE_FACTOR
         direction = me_to_segment.normalize()
-        acceleration = (direction.inverse() + direction * distance / target_distance) * TIGHTNESS
+
+        acceleration = direction * TIGHTNESS
+        acceleration += self.previous_segment.velocity.normalize() * PREVIOUS_INFLUENCE
+        acceleration *= (distance - self.atlas.get_average_radius()) / target_distance * DISTANCE_FACTOR
 
         self.accelerate(acceleration, delta_time)
         self.animate_generic()
@@ -38,14 +43,14 @@ class CentipedeBody(Enemy):
     def on_attack(self):
         pass
 
-    def on_collision(self, other: Sprite):
+    def on_collision(self, other: Sprite, collision_info: CollisionInformation):
         if not isinstance(other, Bullet):
             return
         if not isinstance(other.owner, Player):
             return
 
         # The player shot me
-        self.damage(other.get_attack())
+        self.damage(other.get_attack(), collision_info)
         other.life_time = 0
 
     def has_head(self):

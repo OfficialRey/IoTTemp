@@ -6,8 +6,8 @@ import pygame
 from engine.core.vector import Vector
 from engine.graphics.animation.animation import AnimationType
 from engine.graphics.animation.animation_manager import AnimationManager
-from engine.graphics.atlas.animation import AnimationAtlas
 from engine.graphics.atlas.atlas import Atlas
+from engine.props.types.collision import CollisionInformation
 from engine.props.types.movable import Movable
 from engine.util.constants import BLACK, WHITE, RED
 
@@ -17,7 +17,7 @@ GENERIC_ANIMATIONS = [AnimationType.WALKING_N, AnimationType.WALKING_NE, Animati
 
 ANGLE_OFFSET = 360 / len(GENERIC_ANIMATIONS) * 0.5
 
-HIT_BOX_FACTOR = 0.4
+HIT_BOX_FACTOR = 0.3
 
 
 class Sprite(Movable, pygame.sprite.Sprite):
@@ -69,10 +69,10 @@ class Sprite(Movable, pygame.sprite.Sprite):
         index = min(int((self.get_velocity_rotation() + ANGLE_OFFSET) / 45), len(GENERIC_ANIMATIONS) - 1)
         self.animation_manager.update_animation_type(GENERIC_ANIMATIONS[index])
 
-    def collide_generic(self, other) -> bool:
-        distance = self.center_position.distance(other.center_position)
-        collision_radius = max(self.get_collision_radius(), other.get_collision_radius())
-        return distance <= collision_radius
+    def collide_generic(self, other) -> CollisionInformation:
+        vector = other.center_position - self.center_position
+        collision_radius = self.get_collision_radius() + other.get_collision_radius()
+        return CollisionInformation(vector.normalize(), vector.magnitude(), collision_radius)
 
     def get_collision_radius(self):
         return (self.atlas.get_texture_width() + self.atlas.get_texture_height()) / 2 * HIT_BOX_FACTOR
