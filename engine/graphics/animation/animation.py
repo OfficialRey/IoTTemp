@@ -1,13 +1,4 @@
-import os
 from enum import Enum
-from typing import List
-
-import pygame
-
-from engine.core.vector import Vector
-from engine.graphics.textures.texture import Texture
-from engine.util.debug import print_debug
-from engine.util.resources import get_resource_path
 
 
 class AnimationType(Enum):
@@ -27,10 +18,11 @@ class AnimationType(Enum):
     WALKING_NW = 9
 
     # Actions
-    ATTACK = 10
-    DAMAGED = 11
-    DODGE = 12
-    DEATH = 13
+    RANGED_ATTACK = 10
+    MELEE_ATTACK = 11
+    DAMAGED = 12
+    DODGE = 13
+    DEATH = 14
 
 
 class AnimationData:

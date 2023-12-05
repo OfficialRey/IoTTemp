@@ -1,4 +1,5 @@
 from engine.core.vector import Vector
+from engine.graphics.animation.animation import AnimationType
 from engine.graphics.atlas.animation import AnimationAtlas
 from engine.props.types.collision import CollisionInformation
 from engine.props.types.sprite import Sprite
@@ -29,5 +30,18 @@ class Damageable(Sprite):
         self.health -= value
         self.flash_image(FLASH_TIME)
 
+        if self.health <= 0:
+            self.animation_manager.update_animation_type(AnimationType.DEATH)
+
     def get_damage_multiplier(self):
         return 100 / (100 + self.defense)
+
+    def is_dead(self) -> bool:
+        return self.health <= 0
+
+    def can_remove(self) -> bool:
+        if not self.is_dead():
+            return False
+        if self.atlas.get_animation_data(AnimationType.DEATH) is not None:
+            return self.animation_manager.is_animation_finished()
+        return True

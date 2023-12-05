@@ -7,6 +7,7 @@ from engine.graphics.textures.texture_manager import TextureManager
 from engine.props.bullet.bullet import BulletType
 from engine.props.data import UnitData
 from engine.props.player.cursor import Cursor
+from engine.props.types.collision import CollisionInformation
 from engine.props.types.sprite import Sprite
 from engine.props.types.unit import ShootingUnit
 from engine.props.weapon.weapon import WeaponManager
@@ -17,7 +18,7 @@ class Player(ShootingUnit):
 
     def __init__(self, texture_manager: TextureManager, weapon_manager: WeaponManager, data: UnitData):
         super().__init__(texture_manager.player, weapon_manager.laser_gun, data.get_health(), data.get_attack(),
-                         data.get_defense(), data.get_shot_delay(), data.get_max_speed(), data.get_acceleration())
+                         data.get_defense(), data.get_max_speed(), data.get_acceleration(), is_enemy=False)
         self.input_manager = None
         self.cursor = Cursor(texture_manager)
         self.cursor.play_animation(AnimationType.GENERIC)
@@ -26,14 +27,18 @@ class Player(ShootingUnit):
         self.cursor.update(world, delta_time)
         super().update(world, delta_time)
 
+    def run_behaviour(self, world, delta_time: float):
+        pass
+
     # Format: [w, a, s, d, space, mouse_x, mouse_y, left_click, right_click]
 
     def handle_input(self, input_manager: InputManager, camera, delta_time: float):
         position = Vector(input_manager.mouse_x, input_manager.mouse_y)
         self.cursor.set_position(position)
-        self.accelerate((self.cursor.center_position - camera.get_relative_position(self)), delta_time)
+        self.accelerate(self.cursor.center_position - camera.get_relative_position(self), delta_time)
 
         if input_manager.left_click:
+            self.animation_manager.single_play_animation(AnimationType.RANGED_ATTACK)
             self.shoot_bullet(BulletType.LASER,
                               (self.cursor.get_render_position() - self.get_render_position(camera)))
 
@@ -50,5 +55,5 @@ class Player(ShootingUnit):
     def on_attack(self):
         pass
 
-    def on_collision(self, other: Sprite):
+    def on_collision(self, other: Sprite, collision_info: CollisionInformation):
         pass

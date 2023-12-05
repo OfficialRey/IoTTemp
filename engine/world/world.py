@@ -5,8 +5,7 @@ from engine.core.vector import Vector
 from engine.core.window import Window
 from engine.graphics.textures.texture_manager import TextureManager
 from engine.props.data import UnitData
-from engine.props.enemy.enemy import Enemy
-from engine.props.enemy.storage.centipede.centipede import Centipede
+from engine.props.enemy.storage.spider.spider import ShootingSpider
 from engine.props.player.player import Player
 from engine.props.types.unit import ShootingUnit, Unit
 from engine.props.weapon.weapon import WeaponManager
@@ -26,13 +25,13 @@ class World:
         self.camera = Camera(window, zoom)
 
         self.level_data = LevelData(self.texture_manager.level_textures, "Test", 20, 20)
-        self.player: Player = Player(self.texture_manager, self.weapon_manager, UnitData.PLAYER)
+        self.player = Player(self.texture_manager, self.weapon_manager, UnitData.PLAYER)
         self.texture_atlas = self.level_data.texture_atlas
 
         self.units = pygame.sprite.Group()
         self.units.add(self.player)
 
-        self.units.add(Centipede(self.texture_manager, Vector(0, 0)))
+        self.units.add(ShootingSpider(self.texture_manager.spider, self.weapon_manager.laser_gun, Vector()))
 
         # Server Package Values
         self.player_shot = False
@@ -105,12 +104,10 @@ class World:
                     continue
 
                 for target in self.units.sprites():
-                    if isinstance(target, Unit):
-                        # Return if trying to attack own team
-                        if isinstance(unit, Player) and isinstance(target, Player) or \
-                                isinstance(unit, Enemy) and isinstance(target, Enemy):
-                            continue
-                        target.register_bullet_hits(bullets)
+                    # Return if trying to attack own team
+                    if unit.is_enemy == target.is_enemy:
+                        continue
+                    target.register_bullet_hits(bullets)
 
     def render(self, window: Window):
         window.fill(WHITE)

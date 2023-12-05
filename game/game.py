@@ -26,7 +26,7 @@ class TopDownGame:
             7
         )
 
-        print_debug(f"Loaded {self.world.texture_manager.count_textures()} textures into memory!")
+        print_debug(f"Loaded {self.world.texture_manager.count_textures()} surfaces into memory!")
 
     def run(self):
         self.engine.run(self.world)

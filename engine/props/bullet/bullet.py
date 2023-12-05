@@ -9,8 +9,8 @@ from engine.sound.game_sound import GameSound
 
 
 class BulletType(Enum):
-    # Speed, Animation, Rotation Offset, Size, Damage, GameSound
-    LASER = (8000, 16, 90, 0.5, 1, GameSound.LASER)
+    # Speed, Animation, Rotation Offset, Size, Damage, Shot Delay, GameSound
+    LASER = (8000, 16, 90, 0.5, 10, 0.3, GameSound.LASER)
 
     def get_speed(self):
         return self.value[0]
@@ -27,8 +27,11 @@ class BulletType(Enum):
     def get_attack(self):
         return self.value[4]
 
-    def get_sound_type(self):
+    def get_shot_delay(self):
         return self.value[5]
+
+    def get_sound_type(self):
+        return self.value[6]
 
 
 class Bullet(Sprite):

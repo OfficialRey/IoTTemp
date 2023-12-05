@@ -10,8 +10,9 @@ from engine.props.types.sprite import Sprite
 
 class CentipedeHead(Enemy):
 
-    def __init__(self, atlas: AnimationAtlas, center_position: Vector):
+    def __init__(self, core, atlas: AnimationAtlas, center_position: Vector):
         super().__init__(atlas, UnitData.CENTIPEDE_HEAD, center_position)
+        self.core = core
 
     def run_behaviour(self, world, delta_time: float):
         target = world.player
@@ -22,7 +23,7 @@ class CentipedeHead(Enemy):
         pass
 
     def on_death(self):
-        pass
+        self.core.remove_dead_segments()
 
     def on_attack(self):
         pass

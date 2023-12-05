@@ -15,8 +15,9 @@ PREVIOUS_INFLUENCE = 0.1
 
 class CentipedeBody(Enemy):
 
-    def __init__(self, atlas: AnimationAtlas, previous_segment: Enemy, center_position: Vector):
+    def __init__(self, core, atlas: AnimationAtlas, previous_segment: Enemy, center_position: Vector):
         super().__init__(atlas, UnitData.CENTIPEDE_BODY, center_position)
+        self.core = core
         self.previous_segment = previous_segment
 
     def run_behaviour(self, world, delta_time: float):
@@ -38,7 +39,7 @@ class CentipedeBody(Enemy):
         pass
 
     def on_death(self):
-        pass
+        self.core.remove_dead_segments()
 
     def on_attack(self):
         pass
