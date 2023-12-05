@@ -11,12 +11,13 @@ from engine.util.resources import get_resource_path
 
 class Atlas(ABC):
 
-    def __init__(self, path: str, file_name: str, sprite_width: int, sprite_height: int):
+    def __init__(self, path: str, file_name: str, sprite_width: int, sprite_height: int, rotation_precision: int = 360):
         self.surface = pygame.image.load(
             os.path.join(get_resource_path(), os.path.join(path, file_name))).convert_alpha()
         self.sprite_width, self.sprite_height = sprite_width, sprite_height
         self.sprite_scale = Vector(1, 1)
         self.scaled_height = sprite_height
+        self.rotation_precision = rotation_precision
 
         self.x_length = self.surface.get_width() // self.sprite_width
         self.y_length = self.surface.get_height() // self.sprite_height
@@ -49,3 +50,13 @@ class Atlas(ABC):
             count += 1 + len(texture.images) + len(texture.flash_images)
 
         return count
+
+    def _split_row(self, surface: pygame.Surface) -> List[Texture]:
+        textures = []
+        for x in range(surface.get_width() // self.sprite_width):
+            texture = Texture(
+                surface.subsurface((x * self.sprite_width, 0, self.sprite_width, self.sprite_height)),
+                rotation_precision=self.rotation_precision)
+            if not texture.is_empty():
+                textures.append(texture)
+        return textures

@@ -3,13 +3,11 @@ from engine.graphics.animation.animation import AnimationType
 from engine.graphics.atlas.animation import AnimationAtlas
 from engine.graphics.atlas.bullet import BulletAtlas
 from engine.graphics.atlas.level import LevelAtlas
-from engine.props.bullet.bullet import BulletType
+from engine.props.bullet.bullet import BulletManager
 
 # Define Animations of Sprite Sheet
 
 SINGLE_SPRITE = [AnimationType.GENERIC]
-
-BULLETS = [element for element in BulletType]
 
 PLAYER = [AnimationType.IDLE, AnimationType.WALKING_E, None, AnimationType.RANGED_ATTACK, AnimationType.DAMAGED,
           AnimationType.DEATH]
@@ -50,8 +48,7 @@ class TextureManager:
         self.arrow_down = AnimationAtlas("widgets", "arrow_down.png", SINGLE_SPRITE, 16, 16)
 
         # Bullets
-        self.bullets = BulletAtlas("bullets", "bullets.png", 16, 16, BULLETS,
-                                   animation_time=0.05, rotation_precision=10)
+        self.bullets = BulletAtlas("bullets", "bullets.png", 16, 16, animation_time=0.05, rotation_precision=10)
 
         self.game_textures = [
             # Level
@@ -63,13 +60,7 @@ class TextureManager:
             # Enemy
             self.centipede_head,
             self.centipede_body,
-            self.spider,
-
-            # Calibration
-            self.calibrator,
-
-            # Bullets
-            self.bullets
+            self.spider
         ]
 
     def scale_textures(self, scale):

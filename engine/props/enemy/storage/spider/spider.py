@@ -1,31 +1,24 @@
 from engine.core.vector import Vector
-from engine.graphics.atlas.animation import AnimationAtlas
+from engine.graphics.textures.texture_manager import TextureManager
+from engine.props.bullet.bullet import BulletType
 from engine.props.data import UnitData
+from engine.props.enemy.ai.ai import ShootingAI
 from engine.props.enemy.enemy import ShootingEnemy
 from engine.props.types.collision import CollisionInformation
 from engine.props.types.sprite import Sprite
-from engine.props.weapon.weapon import Weapon
+from engine.sound.game_sound import SoundEngine
 
 TARGET_DISTANCE = 650
 
 
 class ShootingSpider(ShootingEnemy):
-    def __init__(self, atlas: AnimationAtlas, weapon: Weapon, center_position: Vector):
-        super().__init__(atlas, weapon, UnitData.SHOOTING_SPIDER, center_position)
+    def __init__(self, sound_engine: SoundEngine, texture_manager: TextureManager, bullet_type: BulletType,
+                 center_position: Vector):
+        super().__init__(sound_engine, texture_manager.spider, bullet_type, UnitData.SHOOTING_SPIDER, center_position)
+        self.ai = ShootingAI(self)
 
     def run_behaviour(self, world, delta_time: float):
-        target = world.player
-        vector = target.center_position - self.center_position
-        distance = vector.magnitude()
-
-        acceleration = vector.normalize() * (distance - TARGET_DISTANCE)
-        self.accelerate(acceleration, delta_time)
-
-    def on_hit(self):
-        pass
-
-    def on_death(self):
-        pass
+        self.ai.run(world, delta_time)
 
     def on_attack(self):
         pass

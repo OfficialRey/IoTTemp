@@ -15,8 +15,9 @@ PREVIOUS_INFLUENCE = 0.1
 
 class CentipedeBody(MeleeEnemy):
 
-    def __init__(self, core, atlas: AnimationAtlas, previous_segment: MeleeEnemy, center_position: Vector):
-        super().__init__(atlas, UnitData.CENTIPEDE_BODY, center_position)
+    def __init__(self, sound_engine, core, atlas: AnimationAtlas, previous_segment: MeleeEnemy,
+                 center_position: Vector):
+        super().__init__(sound_engine, atlas, UnitData.CENTIPEDE_BODY, center_position)
         self.core = core
         self.previous_segment = previous_segment
 
@@ -35,11 +36,9 @@ class CentipedeBody(MeleeEnemy):
         self.accelerate(acceleration, delta_time)
         self.animate_generic()
 
-    def on_hit(self):
-        pass
-
     def on_death(self):
         self.core.remove_dead_segments()
+        super().on_death()
 
     def on_attack(self):
         pass

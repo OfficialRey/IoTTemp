@@ -46,7 +46,8 @@ class Sprite(Movable, pygame.sprite.Sprite):
         return self.center_position - self.get_render_offset()
 
     def get_render_offset(self) -> Vector:
-        return Vector(self.atlas.get_texture_width() // 2, self.atlas.get_texture_height() // 2)
+        return Vector(self.animation_manager.get_surface().get_width() // 2,
+                      self.animation_manager.get_surface().get_height() // 2)
 
     def offset_animation(self):
         self.animation_manager.offset_animation()
@@ -75,10 +76,13 @@ class Sprite(Movable, pygame.sprite.Sprite):
         return CollisionInformation(vector.normalize(), vector.magnitude(), collision_radius)
 
     def get_collision_position(self):
-        return self.center_position + Vector(self.atlas.sprite_width, self.atlas.sprite_height)
+        return self.center_position + Vector(self.animation_manager.get_surface().get_width(),
+                                             self.animation_manager.get_surface().get_height())
 
     def get_collision_radius(self):
-        return (self.atlas.get_texture_width() + self.atlas.get_texture_height()) / 2 * HIT_BOX_FACTOR
+        return (
+                self.animation_manager.get_surface().get_width() + self.animation_manager.get_surface().get_height()
+        ) / 2 * HIT_BOX_FACTOR
 
     def play_animation(self, animation_type: Union[int, AnimationType]):
         if isinstance(animation_type, AnimationType):

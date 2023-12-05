@@ -40,6 +40,11 @@ class Damageable(Sprite):
         self.acceleration = 0
         self.velocity = Vector(0, 0)
 
+    def collide_generic(self, other) -> CollisionInformation:
+        if self.is_dead():
+            return CollisionInformation()
+        return super().collide_generic(other)
+
     def get_damage_multiplier(self):
         return 100 / (100 + self.defense)
 

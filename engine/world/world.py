@@ -4,12 +4,14 @@ from engine.core.input_manager import InputManager
 from engine.core.vector import Vector
 from engine.core.window import Window
 from engine.graphics.textures.texture_manager import TextureManager
+from engine.props.bullet.bullet import BulletManager
 from engine.props.data import UnitData
 from engine.props.enemy.storage.centipede.centipede import Centipede
 from engine.props.enemy.storage.spider.spider import ShootingSpider
 from engine.props.player.player import Player
 from engine.props.types.unit import ShootingUnit, Unit
 from engine.props.weapon.weapon import WeaponManager
+from engine.sound.game_sound import SoundEngine
 from engine.util.constants import WHITE
 from engine.util.debug import print_debug
 from engine.world.camera import Camera
@@ -18,22 +20,24 @@ from engine.world.level_data import LevelData
 
 class World:
 
-    def __init__(self, window: Window, zoom: float):
+    def __init__(self, sound_engine: SoundEngine, window: Window, zoom: float):
         print_debug("Creating world...")
 
         self.texture_manager = TextureManager()
-        self.weapon_manager = WeaponManager(self.texture_manager)
+        self.bullet_manager = BulletManager(self.texture_manager.bullets)
+        self.weapon_manager = WeaponManager(self.bullet_manager)
+        self.sound_engine = sound_engine
         self.camera = Camera(window, zoom)
 
         self.level_data = LevelData(self.texture_manager.level_textures, "Test", 20, 20)
-        self.player = Player(self.texture_manager, self.weapon_manager, UnitData.PLAYER)
+        self.player = Player(self.sound_engine, self.texture_manager, self.weapon_manager, UnitData.PLAYER)
         self.texture_atlas = self.level_data.texture_atlas
 
         self.units = pygame.sprite.Group()
         self.units.add(self.player)
 
-        self.units.add(ShootingSpider(self.texture_manager.spider, self.weapon_manager.laser_gun, Vector()))
-        self.units.add(Centipede(self.texture_manager, Vector()))
+        #self.units.add(ShootingSpider(self.sound_engine, self.texture_manager, self.bullet_manager.laser, Vector()))
+        self.units.add(Centipede(self.sound_engine, self.texture_manager, Vector()))
 
         # Server Package Values
         self.player_shot = False

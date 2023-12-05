@@ -13,8 +13,15 @@ class GameSound(Enum):
     GUI_HOVER = "gui_hover.wav",
     GUI_CONFIRM = "gui_confirm.wav",
 
+    # DAMAGE
+    HURT = "hurt.wav",
+    DEATH = "death.wav",
+
     # SHOOTING
     LASER = "laser.wav",
+
+    # EFFECTS
+    POWER_UP = "power_up.wav",
 
     def get_file_name(self):
         return self.value[0]

@@ -2,20 +2,18 @@ import pygame
 
 from engine.core.vector import Vector
 from engine.graphics.textures.texture_manager import TextureManager
-from engine.props.bullet.bullet import Bullet
 from engine.props.data import UnitData
 from engine.props.enemy.enemy import MeleeEnemy
 from engine.props.enemy.storage.centipede.centipede_body import CentipedeBody
 from engine.props.enemy.storage.centipede.centipede_head import CentipedeHead
-from engine.props.player.player import Player
 from engine.props.types.collision import CollisionInformation
-from engine.props.types.sprite import Sprite
+from engine.sound.game_sound import SoundEngine
 
 
 class Centipede(MeleeEnemy):
 
-    def __init__(self, texture_manager: TextureManager, center_position: Vector):
-        super().__init__(texture_manager.centipede_head, UnitData.NONE, center_position)
+    def __init__(self, sound_engine: SoundEngine, texture_manager: TextureManager, center_position: Vector):
+        super().__init__(sound_engine, texture_manager.centipede_head, UnitData.NONE, center_position)
         self.head_texture = texture_manager.centipede_head
         self.body_texture = texture_manager.centipede_body
         self.segments = []
@@ -25,12 +23,12 @@ class Centipede(MeleeEnemy):
     def _create_centipede(self):
         length = 50
 
-        previous_segment = CentipedeHead(self, self.head_texture, self.center_position)
+        previous_segment = CentipedeHead(self.sound_engine, self, self.head_texture, self.center_position)
         self.segments = [previous_segment]
         for i in range(1, length):
-            previous_segment = CentipedeBody(self, self.body_texture, previous_segment,
-                                             previous_segment.center_position + Vector(-1,
-                                                                                       0) * self.get_collision_radius())
+            new_position = previous_segment.center_position + Vector(-1, 0) * self.get_collision_radius()
+            previous_segment = CentipedeBody(self.sound_engine, self, self.body_texture, previous_segment, new_position)
+
             previous_segment.offset_animation()
             previous_segment.velocity = Vector()
             self.segments.append(previous_segment)
@@ -56,7 +54,8 @@ class Centipede(MeleeEnemy):
             if isinstance(current_segment, CentipedeBody):
                 # Create new head
                 if not current_segment.has_head():
-                    self.segments[i] = CentipedeHead(self, self.head_texture, current_segment.center_position)
+                    self.segments[i] = CentipedeHead(self.sound_engine, self, self.head_texture,
+                                                     current_segment.center_position)
                     self.segments[i + 1].previous_segment = self.segments[i]
 
     def render(self, surface: pygame.Surface, camera) -> None:

@@ -10,8 +10,8 @@ from engine.props.types.sprite import Sprite
 
 class CentipedeHead(MeleeEnemy):
 
-    def __init__(self, core, atlas: AnimationAtlas, center_position: Vector):
-        super().__init__(atlas, UnitData.CENTIPEDE_HEAD, center_position)
+    def __init__(self, sound_engine, core, atlas: AnimationAtlas, center_position: Vector):
+        super().__init__(sound_engine, atlas, UnitData.CENTIPEDE_HEAD, center_position)
         self.core = core
 
     def run_behaviour(self, world, delta_time: float):
@@ -19,14 +19,9 @@ class CentipedeHead(MeleeEnemy):
         self.accelerate((target.center_position - self.center_position).normalize(), delta_time)
         self.animate_generic()
 
-    def on_hit(self):
-        pass
-
     def on_death(self):
         self.core.remove_dead_segments()
-
-    def on_attack(self):
-        pass
+        super().on_death()
 
     def on_collision(self, other: Sprite, collision_info: CollisionInformation):
         if not isinstance(other, Bullet):

@@ -1,7 +1,5 @@
 from typing import List
 
-import pygame
-
 from engine.graphics.animation.animation import AnimationType, AnimationData
 from engine.graphics.atlas.atlas import Atlas
 from engine.graphics.textures.texture import Texture
@@ -41,16 +39,6 @@ class AnimationAtlas(Atlas):
 
                 self.textures.extend(textures)
                 self.animation_data.append(animation_data)
-
-    def _split_row(self, surface: pygame.Surface) -> List[Texture]:
-        textures = []
-        for x in range(surface.get_width() // self.sprite_width):
-            texture = Texture(
-                surface.subsurface((x * self.sprite_width, 0, self.sprite_width, self.sprite_height)),
-                rotation_precision=self.rotation_precision)
-            if not texture.is_empty():
-                textures.append(texture)
-        return textures
 
     def get_animation_data(self, animation_type: AnimationType):
         for animation_data in self.animation_data:

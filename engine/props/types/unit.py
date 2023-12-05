@@ -9,16 +9,17 @@ from engine.props.bullet.bullet import Bullet, BulletType
 from engine.props.types.collision import CollisionInformation
 from engine.props.types.damageable import Damageable
 from engine.props.types.sprite import Sprite
-from engine.props.weapon.weapon import Weapon
+from engine.sound.game_sound import SoundEngine, GameSound
 from engine.world.camera import Camera
 
 
 class Unit(Damageable, ABC):
 
-    def __init__(self, atlas: AnimationAtlas, max_health: int, attack: int, defense: int,
+    def __init__(self, sound_engine: SoundEngine, atlas: AnimationAtlas, max_health: int, attack: int, defense: int,
                  max_speed: float = 0, acceleration: float = 0, center_position: Vector = Vector(),
                  velocity: Vector = Vector(), is_enemy: bool = True):
         super().__init__(atlas, max_health, attack, defense, max_speed, acceleration, center_position, velocity)
+        self.sound_engine = sound_engine
         self.is_enemy = is_enemy
         self.triggered_death = False
 
@@ -31,8 +32,9 @@ class Unit(Damageable, ABC):
 
     def _death_update(self):
         if self.is_dead() and not self.triggered_death:
-            self.animation_manager.flash_time = 0
             self.on_death()
+            self.animation_manager.flash_time = 0
+            self.triggered_death = True
 
     def register_bullet_hits(self, bullets: List[Bullet]):
         # Ensure bullets exist
@@ -55,15 +57,19 @@ class Unit(Damageable, ABC):
             if other.owner.is_enemy is not self.is_enemy:
                 self.damage(other.get_attack(), collision_info)
                 other.life_time = 0
+                self.on_hit()
+
+    def play_sound(self, sound: GameSound):
+        self.sound_engine.play_sound(sound)
 
     def run_behaviour(self, world, delta_time: float):
         raise NotImplementedError("Must implement generic behaviour")
 
     def on_hit(self):
-        raise NotImplementedError("Must implement on_hit behaviour")
+        self.play_sound(GameSound.HURT)
 
     def on_death(self):
-        raise NotImplementedError("Must implement on_death behaviour")
+        self.play_sound(GameSound.DEATH)
 
     def on_attack(self):
         raise NotImplementedError("Must implement on_attack behaviour")
@@ -73,18 +79,20 @@ class Unit(Damageable, ABC):
 
 
 class ShootingUnit(Unit, ABC):
-    def __init__(self, atlas: AnimationAtlas, weapon: Weapon, max_health: int, attack: int,
-                 defense: int, max_speed: float, acceleration: float, center_position: Vector = Vector(),
-                 velocity: Vector = Vector(), is_enemy: bool = True):
-        super().__init__(atlas, max_health, attack, defense, max_speed, acceleration, center_position, velocity,
+    def __init__(self, sound_engine: SoundEngine, atlas: AnimationAtlas, bullet_type: BulletType, max_health: int,
+                 attack: int, defense: int, max_speed: float, acceleration: float, shot_delay: float,
+                 center_position: Vector = Vector(), velocity: Vector = Vector(), is_enemy: bool = True):
+        super().__init__(sound_engine, atlas, max_health, attack, defense, max_speed, acceleration, center_position,
+                         velocity,
                          is_enemy)
-        self.weapon = weapon
+        self.bullet_type = bullet_type
+        self.shot_delay = shot_delay
         self.current_shot_timer = 0
         self.bullets = []
 
-    def shoot_bullet(self, bullet_type: BulletType, direction: Vector) -> bool:
-        if self.current_shot_timer >= self.weapon.bullet_type.get_shot_delay():
-            bullet = Bullet(self.weapon.animation_atlas, self, bullet_type, self.center_position, direction)
+    def shoot_bullet(self, direction: Vector) -> bool:
+        if self.current_shot_timer >= self.shot_delay:
+            bullet = Bullet(self, self.bullet_type, self.center_position, direction)
             self.bullets.append(bullet)
             self.current_shot_timer = 0
             return True
@@ -98,7 +106,7 @@ class ShootingUnit(Unit, ABC):
                 self.bullets.remove(bullet)
 
         # Allow Auto Fire
-        if self.current_shot_timer >= self.weapon.bullet_type.get_shot_delay():
+        if self.current_shot_timer >= self.shot_delay:
             return
         self.current_shot_timer += delta_time
 
@@ -113,9 +121,9 @@ class ShootingUnit(Unit, ABC):
 
 class MeleeUnit(Unit, ABC):
 
-    def __init__(self, atlas: AnimationAtlas, max_health: int, attack: int, defense: int, max_speed: float,
-                 acceleration: float, center_position: Vector = Vector(), velocity: Vector = Vector(),
+    def __init__(self, sound_engine: SoundEngine, atlas: AnimationAtlas, max_health: int, attack: int, defense: int,
+                 max_speed: float, acceleration: float, center_position: Vector = Vector(), velocity: Vector = Vector(),
                  is_enemy: bool = True):
-        super().__init__(atlas, max_health, attack, defense, max_speed, acceleration, center_position, velocity,
-                         is_enemy)
+        super().__init__(sound_engine, atlas, max_health, attack, defense, max_speed, acceleration, center_position,
+                         velocity, is_enemy)
         self.melee_cooldown = 0
