@@ -42,7 +42,7 @@ class Centipede(MeleeEnemy):
     def remove_dead_segments(self):
         to_remove = []
         for segment in self.segments:
-            if segment.can_remove() or isinstance(segment, CentipedeBody) and segment.previous_segment is None:
+            if segment.can_remove():
                 to_remove.append(segment)
 
         if len(to_remove) > 0:
@@ -69,8 +69,8 @@ class Centipede(MeleeEnemy):
         for segment in self.segments:
             collision_info = segment.collide_generic(other)
             if collision_info.hit:
-                segment.on_collision(other, collision_info)
-                return collision_info
+                segment.on_generic_collision(other, collision_info)
+                return CollisionInformation()
         return CollisionInformation()
 
     def is_dead(self):
@@ -84,13 +84,3 @@ class Centipede(MeleeEnemy):
 
     def on_attack(self):
         pass
-
-    def on_collision(self, other: Sprite, collision_info: CollisionInformation):
-        if not isinstance(other, Bullet):
-            return
-        if not isinstance(other.owner, Player):
-            return
-
-        # The player shot me
-        self.damage(other.bullet_type.get_attack(), collision_info)
-        other.life_time = 0

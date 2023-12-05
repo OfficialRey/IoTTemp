@@ -5,6 +5,7 @@ from engine.core.vector import Vector
 from engine.core.window import Window
 from engine.graphics.textures.texture_manager import TextureManager
 from engine.props.data import UnitData
+from engine.props.enemy.storage.centipede.centipede import Centipede
 from engine.props.enemy.storage.spider.spider import ShootingSpider
 from engine.props.player.player import Player
 from engine.props.types.unit import ShootingUnit, Unit
@@ -32,6 +33,7 @@ class World:
         self.units.add(self.player)
 
         self.units.add(ShootingSpider(self.texture_manager.spider, self.weapon_manager.laser_gun, Vector()))
+        self.units.add(Centipede(self.texture_manager, Vector()))
 
         # Server Package Values
         self.player_shot = False

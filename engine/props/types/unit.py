@@ -44,10 +44,10 @@ class Unit(Damageable, ABC):
             if bullet.life_time > 0:
                 collision_info = self.collide_generic(bullet)
                 if collision_info.hit:
-                    self._on_collision(bullet, collision_info)
+                    self.on_generic_collision(bullet, collision_info)
                     continue
 
-    def _on_collision(self, other: Sprite, collision_info: CollisionInformation):
+    def on_generic_collision(self, other: Sprite, collision_info: CollisionInformation):
         self.on_collision(other, collision_info)
 
         # Bullet Hits

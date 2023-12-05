@@ -15,7 +15,7 @@ PREVIOUS_INFLUENCE = 0.1
 
 class CentipedeBody(MeleeEnemy):
 
-    def __init__(self, core, atlas: AnimationAtlas, previous_segment: Enemy, center_position: Vector):
+    def __init__(self, core, atlas: AnimationAtlas, previous_segment: MeleeEnemy, center_position: Vector):
         super().__init__(atlas, UnitData.CENTIPEDE_BODY, center_position)
         self.core = core
         self.previous_segment = previous_segment

@@ -42,11 +42,15 @@ class AnimationManager:
             self.update_animation_type(animation_type)
 
     def update_animation_data(self, animation_data: AnimationData):
-        if animation_data is not None:
-            self.previous_animation = self.animation_data
-            self.animation_data = animation_data
-            self.timer = 0
-            self.count = 0
+        if animation_data is None:
+            return
+        if animation_data is self.animation_data:
+            return
+
+        self.previous_animation = self.animation_data
+        self.animation_data = animation_data
+        self.timer = 0
+        self.count = 0
 
     def update_animation_type(self, animation_type: AnimationType):
         if isinstance(self.atlas, AnimationAtlas):
