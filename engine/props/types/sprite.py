@@ -34,7 +34,7 @@ class Sprite(Movable, pygame.sprite.Sprite):
         self.animation_manager.flash_image(flash_time)
 
     def get_surface(self) -> pygame.Surface:
-        return self.animation_manager.get_surface(self.atlas)
+        return self.animation_manager.get_surface()
 
     def render(self, surface: pygame.Surface, camera) -> None:
         surface.blit(self.get_surface(), self.get_render_position(camera).as_tuple())
@@ -70,9 +70,12 @@ class Sprite(Movable, pygame.sprite.Sprite):
         self.animation_manager.update_animation_type(GENERIC_ANIMATIONS[index])
 
     def collide_generic(self, other) -> CollisionInformation:
-        vector = other.center_position - self.center_position
+        vector = other.get_collision_position() - self.get_collision_position()
         collision_radius = self.get_collision_radius() + other.get_collision_radius()
         return CollisionInformation(vector.normalize(), vector.magnitude(), collision_radius)
+
+    def get_collision_position(self):
+        return self.center_position + Vector(self.atlas.sprite_width, self.atlas.sprite_height)
 
     def get_collision_radius(self):
         return (self.atlas.get_texture_width() + self.atlas.get_texture_height()) / 2 * HIT_BOX_FACTOR

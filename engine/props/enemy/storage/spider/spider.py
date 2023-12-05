@@ -2,13 +2,14 @@ from engine.core.vector import Vector
 from engine.graphics.atlas.animation import AnimationAtlas
 from engine.props.data import UnitData
 from engine.props.enemy.enemy import ShootingEnemy
+from engine.props.types.collision import CollisionInformation
+from engine.props.types.sprite import Sprite
 from engine.props.weapon.weapon import Weapon
 
 TARGET_DISTANCE = 650
 
 
 class ShootingSpider(ShootingEnemy):
-
     def __init__(self, atlas: AnimationAtlas, weapon: Weapon, center_position: Vector):
         super().__init__(atlas, weapon, UnitData.SHOOTING_SPIDER, center_position)
 
@@ -19,3 +20,15 @@ class ShootingSpider(ShootingEnemy):
 
         acceleration = vector.normalize() * (distance - TARGET_DISTANCE)
         self.accelerate(acceleration, delta_time)
+
+    def on_hit(self):
+        pass
+
+    def on_death(self):
+        pass
+
+    def on_attack(self):
+        pass
+
+    def on_collision(self, other: Sprite, collision_info: CollisionInformation):
+        pass

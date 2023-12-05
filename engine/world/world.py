@@ -71,6 +71,7 @@ class World:
         self._process_player(input_manager, delta_time)
         self._process_units(delta_time)
         self._process_bullets()
+        self._remove_units()
 
     def _reset_package_values(self):
         self.player_shot = False
@@ -108,6 +109,14 @@ class World:
                     if unit.is_enemy == target.is_enemy:
                         continue
                     target.register_bullet_hits(bullets)
+
+    def _remove_units(self):
+        to_remove = []
+        for unit in self.units.sprites():
+            if unit.can_remove():
+                to_remove.append(unit)
+
+        self.units.remove(*to_remove)
 
     def render(self, window: Window):
         window.fill(WHITE)

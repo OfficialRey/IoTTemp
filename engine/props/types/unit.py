@@ -20,14 +20,18 @@ class Unit(Damageable, ABC):
                  velocity: Vector = Vector(), is_enemy: bool = True):
         super().__init__(atlas, max_health, attack, defense, max_speed, acceleration, center_position, velocity)
         self.is_enemy = is_enemy
+        self.triggered_death = False
 
     def update(self, world, delta_time: float):
-        self.run_behaviour(world, delta_time)
-        self._unit_update()
         super().update(world, delta_time)
-
-    def _unit_update(self):
+        self._death_update()
         if self.is_dead():
+            return
+        self.run_behaviour(world, delta_time)
+
+    def _death_update(self):
+        if self.is_dead() and not self.triggered_death:
+            self.animation_manager.flash_time = 0
             self.on_death()
 
     def register_bullet_hits(self, bullets: List[Bullet]):
@@ -40,8 +44,17 @@ class Unit(Damageable, ABC):
             if bullet.life_time > 0:
                 collision_info = self.collide_generic(bullet)
                 if collision_info.hit:
-                    self.on_collision(bullet, collision_info)
+                    self._on_collision(bullet, collision_info)
                     continue
+
+    def _on_collision(self, other: Sprite, collision_info: CollisionInformation):
+        self.on_collision(other, collision_info)
+
+        # Bullet Hits
+        if isinstance(other, Bullet):
+            if other.owner.is_enemy is not self.is_enemy:
+                self.damage(other.get_attack(), collision_info)
+                other.life_time = 0
 
     def run_behaviour(self, world, delta_time: float):
         raise NotImplementedError("Must implement generic behaviour")
@@ -100,9 +113,9 @@ class ShootingUnit(Unit, ABC):
 
 class MeleeUnit(Unit, ABC):
 
-    def __init__(self, atlas: AnimationAtlas, max_health: int, attack: int,
-                 defense: int, max_speed: float, acceleration: float,
-                 center_position: Vector = Vector(),
-                 velocity: Vector = Vector()):
-        super().__init__(atlas, max_health, attack, defense, max_speed, acceleration, center_position, velocity)
+    def __init__(self, atlas: AnimationAtlas, max_health: int, attack: int, defense: int, max_speed: float,
+                 acceleration: float, center_position: Vector = Vector(), velocity: Vector = Vector(),
+                 is_enemy: bool = True):
+        super().__init__(atlas, max_health, attack, defense, max_speed, acceleration, center_position, velocity,
+                         is_enemy)
         self.melee_cooldown = 0

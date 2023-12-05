@@ -2,13 +2,13 @@ from engine.core.vector import Vector
 from engine.graphics.atlas.animation import AnimationAtlas
 from engine.props.bullet.bullet import Bullet
 from engine.props.data import UnitData
-from engine.props.enemy.enemy import Enemy
+from engine.props.enemy.enemy import MeleeEnemy
 from engine.props.player.player import Player
 from engine.props.types.collision import CollisionInformation
 from engine.props.types.sprite import Sprite
 
 
-class CentipedeHead(Enemy):
+class CentipedeHead(MeleeEnemy):
 
     def __init__(self, core, atlas: AnimationAtlas, center_position: Vector):
         super().__init__(atlas, UnitData.CENTIPEDE_HEAD, center_position)

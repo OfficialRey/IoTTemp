@@ -17,6 +17,6 @@ class ShootingEnemy(ShootingUnit, ABC):
 
 class MeleeEnemy(MeleeUnit, ABC):
 
-    def __init__(self, atlas: AnimationAtlas, max_health: int, attack: int, defense: int, max_speed: float,
-                 acceleration: float):
-        super().__init__(atlas, max_health, attack, defense, max_speed, acceleration)
+    def __init__(self, atlas: AnimationAtlas, enemy_data: UnitData, center_position: Vector):
+        super().__init__(atlas, enemy_data.get_health(), enemy_data.get_attack(), enemy_data.get_defense(),
+                         enemy_data.get_max_speed(), enemy_data.get_acceleration(), center_position)

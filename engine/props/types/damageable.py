@@ -31,7 +31,14 @@ class Damageable(Sprite):
         self.flash_image(FLASH_TIME)
 
         if self.health <= 0:
-            self.animation_manager.update_animation_type(AnimationType.DEATH)
+            self.play_death_animation()
+
+    def play_death_animation(self):
+        self.animation_manager.update_animation_type(AnimationType.DEATH)
+        self.animation_manager.loop = False
+        self.animation_manager.timer = -2
+        self.acceleration = 0
+        self.velocity = Vector(0, 0)
 
     def get_damage_multiplier(self):
         return 100 / (100 + self.defense)

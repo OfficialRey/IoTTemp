@@ -36,15 +36,17 @@ class AnimationManager:
     def single_play_animation(self, animation_type: AnimationType):
         self.single_play = True
         if self.get_animation_data(animation_type) is not self.animation_data:
-            self.previous_animation = self.animation_data
-            self.update_animation_type(animation_type)
             self.timer = 0
             self.count = 0
+            self.previous_animation = self.animation_data
+            self.update_animation_type(animation_type)
 
     def update_animation_data(self, animation_data: AnimationData):
         if animation_data is not None:
             self.previous_animation = self.animation_data
             self.animation_data = animation_data
+            self.timer = 0
+            self.count = 0
 
     def update_animation_type(self, animation_type: AnimationType):
         if isinstance(self.atlas, AnimationAtlas):
@@ -71,15 +73,20 @@ class AnimationManager:
     def update(self, delta_time: float):
         self.flash_time -= delta_time
         self.timer += delta_time
-        if self.timer >= self.animation_data.animation_time:
-            self.count += 1
-            self.timer -= self.animation_data.animation_time
-            if self.count >= self.animation_data.length:
-                self.on_repeat_animation()
-                if self.animation_data.loop:
-                    self.count = 0
-                else:
-                    self.count -= 1
+
+        if self.timer < self.animation_data.animation_time:
+            return
+
+        self.count += 1
+        self.timer -= self.animation_data.animation_time
+
+        if self.count < self.animation_data.length:
+            return
+        if self.animation_data.loop:
+            self.count = 0
+        else:
+            self.count -= 1
+        self.on_repeat_animation()
 
     def offset_animation(self, value: float = 0):
         if value == 0:
@@ -87,18 +94,18 @@ class AnimationManager:
         self.count = int(value % self.animation_data.length)
         self.timer = value % self.animation_data.animation_time
 
-    def get_texture(self, atlas: Atlas) -> Texture:
-        return atlas.textures[self.animation_data.start_index + self.count]
+    def get_texture(self) -> Texture:
+        return self.atlas.textures[self.animation_data.start_index + self.count]
 
-    def get_surface(self, atlas: Atlas) -> pygame.Surface:
-        texture = self.get_texture(atlas)
+    def get_surface(self) -> pygame.Surface:
+        texture = self.get_texture()
         if self.flash_time > 0 and self.flash_time % self.flash_speed * 2 < self.flash_speed:
             return texture.get_flash_image(self.rotation)
         return texture.get_image(self.rotation)
 
     def is_animation_finished(self):
         if not self.loop:
-            return self.count == self.animation_data.length - 1
+            return self.count == self.animation_data.length - 1 and self.timer >= 0
 
     def on_repeat_animation(self):
         if self.single_play:

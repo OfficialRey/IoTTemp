@@ -2,7 +2,7 @@ from engine.core.vector import Vector
 from engine.graphics.atlas.animation import AnimationAtlas
 from engine.props.bullet.bullet import Bullet
 from engine.props.data import UnitData
-from engine.props.enemy.enemy import Enemy
+from engine.props.enemy.enemy import MeleeEnemy
 from engine.props.enemy.storage.centipede.centipede_head import CentipedeHead
 from engine.props.player.player import Player
 from engine.props.types.collision import CollisionInformation
@@ -13,7 +13,7 @@ DISTANCE_FACTOR = 1.2
 PREVIOUS_INFLUENCE = 0.1
 
 
-class CentipedeBody(Enemy):
+class CentipedeBody(MeleeEnemy):
 
     def __init__(self, core, atlas: AnimationAtlas, previous_segment: Enemy, center_position: Vector):
         super().__init__(atlas, UnitData.CENTIPEDE_BODY, center_position)

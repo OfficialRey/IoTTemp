@@ -4,7 +4,7 @@ from engine.core.vector import Vector
 from engine.graphics.textures.texture_manager import TextureManager
 from engine.props.bullet.bullet import Bullet
 from engine.props.data import UnitData
-from engine.props.enemy.enemy import Enemy
+from engine.props.enemy.enemy import MeleeEnemy
 from engine.props.enemy.storage.centipede.centipede_body import CentipedeBody
 from engine.props.enemy.storage.centipede.centipede_head import CentipedeHead
 from engine.props.player.player import Player
@@ -12,7 +12,7 @@ from engine.props.types.collision import CollisionInformation
 from engine.props.types.sprite import Sprite
 
 
-class Centipede(Enemy):
+class Centipede(MeleeEnemy):
 
     def __init__(self, texture_manager: TextureManager, center_position: Vector):
         super().__init__(texture_manager.centipede_head, UnitData.NONE, center_position)
