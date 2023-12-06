@@ -36,8 +36,17 @@ class Vector:
             return 0
         return math.degrees(math.acos(dot_product / len_product))
 
+    def rotate_counter_clockwise(self, theta: float):
+        theta = math.radians(theta)
+        cs = math.cos(theta)
+        sn = math.sin(theta)
+        return Vector(self.x * cs - self.y * sn, self.x * sn + self.y * cs)
+
     def as_tuple(self) -> Tuple[float, float]:
         return self.x, self.y
+
+    def as_int(self):
+        return Vector(int(self.x), int(self.y))
 
     def __add__(self, other):
         if isinstance(other, Vector):
@@ -76,6 +85,11 @@ class Vector:
 
 
 if __name__ == '__main__':
+    # Vector rotation test
+    vector = Vector(1, 0)
+    for rotation in range(0, 360, 1):
+        print(f"Rotation: {rotation} | Vector: {vector.rotate_counter_clockwise(rotation)}")
+
     # Angle Test
 
     for x, y in zip([i / 10 for i in range(11)], [i / 10 for i in range(10, -1, -1)]):

@@ -1,6 +1,8 @@
 from engine.graphics.atlas.level import LevelAtlas
 from engine.graphics.textures.texture import Texture
 
+from random import random
+
 
 class LevelData:
 

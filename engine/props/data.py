@@ -4,14 +4,15 @@ ANIMATION = 0
 
 
 class UnitData(Enum):
-    # Syntax: Base Max Health, Base Attack, Base Defense, Shot Delay, Max Speed, Acceleration
+    # Syntax: Base Max Health, Base Attack, Base Defense, Max Speed, Acceleration, Shot Delay
 
     NONE = (0, 0, 0, 0, 0, 0)
+    PLAYER = (100, 0, 0, 2700, 6, 0)
 
-    CACO_DEMON = (12, 12, 0, 0, 12, 1)
-    CENTIPEDE_HEAD = (30, 6, 0, 0, 1500, 1200)
-    CENTIPEDE_BODY = (12, 2, 0, 0, 1500, 1200)
-    PLAYER = (100, 0, 0, 0.05, 2700, 6)
+    CENTIPEDE_HEAD = (8, 8, 0, 1500, 1200, 0)
+    CENTIPEDE_BODY = (10, 2, 0, 1500, 1200, 0)
+
+    SHOOTING_SPIDER = (12, 4, 0, 1200, 4, 2)
 
     def get_health(self):
         return self.value[0]
@@ -22,11 +23,11 @@ class UnitData(Enum):
     def get_defense(self):
         return self.value[2]
 
-    def get_shot_delay(self):
+    def get_max_speed(self):
         return self.value[3]
 
-    def get_max_speed(self):
+    def get_acceleration(self):
         return self.value[4]
 
-    def get_acceleration(self):
+    def get_shot_delay(self):
         return self.value[5]

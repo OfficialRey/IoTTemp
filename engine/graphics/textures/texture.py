@@ -39,7 +39,7 @@ class Texture:
         for i in range(len(self.flash_images)):
             self.flash_images[i] = colorize_image(self.flash_images[i], *FLASH_COLOR_OFFSET)
 
-    def set_scale(self, image_scale: Union[Vector, float, int]):
+    def scale_texture(self, image_scale: Union[Vector, float, int]):
         if image_scale == Vector(1, 1):
             return self.images
         if isinstance(image_scale, (float, int)):

@@ -19,14 +19,15 @@ class TopDownGame:
 
     def __init__(self):
         self.communication = Communication(UDP_IP, UDP_PORT, RECEIVER_IP, RECEIVER_PORT, RECEIVER_BUFFER_SIZE)
-        self.engine = Engine(self.communication, max_fps=90)
+        self.engine = Engine(self.communication, max_fps=144)
 
         self.world = World(
+            self.engine.sound_engine,
             self.engine.window,
             7
         )
 
-        print_debug(f"Loaded {self.world.texture_manager.count_textures()} textures into memory...")
+        print_debug(f"Loaded {self.world.texture_manager.count_textures()} surfaces into memory!")
 
     def run(self):
         self.engine.run(self.world)
