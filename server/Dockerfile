@@ -9,7 +9,8 @@ COPY . /backend
 # Install any needed packages specified in requirements.txt
 # RUN pip install --no-cache-dir -r requirements.txt
 
-# Make port 8888 available to the world outside this container
+# Make port 8887 and 8888 available to the world outside this container
+EXPOSE 8887
 EXPOSE 8888
 
 # Run app.py when the container launches
