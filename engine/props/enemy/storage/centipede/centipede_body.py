@@ -36,10 +36,6 @@ class CentipedeBody(MeleeEnemy):
         self.accelerate(acceleration, delta_time)
         self.animate_generic()
 
-    def on_death(self):
-        self.core.remove_dead_segments()
-        super().on_death()
-
     def on_attack(self):
         pass
 

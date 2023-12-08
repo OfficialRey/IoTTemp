@@ -3,6 +3,7 @@ from typing import Tuple
 
 import pygame
 
+from engine.game_info.game_info import GameInformation
 from engine.sound.game_sound import SoundEngine, GameSound
 
 WHITE = (255, 255, 255)
@@ -18,10 +19,11 @@ class Widget(ABC):
                                        area[2] + BORDER_SIZE * 2, area[3] + BORDER_SIZE * 2)
         self.enabled = True
         self.hovered = False
+        self.center_position = self.area.center
 
-    def update(self, event: pygame.event.Event):
-        if event.type == pygame.MOUSEMOTION:
-            x_pos, y_pos = pygame.mouse.get_pos()
+    def update(self, game_info: GameInformation):
+        if game_info.fire_trigger:
+            x_pos, y_pos = game_info.x, game_info.y
             if self.area.x <= x_pos <= self.area.x + self.area.width and \
                     self.area.y <= y_pos <= self.area.y + self.area.height:
                 self.set_hover(True)
@@ -65,10 +67,11 @@ class Label(Widget):
         self.base_render_content = None
         self.render_content = None
 
-        self.set_text(self.text)
+        if self.text is not None:
+            self.set_text(self.text)
 
-    def update(self, event: pygame.event.Event):
-        super().update(event)
+    def update(self, game_info: GameInformation):
+        super().update(game_info)
 
     def set_text(self, text: str):
         self.text = text
@@ -94,7 +97,12 @@ class Label(Widget):
         super().set_area(area)
         self.update_content()
 
+    def on_hover(self):
+        pass
+
     def render(self, surface: pygame.Surface) -> None:
+        if not self.enabled:
+            return
         if self.border_color is not None:
             surface.fill(self.border_color, self.border_area)
         if self.background_color is not None:
@@ -116,19 +124,14 @@ class Button(Label, ABC):
         super().__init__(area, text, font_color, background_color, border_color, hover_color, font)
         self.sound_engine = sound_engine
 
-    def render(self, surface: pygame.Surface) -> None:
-        if not self.enabled:
-            return
-        super().render(surface)
-
-    def update(self, event: pygame.event.Event):
-        super().update(event)
+    def update(self, game_info: GameInformation):
+        super().update(game_info)
         if not self.enabled:
             return
 
-        if self.hovered and event.type == pygame.MOUSEBUTTONDOWN:
+        if self.hovered and game_info.fire_trigger_pressed:
             self._on_press()
-        elif event.type == pygame.MOUSEBUTTONUP:
+        elif game_info.fire_trigger_released:
             self._on_release()
 
     def _on_press(self):

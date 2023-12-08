@@ -31,7 +31,13 @@ class AnimationData:
                  loop: bool):
         self.animation_type = animation_type
         self.start_index = start_index
-        self.stop_index = end_index
-        self.length = self.stop_index - self.start_index
+        self.end_index = end_index
+        self.length = self.end_index - self.start_index
         self.animation_time = animation_time
         self.loop = loop
+
+    def set_cycle_time(self, time: float):
+        self.animation_time = time / self.length
+
+    def copy(self):
+        return AnimationData(self.animation_type, self.start_index, self.end_index, self.animation_time, self.loop)

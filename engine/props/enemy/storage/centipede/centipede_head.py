@@ -19,10 +19,6 @@ class CentipedeHead(MeleeEnemy):
         self.accelerate((target.center_position - self.center_position).normalize(), delta_time)
         self.animate_generic()
 
-    def on_death(self):
-        self.core.remove_dead_segments()
-        super().on_death()
-
     def on_collision(self, other: Sprite, collision_info: CollisionInformation):
         if not isinstance(other, Bullet):
             return

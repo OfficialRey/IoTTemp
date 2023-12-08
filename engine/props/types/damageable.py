@@ -35,8 +35,8 @@ class Damageable(Sprite):
 
     def play_death_animation(self):
         self.animation_manager.update_animation_type(AnimationType.DEATH)
-        self.animation_manager.loop = False
-        self.animation_manager.timer = -2
+        self.animation_manager.update_current_animation(loop=False)
+        self.animation_manager.current_animation.set_cycle_time(1)
         self.acceleration = 0
         self.velocity = Vector(0, 0)
 

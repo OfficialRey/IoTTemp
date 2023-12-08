@@ -4,6 +4,7 @@ from typing import List
 import pygame
 
 from engine.core.vector import Vector
+from engine.graphics.animation.animation import AnimationType
 from engine.graphics.atlas.animation import AnimationAtlas
 from engine.props.bullet.bullet import Bullet, BulletType
 from engine.props.types.collision import CollisionInformation
@@ -89,12 +90,14 @@ class ShootingUnit(Unit, ABC):
         self.shot_delay = shot_delay
         self.current_shot_timer = 0
         self.bullets = []
+        self.animation_manager.get_animation_data(AnimationType.RANGED_ATTACK).set_cycle_time(self.shot_delay)
 
     def shoot_bullet(self, direction: Vector) -> bool:
         if self.current_shot_timer >= self.shot_delay:
             bullet = Bullet(self, self.bullet_type, self.center_position, direction)
             self.bullets.append(bullet)
             self.current_shot_timer = 0
+            self.sound_engine.play_sound(self.bullet_type.sound_type)
             return True
         return False
 

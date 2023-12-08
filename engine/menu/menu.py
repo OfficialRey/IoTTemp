@@ -3,6 +3,7 @@ from typing import List
 import pygame.event
 
 from engine.core.window import Window
+from engine.game_info.game_info import GameInformation
 from engine.graphics.gui.widget import Widget
 from engine.util.util import show_cursor
 
@@ -13,12 +14,12 @@ class Menu:
         self.widgets: List[Widget] = []
         show_cursor()
 
-    def run(self):
-        for event in pygame.event.get():
-            for widget in self.widgets:
-                widget.update(event)
+    def run(self, game_info: GameInformation):
+        for widget in self.widgets:
+            widget.update(game_info)
 
     def render(self, window: Window):
+        window.fill()
         for widget in self.widgets:
             widget.render(window.surface)
         pygame.display.flip()

@@ -3,6 +3,7 @@ from typing import Tuple
 import pygame
 
 from engine.core.vector import Vector
+from engine.util.constants import BLACK
 
 
 class Window:
@@ -26,7 +27,7 @@ class Window:
         self.window_flags = pygame.FULLSCREEN | pygame.DOUBLEBUF | int(full_screen) * pygame.FULLSCREEN
         self.surface = pygame.display.set_mode((self.resolution.as_tuple()), self.window_flags)
 
-    def fill(self, color: Tuple[int, int, int]) -> None:
+    def fill(self, color: Tuple[int, int, int] = BLACK) -> None:
         self.surface.fill(color, (0, 0, *self.resolution.as_tuple()))
 
     def get_width(self):

@@ -3,6 +3,7 @@ import pygame.sprite
 from engine.core.input_manager import InputManager
 from engine.core.vector import Vector
 from engine.core.window import Window
+from engine.game_info.game_info import GameInformation
 from engine.graphics.textures.texture_manager import TextureManager
 from engine.props.bullet.bullet import BulletManager
 from engine.props.data import UnitData
@@ -20,10 +21,10 @@ from engine.world.level_data import LevelData
 
 class World:
 
-    def __init__(self, sound_engine: SoundEngine, window: Window, zoom: float):
+    def __init__(self, sound_engine: SoundEngine, texture_manager: TextureManager, window: Window, zoom: float):
         print_debug("Creating world...")
 
-        self.texture_manager = TextureManager()
+        self.texture_manager = texture_manager
         self.bullet_manager = BulletManager(self.texture_manager.bullets)
         self.weapon_manager = WeaponManager(self.bullet_manager)
         self.sound_engine = sound_engine
@@ -36,7 +37,7 @@ class World:
         self.units = pygame.sprite.Group()
         self.units.add(self.player)
 
-        #self.units.add(ShootingSpider(self.sound_engine, self.texture_manager, self.bullet_manager.laser, Vector()))
+        # self.units.add(ShootingSpider(self.sound_engine, self.texture_manager, self.bullet_manager.laser, Vector()))
         self.units.add(Centipede(self.sound_engine, self.texture_manager, Vector()))
 
         # Server Package Values
@@ -72,9 +73,9 @@ class World:
             position.y = 0
         self.camera.position = position
 
-    def process(self, input_manager: InputManager, delta_time: float):
+    def process(self, game_info: GameInformation, delta_time: float):
         self._reset_package_values()
-        self._process_player(input_manager, delta_time)
+        self._process_player(game_info, delta_time)
         self._process_units(delta_time)
         self._process_bullets()
         self._remove_units()
@@ -84,8 +85,8 @@ class World:
         self.player_damaged = False
         self.enemy_killed = False
 
-    def _process_player(self, input_manager: InputManager, delta_time: float):
-        self.player.handle_input(input_manager, self.camera, delta_time)
+    def _process_player(self, game_info: GameInformation, delta_time: float):
+        self.player.handle_input(game_info, self.camera, delta_time)
 
         # Player just shot
         if self.player.current_shot_timer == 0:

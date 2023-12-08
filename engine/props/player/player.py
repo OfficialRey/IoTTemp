@@ -1,10 +1,9 @@
 import pygame
 
-from engine.core.input_manager import InputManager
 from engine.core.vector import Vector
+from engine.game_info.game_info import GameInformation
 from engine.graphics.animation.animation import AnimationType
 from engine.graphics.textures.texture_manager import TextureManager
-from engine.props.bullet.bullet import BulletManager
 from engine.props.data import UnitData
 from engine.props.player.cursor import Cursor
 from engine.props.types.collision import CollisionInformation
@@ -17,7 +16,8 @@ from engine.world.camera import Camera
 
 class Player(ShootingUnit):
 
-    def __init__(self, sound_engine: SoundEngine, texture_manager: TextureManager, weapon_manager: WeaponManager, data: UnitData):
+    def __init__(self, sound_engine: SoundEngine, texture_manager: TextureManager, weapon_manager: WeaponManager,
+                 data: UnitData):
         super().__init__(sound_engine, texture_manager.player, weapon_manager.laser_gun.bullet_type, data.get_health(),
                          data.get_attack(), data.get_defense(), data.get_max_speed(), data.get_acceleration(), 0.3,
                          is_enemy=False)
@@ -34,12 +34,12 @@ class Player(ShootingUnit):
 
     # Format: [w, a, s, d, space, mouse_x, mouse_y, left_click, right_click]
 
-    def handle_input(self, input_manager: InputManager, camera, delta_time: float):
-        position = Vector(input_manager.mouse_x, input_manager.mouse_y)
+    def handle_input(self, game_info: GameInformation, camera, delta_time: float):
+        position = Vector(game_info.x, game_info.y)
         self.cursor.set_position(position)
         self.accelerate(self.cursor.center_position - camera.get_relative_position(self), delta_time)
 
-        if input_manager.left_click:
+        if game_info.fire_trigger.held:
             self.animation_manager.single_play_animation(AnimationType.RANGED_ATTACK)
             self.shoot_bullet((self.cursor.get_render_position() - self.get_render_position(camera)))
 

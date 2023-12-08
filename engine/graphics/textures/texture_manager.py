@@ -14,11 +14,13 @@ PLAYER = [AnimationType.IDLE, AnimationType.WALKING_E, None, AnimationType.RANGE
 CURSOR = [AnimationType.GENERIC]
 
 CENTIPEDE = [AnimationType.WALKING_E, AnimationType.WALKING_NE, AnimationType.WALKING_N, AnimationType.WALKING_NW,
-             AnimationType.WALKING_W, AnimationType.WALKING_SW, AnimationType.WALKING_S, AnimationType.WALKING_SE]
+             AnimationType.WALKING_W, AnimationType.WALKING_SW, AnimationType.WALKING_S, AnimationType.WALKING_SE, None,
+             None, None, None, None, None, None, None, None, AnimationType.DEATH]
 
 CENTIPEDE_BODY = [None, None, None, None, None, None, None, None,
                   AnimationType.WALKING_E, AnimationType.WALKING_NE, AnimationType.WALKING_N, AnimationType.WALKING_NW,
-                  AnimationType.WALKING_W, AnimationType.WALKING_SW, AnimationType.WALKING_S, AnimationType.WALKING_SE]
+                  AnimationType.WALKING_W, AnimationType.WALKING_SW, AnimationType.WALKING_S, AnimationType.WALKING_SE,
+                  None, AnimationType.DEATH]
 
 SPIDER = [AnimationType.IDLE, AnimationType.WALKING_E, AnimationType.RANGED_ATTACK, AnimationType.MELEE_ATTACK,
           AnimationType.DEATH]

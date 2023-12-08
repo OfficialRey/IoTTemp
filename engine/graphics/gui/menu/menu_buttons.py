@@ -1,5 +1,7 @@
 from typing import Tuple
 
+import pygame.mouse
+
 from engine.graphics.gui.widget import Button, WHITE
 from engine.util.util import show_cursor
 

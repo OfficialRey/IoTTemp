@@ -42,7 +42,7 @@ class BulletAtlas(Atlas):
 
     def scale_textures(self, bullet_type: BulletType):
         animation_data = self.animation_data[bullet_type.animation_index]
-        for i in range(animation_data.start_index, animation_data.stop_index):
+        for i in range(animation_data.start_index, animation_data.end_index):
             self.textures[i].scale_texture(Vector(bullet_type.size, bullet_type.size))
 
     def get_animation_data(self, index: int):

@@ -2,18 +2,28 @@ from enum import Enum
 
 import pygame
 
+from calibration.calibration_manager import CalibrationManager
 from engine.core.communication import Communication
 from engine.core.vector import Vector
-from engine.core.input_manager import InputManager
 from engine.core.window import Window
+from engine.game_info.game_info import GameInformation
+from engine.graphics.textures.texture_manager import TextureManager
 from engine.menu.menu import Menu
-from engine.menu.storage.start_menu import StartMenu
-from engine.sound.arduino_sound import ArduinoSoundData
+from engine.menu.storage.calibration_menu import CalibrationMenu
 from engine.sound.game_sound import SoundEngine
 from engine.util.debug import print_debug
 from protocol.server_package import ServerPackage
+from protocol.weapon_package import WeaponPackage
 
 MILLI_SECONDS = 1000
+
+UDP_IP = "192.168.2.45"
+RECEIVER_IP = "0.0.0.0"
+
+UDP_PORT = 8888
+RECEIVER_PORT = 5050
+
+RECEIVER_BUFFER_SIZE = 0
 
 
 class RunMode(Enum):
@@ -23,23 +33,29 @@ class RunMode(Enum):
 
 class Engine:
 
-    def __init__(self, communication: Communication, window_resolution: Vector = Vector(1920, 1080), max_fps: int = 60,
-                 run_mode: RunMode = RunMode.COMPUTER):
+    def __init__(self, window_resolution: Vector = Vector(1920, 1080), max_fps: int = 60):
         print_debug("Creating engine...")
 
         self.window = Window(window_resolution)
-        self.input_manager = InputManager()
+        self.communication = Communication(UDP_IP, UDP_PORT, RECEIVER_IP, RECEIVER_PORT, RECEIVER_BUFFER_SIZE, self,
+                                           synthesize_connection=True)  # TODO: Remove fake connection when running
+        self.calibration_manager = CalibrationManager()
+        self.texture_manager = TextureManager()
+        # self.input_manager = InputManager() DEPRECATED
+        # self.inputs = self.input_manager.read() DEPRECATED
         self.sound_engine = SoundEngine()
-        self.communication = communication
-        self.inputs = self.input_manager.read()
         self.done = False
-        self.run_mode = run_mode
 
         self.clock = pygame.time.Clock()
         self.max_fps = max_fps
         self.delta_time = 0
 
-        self.current_menu: Menu = StartMenu(self)
+        self.game_info = GameInformation()
+        self.server_package = ServerPackage()
+        self.weapon_package = WeaponPackage()
+
+        self.current_menu: Menu = CalibrationMenu(self)
+        self.pygame_events = []
 
     def run(self, world) -> None:
         # Reset clock and set delta time to 0 to not use loading time as calculation time
@@ -48,38 +64,42 @@ class Engine:
         print_debug("Starting main loop...")
         while not self.done:
 
-            while self.current_menu is not None:
+            self._check_events()
+            self._communicate()
+            self._update_game_info()
+
+            if self.current_menu is not None:
                 self.current_menu.render(self.window)
-                self.current_menu.run()
+                self.current_menu.run(self.game_info)
 
                 # Fix clock working improperly
                 self.clock.tick(self.max_fps)
                 self.delta_time = 0
+                continue
 
-            self._create_package()
-            self._check_events()
-
-            world.process(self.input_manager, self.delta_time)
+            world.process(self.game_info, self.delta_time)
             world.render(self.window)
 
-            self._update_package(world)
-            self.communication.run(self.package)
             self._update_delta_time()
 
     def _update_delta_time(self) -> None:
         self.delta_time = self.clock.tick(self.max_fps) / MILLI_SECONDS
 
-    def _create_package(self):
-        self.package = ServerPackage()
+    def _update_game_info(self):
+        self.game_info.update(self.weapon_package)
 
-    def _update_package(self, world):
-        if world.player_shot:
-            self.package.sound_number = ArduinoSoundData.EXAMPLE.value
+        # Update X and Y of GameInformation
+        self.game_info.x, self.game_info.y = self.calibration_manager.get_plane_position(self.game_info.yaw,
+                                                                                         self.game_info.pitch)
 
     def _check_events(self) -> None:
-        for event in pygame.event.get():
+        self.pygame_events = pygame.event.get()
+        for event in self.pygame_events:
             self.window.update(event)
-            self.input_manager.update(event)
+            # self.input_manager.update(event) DEPRECATED
 
         # Update Input
-        self.inputs = self.input_manager.read()
+        # self.inputs = self.input_manager.read() DEPRECATED
+
+    def _communicate(self):
+        self.weapon_package = self.communication.run(self.server_package)
