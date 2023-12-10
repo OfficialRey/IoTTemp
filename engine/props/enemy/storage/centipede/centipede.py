@@ -40,7 +40,6 @@ class Centipede(MeleeEnemy):
         self.remove_dead_segments()
 
     def remove_dead_segments(self):
-
         to_remove = []
         for segment in self.segments:
             if segment.can_remove():
@@ -52,14 +51,15 @@ class Centipede(MeleeEnemy):
         self.split_centipede()
 
     def split_centipede(self):
-        for i in range(len(self.segments) - 1):
+        for i in range(len(self.segments)):
             current_segment = self.segments[i]
             if isinstance(current_segment, CentipedeBody):
                 # Create new head
-                if not current_segment.has_head():
+                if not current_segment.is_dead() and not current_segment.has_head():
                     self.segments[i] = CentipedeHead(self.sound_engine, self, self.head_texture,
                                                      current_segment.center_position)
-                    self.segments[i + 1].previous_segment = current_segment
+                    if i + 1 < len(self.segments):
+                        self.segments[i + 1].previous_segment = self.segments[i]
 
     def render(self, surface: pygame.Surface, camera) -> None:
         segments = self.segments.copy()

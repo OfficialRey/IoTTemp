@@ -16,7 +16,8 @@ class CentipedeHead(MeleeEnemy):
 
     def run_behaviour(self, world, delta_time: float):
         target = world.player
-        self.accelerate((target.center_position - self.center_position).normalize(), delta_time)
+        vector = (target.center_position - self.center_position).normalize()
+        self.accelerate(vector, delta_time)
         self.animate_generic()
 
     def on_collision(self, other: Sprite, collision_info: CollisionInformation):

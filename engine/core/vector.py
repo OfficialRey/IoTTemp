@@ -77,7 +77,7 @@ class Vector:
 
     @classmethod
     def random(cls):
-        return Vector(random.random(), random.random())
+        return Vector(random.random(), random.random()).normalize()
 
     @classmethod
     def up(cls):
