@@ -29,3 +29,5 @@ feedback to the user
 - [x] Breadboard
 - [x] USB Cable
 - [X] AAA Battery Pack
+- [X] Buzzer
+- [X] Lithium ion battery
