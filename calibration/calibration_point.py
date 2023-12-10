@@ -1,6 +1,6 @@
 class CalibrationPoint:
 
-    def __init__(self, x: int, y: int, yaw: float, pitch: float):
+    def __init__(self, x: float, y: float, yaw: float, pitch: float):
         self.x = x
         self.y = y
         self.yaw = yaw

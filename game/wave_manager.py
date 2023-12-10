@@ -48,7 +48,7 @@ class WaveManager:
         self._create_render_objects()
 
     def _create_render_objects(self):
-        path = os.path.join(get_resource_path(), os.path.join("font", "ka1.ttf"))
+        path = os.path.join(get_resource_path(), os.path.join("font", "VCR_OSD_MONO_1.001.ttf"))
         font = pygame.font.Font(path, self.title_size)
         # Render 999 waves
         for i in range(MAX_WAVE):

@@ -8,7 +8,7 @@ from engine.props.types.collision import CollisionInformation
 from engine.props.types.sprite import Sprite
 from engine.sound.game_sound import SoundEngine
 
-TARGET_DISTANCE = 650
+TARGET_DISTANCE = 350
 
 
 class ShootingSpider(ShootingEnemy):

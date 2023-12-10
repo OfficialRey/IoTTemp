@@ -5,6 +5,7 @@ from engine.core.vector import Vector
 from engine.game_info.game_info import GameInformation
 from engine.graphics.gui.widget import Label
 from engine.menu.menu import Menu
+from engine.menu.storage.start_menu import StartMenu
 
 BORDER_DISTANCE = 0.2
 BUTTON_SIZE = 50
@@ -44,7 +45,7 @@ class CalibrationMenu(Menu):
 
         if len(self.widgets) <= self.count:
             # Done calibrating
-            self.engine.current_menu = None
+            self.engine.current_menu = StartMenu(self.engine)
             self.engine.calibration_manager.calculate_formula()
             return
 

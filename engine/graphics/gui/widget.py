@@ -129,9 +129,9 @@ class Button(Label, ABC):
         if not self.enabled:
             return
 
-        if self.hovered and game_info.fire_trigger_pressed:
+        if self.hovered and game_info.fire_trigger.pressed:
             self._on_press()
-        elif game_info.fire_trigger_released:
+        elif game_info.fire_trigger.released:
             self._on_release()
 
     def _on_press(self):
