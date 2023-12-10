@@ -43,7 +43,8 @@ class Bullet(Sprite):
         self.velocity = self.velocity.normalize() * self.max_speed
         self.bullet_type = bullet_type
         self.life_time = 5
-        self.animation_manager.update_animation_data(self.atlas.get_animation_data(self.bullet_type.animation_index))
+        self.animation_manager.update_animation_data(
+            self.atlas.get_animation_data(self.bullet_type.animation_index))
         self.set_rotation(self.bullet_type.rotation_offset - self.get_velocity_rotation())
 
     def update(self, world, delta_time: float) -> None:

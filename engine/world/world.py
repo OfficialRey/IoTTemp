@@ -1,14 +1,11 @@
 import pygame.sprite
 
-from engine.core.input_manager import InputManager
 from engine.core.vector import Vector
 from engine.core.window import Window
 from engine.game_info.game_info import GameInformation
 from engine.graphics.textures.texture_manager import TextureManager
 from engine.props.bullet.bullet import BulletManager
 from engine.props.data import UnitData
-from engine.props.enemy.storage.centipede.centipede import Centipede
-from engine.props.enemy.storage.spider.spider import ShootingSpider
 from engine.props.player.player import Player
 from engine.props.types.unit import ShootingUnit, Unit
 from engine.props.weapon.weapon import WeaponManager
@@ -17,6 +14,7 @@ from engine.util.constants import WHITE
 from engine.util.debug import print_debug
 from engine.world.camera import Camera
 from engine.world.level_data import LevelData
+from game.wave_manager import WaveManager
 
 
 class World:
@@ -37,14 +35,13 @@ class World:
         self.units = pygame.sprite.Group()
         self.units.add(self.player)
 
-        # self.units.add(ShootingSpider(self.sound_engine, self.texture_manager, self.bullet_manager.laser, Vector()))
-        self.units.add(Centipede(self.sound_engine, self.texture_manager, Vector()))
-
         # Server Package Values
         self.player_shot = False
         self.player_damaged = False
         self.enemy_killed = False
         self.set_camera_zoom(zoom)
+
+        self.wave_manager = WaveManager(self, self.bullet_manager)
 
     def get_camera_zoom(self):
         return self.camera.get_zoom()
@@ -74,6 +71,7 @@ class World:
         self.camera.position = position
 
     def process(self, game_info: GameInformation, delta_time: float):
+        self.wave_manager.run(delta_time)
         self._reset_package_values()
         self._process_player(game_info, delta_time)
         self._process_units(delta_time)
@@ -129,6 +127,7 @@ class World:
         window.fill(WHITE)
         self._render_level(window)
         self._render_units(window)
+        self.wave_manager.render(window)
         pygame.display.flip()
 
     def _render_level(self, window: Window) -> None:
@@ -151,3 +150,14 @@ class World:
             if unit is not self.player:
                 unit.render(window.surface, self.camera)
         self.player.render(window.surface, self.camera)
+
+    def are_enemies_dead(self):
+        for unit in self.units.sprites():
+            if not isinstance(unit, Unit):
+                continue
+            if isinstance(unit, Player):
+                continue
+            if unit.is_dead():
+                continue
+            return False
+        return True

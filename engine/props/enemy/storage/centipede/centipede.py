@@ -1,5 +1,7 @@
 import pygame
 
+from random import random
+
 from engine.core.vector import Vector
 from engine.graphics.textures.texture_manager import TextureManager
 from engine.props.data import UnitData
@@ -12,20 +14,19 @@ from engine.sound.game_sound import SoundEngine
 
 class Centipede(MeleeEnemy):
 
-    def __init__(self, sound_engine: SoundEngine, texture_manager: TextureManager, center_position: Vector):
+    def __init__(self, sound_engine: SoundEngine, texture_manager: TextureManager, center_position: Vector, level: int):
         super().__init__(sound_engine, texture_manager.centipede_head, UnitData.NONE, center_position)
         self.head_texture = texture_manager.centipede_head
         self.body_texture = texture_manager.centipede_body
         self.segments = []
+        self.length = int(level / 5 + 3 + random() * 3)
 
         self._create_centipede()
 
     def _create_centipede(self):
-        length = 50
-
         previous_segment = CentipedeHead(self.sound_engine, self, self.head_texture, self.center_position)
         self.segments = [previous_segment]
-        for i in range(1, length):
+        for i in range(1, self.length):
             new_position = previous_segment.center_position + Vector(-1, 0) * self.get_collision_radius()
             previous_segment = CentipedeBody(self.sound_engine, self, self.body_texture, previous_segment, new_position)
 
