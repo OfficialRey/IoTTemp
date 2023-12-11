@@ -7,6 +7,10 @@ import math
 
 from engine.core.vector import Vector
 
+CENTER_POSITION = "center_position"
+RADIUS = "radius"
+SHAPE = "shape"
+
 
 class CollisionShape(IntEnum):
     NONE = 0,
@@ -61,6 +65,13 @@ class Collision:
             shape = 0
         self.shape = CollisionShape(shape)
 
+    def get_dict(self):
+        return {
+            CENTER_POSITION: self.center_position.get_dict(),
+            RADIUS: self.radius,
+            SHAPE: int(self.shape)
+        }
+
 
 def intersect_circle_circle(circle, other) -> CollisionInformation:
     vector = circle.center_position - other.center_position
@@ -89,3 +100,11 @@ def intersect_circle_rectangle(circle, rectangle) -> CollisionInformation:
     distance = vector.magnitude()
     hit = distance_squared < circle.radius ** 2
     return CollisionInformation(vector, distance, hit)
+
+
+def load_collision(collision_data: dict) -> Collision:
+    return Collision(
+        collision_data[CENTER_POSITION],
+        collision_data[RADIUS],
+        CollisionShape(collision_data[SHAPE])
+    )

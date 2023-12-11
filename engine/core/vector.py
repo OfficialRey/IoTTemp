@@ -4,6 +4,9 @@ from typing import Tuple
 
 NUMBER_TYPE = (int, float, complex)
 
+X = "x"
+Y = "y"
+
 
 class Vector:
 
@@ -48,6 +51,12 @@ class Vector:
     def as_int(self):
         return Vector(int(self.x), int(self.y))
 
+    def get_dict(self):
+        return {
+            X: self.x,
+            Y: self.y
+        }
+
     def __add__(self, other):
         if isinstance(other, Vector):
             return Vector(self.x + other.x, self.y + other.y)
@@ -82,6 +91,13 @@ class Vector:
     @classmethod
     def up(cls):
         return Vector(0, -1)
+
+
+def load_vector(vector_data: dict) -> Vector:
+    return Vector(
+        vector_data[X],
+        vector_data[Y]
+    )
 
 
 if __name__ == '__main__':

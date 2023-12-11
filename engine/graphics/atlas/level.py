@@ -7,6 +7,11 @@ from engine.graphics.atlas.atlas import Atlas
 from engine.graphics.textures.texture import Texture
 from engine.util.debug import print_debug
 
+PATH = "path"
+FILE = "file"
+SPRITE_WIDTH = "sprite_width"
+SPRITE_HEIGHT = "sprite_height"
+
 
 class LevelAtlas(Atlas):
 
@@ -36,3 +41,20 @@ class LevelAtlas(Atlas):
 
     def __getitem__(self, item: int) -> Texture:
         return self.textures[item]
+
+    def get_dict(self) -> dict:
+        return {
+            PATH: self.path,
+            FILE: self.file_name,
+            SPRITE_WIDTH: self.sprite_width,
+            SPRITE_HEIGHT: self.sprite_height
+        }
+
+
+def load_atlas(atlas_data: dict) -> LevelAtlas:
+    return LevelAtlas(
+        atlas_data[PATH],
+        atlas_data[FILE],
+        atlas_data[SPRITE_WIDTH],
+        atlas_data[SPRITE_HEIGHT]
+    )

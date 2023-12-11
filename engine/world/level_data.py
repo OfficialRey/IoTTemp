@@ -1,30 +1,26 @@
 from typing import List, Union
 
 from engine.core.vector import Vector
-from engine.graphics.atlas.level import LevelAtlas
+from engine.graphics.atlas.level import LevelAtlas, load_atlas
 from engine.graphics.textures.texture import Texture
 
 from json import loads
 
-from engine.world.collision import Collision
+from engine.world.collision import Collision, load_collision
 
 WORLD = "world"
 LAYERS = "layers"
 WIDTH = "width"
 HEIGHT = "height"
 CONTENT = "content"
-TEXTURE_ATLAS = "atlas"
-
-ATLAS_PATH = "path"
-ATLAS_FILE = "file"
-ATLAS_SPRITE_WIDTH = "sprite_width"
-ATLAS_SPRITE_HEIGHT = "sprite_height"
+COLLISION = "collision"
+ATLAS = "atlas"
 
 
 class LevelData:
 
     def __init__(self, texture_atlas: LevelAtlas, world_name: str, width: int = 50, height: int = 50, layers: int = 2,
-                 base_block: int = -1, level_data: List[List[int]] = None, collision: List[List[Collision]] = None):
+                 base_block: int = -1, level_data: List[List[int]] = None, collision: List[Collision] = None):
         # TODO: Add multiple texture layers
         if level_data is None:
             level_data = [[base_block for _ in range(width * height)] for _ in range(layers)]
@@ -67,19 +63,14 @@ class LevelData:
 
     def save_level(self, path: str) -> None:
         # Create JSON object
-        atlas = {
-            ATLAS_PATH: self.texture_atlas.path,
-            ATLAS_FILE: self.texture_atlas.file_name,
-            ATLAS_SPRITE_WIDTH: self.texture_atlas.sprite_width,
-            ATLAS_SPRITE_HEIGHT: self.texture_atlas.sprite_height
-        }
         storage = {
-            TEXTURE_ATLAS: atlas,
+            ATLAS: self.texture_atlas.get_dict(),
             WORLD: self.world_name,
             WIDTH: self.width,
             HEIGHT: self.height,
             LAYERS: self.layers,
-            CONTENT: self.level
+            CONTENT: self.level,
+            COLLISION: [collision.get_dict() for collision in self.collision]
         }
         with open(path, "w") as file:
             file.write(str(storage))
@@ -94,19 +85,12 @@ def load_level(path: str) -> LevelData:
         content = loads(file.read().replace("'", '"'))
         file.close()
 
-    atlas_data = content[TEXTURE_ATLAS]
-    atlas = LevelAtlas(
-        atlas_data[ATLAS_PATH],
-        atlas_data[ATLAS_FILE],
-        atlas_data[ATLAS_SPRITE_WIDTH],
-        atlas_data[ATLAS_SPRITE_HEIGHT]
-    )
-
     return LevelData(
-        atlas,
+        load_atlas(content[ATLAS]),
         content[WORLD],
         content[WIDTH],
         content[HEIGHT],
         content[LAYERS],
-        level_data=content[CONTENT]
+        level_data=content[CONTENT],
+        collision=[load_collision(collision) for collision in content[COLLISION]]
     )
