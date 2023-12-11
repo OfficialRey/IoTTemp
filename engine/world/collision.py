@@ -5,7 +5,7 @@ from pygame.math import clamp
 
 import math
 
-from engine.core.vector import Vector
+from engine.core.vector import Vector, load_vector
 
 CENTER_POSITION = "center_position"
 RADIUS = "radius"
@@ -88,11 +88,11 @@ def intersect_rectangle_rectangle(rectangle, other) -> CollisionInformation:
 
 
 def intersect_circle_rectangle(circle, rectangle) -> CollisionInformation:
-    closest_x = clamp(circle.center_position.x, rectangle.left, rectangle.right)
-    closest_y = clamp(circle.center_position.y, rectangle.top, rectangle.bottom)
+    closest_x = clamp(circle.center_position.x, rectangle.rectangle.left, rectangle.rectangle.right)
+    closest_y = clamp(circle.center_position.y, rectangle.rectangle.top, rectangle.rectangle.bottom)
 
-    x_distance = circle.x - closest_x
-    y_distance = circle.y - closest_y
+    x_distance = circle.center_position.x - closest_x
+    y_distance = circle.center_position.y - closest_y
 
     distance_squared = x_distance ** 2 + y_distance ** 2
 
@@ -104,7 +104,7 @@ def intersect_circle_rectangle(circle, rectangle) -> CollisionInformation:
 
 def load_collision(collision_data: dict) -> Collision:
     return Collision(
-        collision_data[CENTER_POSITION],
+        load_vector(collision_data[CENTER_POSITION]),
         collision_data[RADIUS],
         CollisionShape(collision_data[SHAPE])
     )

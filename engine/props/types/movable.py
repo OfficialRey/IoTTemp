@@ -35,9 +35,12 @@ class Movable:
                 collision = world.level_data.get_collision(x_pos + x, y_pos + y)
                 if collision is None:
                     continue
+                calls = 0
                 while self.collision.collides_with(collision).hit:
                     self.fix_collision(collision)
+                    calls += 1
 
     def fix_collision(self, collision: Collision, step: float = 5):
         vector = self.collision.center_position - collision.center_position
         self.center_position += vector.normalize() * step
+        self.collision.center_position = self.center_position

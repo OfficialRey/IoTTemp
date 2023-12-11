@@ -14,6 +14,7 @@ WIDTH = "width"
 HEIGHT = "height"
 CONTENT = "content"
 COLLISION = "collision"
+SCALE = "scale"
 ATLAS = "atlas"
 
 

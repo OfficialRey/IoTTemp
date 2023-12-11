@@ -1,3 +1,5 @@
+import os
+
 import pygame.sprite
 
 from engine.core.vector import Vector
@@ -12,14 +14,16 @@ from engine.props.weapon.weapon import WeaponManager
 from engine.sound.game_sound import SoundEngine
 from engine.util.constants import WHITE
 from engine.util.debug import print_debug
+from engine.util.resources import get_resource_path
 from engine.world.camera import Camera
-from engine.world.level_data import LevelData
+from engine.world.level_data import LevelData, load_level
 from game.wave_manager import WaveManager
 
 
 class World:
 
-    def __init__(self, sound_engine: SoundEngine, texture_manager: TextureManager, window: Window, zoom: float):
+    def __init__(self, sound_engine: SoundEngine, texture_manager: TextureManager, window: Window, zoom: float,
+                 level_file: str = None):
         print_debug("Creating world...")
 
         self.texture_manager = texture_manager
@@ -28,7 +32,11 @@ class World:
         self.sound_engine = sound_engine
         self.camera = Camera(window, zoom)
 
-        self.level_data = LevelData(self.texture_manager.level_textures, "Test", 20, 20)
+        if level_file is None:
+            self.level_data = LevelData(self.texture_manager.level_textures, "Test", 20, 20)
+        else:
+            path = self.path = os.path.join(get_resource_path(), os.path.join("level", level_file))
+            self.level_data = load_level(path)
         self.player = Player(self.sound_engine, self.texture_manager, self.weapon_manager, UnitData.PLAYER)
         self.texture_atlas = self.level_data.texture_atlas
 

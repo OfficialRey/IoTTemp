@@ -3,6 +3,7 @@ from typing import List
 
 import pygame.image
 
+from engine.core.vector import Vector
 from engine.graphics.atlas.atlas import Atlas
 from engine.graphics.textures.texture import Texture
 from engine.util.debug import print_debug
@@ -11,16 +12,24 @@ PATH = "path"
 FILE = "file"
 SPRITE_WIDTH = "sprite_width"
 SPRITE_HEIGHT = "sprite_height"
+SCALED_WIDTH = "scaled_width"
+SCALED_HEIGHT = "scaled_height"
 
 
 class LevelAtlas(Atlas):
 
-    def __init__(self, path: str, file_name: str, sprite_width: int, sprite_height: int):
+    def __init__(self, path: str, file_name: str, sprite_width: int, sprite_height: int, scaled_width: int = None,
+                 scaled_height: int = None):
         super().__init__(path, file_name, sprite_width, sprite_height)
 
         print_debug(f"Creating level atlas {path}/{file_name}")
 
         self.textures = self._load_textures()
+
+        if scaled_width is not None and scaled_height is not None:
+            x_scale = scaled_width // self.sprite_width
+            y_scale = scaled_height // self.sprite_height
+            self.scale_textures(Vector(x_scale, y_scale))
 
     def _load_textures(self) -> List[Texture]:
         textures = self._load_spawn_points()
@@ -47,7 +56,9 @@ class LevelAtlas(Atlas):
             PATH: self.path,
             FILE: self.file_name,
             SPRITE_WIDTH: self.sprite_width,
-            SPRITE_HEIGHT: self.sprite_height
+            SPRITE_HEIGHT: self.sprite_height,
+            SCALED_WIDTH: self.scaled_width,
+            SCALED_HEIGHT: self.scaled_height
         }
 
 
@@ -56,5 +67,7 @@ def load_atlas(atlas_data: dict) -> LevelAtlas:
         atlas_data[PATH],
         atlas_data[FILE],
         atlas_data[SPRITE_WIDTH],
-        atlas_data[SPRITE_HEIGHT]
+        atlas_data[SPRITE_HEIGHT],
+        atlas_data[SCALED_WIDTH],
+        atlas_data[SCALED_HEIGHT]
     )
