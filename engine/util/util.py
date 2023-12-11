@@ -19,3 +19,7 @@ def colorize_image(surface: pygame.Surface, red_offset: int = 0, green_offset: i
             alpha = min(MAX_COLOR, max(MIN_COLOR, a + alpha_offset))
             surface.set_at((x, y), pygame.Color(red, green, blue, alpha))
     return surface
+
+
+def sign(x: (float, int)):
+    return 0.0 if abs(x) == 0 else x / abs(x)

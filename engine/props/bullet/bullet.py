@@ -3,6 +3,7 @@ import math
 from engine.core.vector import Vector
 from engine.props.types.sprite import Sprite
 from engine.sound.game_sound import GameSound
+from engine.world.collision import Collision
 
 
 class BulletType:
@@ -59,3 +60,6 @@ class Bullet(Sprite):
 
     def get_attack(self):
         return self.owner.attack + self.bullet_type.attack
+
+    def on_world_collide(self, collision: Collision):
+        self.life_time = 0

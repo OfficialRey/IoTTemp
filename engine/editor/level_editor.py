@@ -12,6 +12,7 @@ from engine.graphics.gui.editor.editor_widget import LevelEditorScrollTextureBut
 from engine.graphics.gui.widget import Button
 from engine.graphics.textures.texture_manager import TextureManager
 from engine.util.constants import RED, WHITE, BLACK, GREEN
+from engine.util.util import sign
 from engine.world.collision import CollisionShape
 from engine.world.level_data import LevelData, load_level
 
@@ -24,7 +25,8 @@ GRAPHICS_PER_ROW = 20
 
 
 # Tutorial:
-# Left Click: Place Textures & Select Textures
+# Left Click: Place Textures & Select Textures & Change Hitboxes
+# MouseWheel: Change Hit-Box Radius
 # Right Click: Remove Textures
 # Arrow Key Up & Down: Change current layer
 # W, A, S, D: Navigate current level layout
@@ -32,8 +34,6 @@ GRAPHICS_PER_ROW = 20
 # Ctrl + S: Save current level layout
 # Ctrl + L: Load existing level layout
 
-
-# TODO: Level Collision editor
 
 class EditingType(IntEnum):
     TEXTURE = 0,
@@ -166,7 +166,8 @@ class LevelEditor:
             self.render()
 
     def check_events(self):
-        for event in pygame.event.get():
+        events = pygame.event.get()
+        for event in events:
             for button in self.buttons:
                 button.update(self.game_info)
             for button in self.scroll_buttons:
@@ -197,7 +198,7 @@ class LevelEditor:
             self.editing_type = int(not self.editing_type)
 
         self.texture_editing(keys, mouse)
-        self.collision_editing(keys, mouse)
+        self.collision_editing(keys, mouse, events)
         self.file_management(keys)
 
     def texture_editing(self, keys, mouse):
@@ -215,12 +216,18 @@ class LevelEditor:
                 if self.gui_mode >= len(GuiMode):
                     self.gui_mode = 0
 
-    def collision_editing(self, keys, mouse):
+    def collision_editing(self, keys, mouse, events):
+        # Collision Switching
         if self.editing_type == EditingType.COLLISION:
             left_click, _, _ = mouse
             self.left_trigger.update(left_click)
             if self.left_trigger.pressed:
                 self.change_collision(Vector(*pygame.mouse.get_pos()))
+        # Collision Radius
+        for event in events:
+            if event.type == pygame.MOUSEWHEEL:
+                y_motion = sign(event.y)
+                self.change_collision_radius(Vector(*pygame.mouse.get_pos()), y_motion)
 
     def file_management(self, keys):
         # Load
@@ -348,6 +355,11 @@ class LevelEditor:
                                  y * self.texture_atlas.scaled_height + self.texture_atlas.scaled_height * 0.5)
         self.level_data.change_collision(int(x), int(y), center_position,
                                          (self.texture_atlas.scaled_width + self.texture_atlas.scaled_height) / 4)
+
+    def change_collision_radius(self, position: Vector, motion):
+        x = position.x // self.texture_atlas.scaled_width + self.position.x
+        y = position.y // self.texture_atlas.scaled_height + self.position.y
+        self.level_data.change_collision_radius(int(x), int(y), motion)
 
     def update_game_info(self):
         self.game_info.x, self.game_info.y = pygame.mouse.get_pos()

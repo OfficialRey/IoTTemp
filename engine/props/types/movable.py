@@ -37,10 +37,15 @@ class Movable:
                     continue
                 calls = 0
                 if self.collision.collides_with(collision).hit:
+                    self.on_world_collide(collision)
                     self.fix_collision(collision)
                     calls += 1
 
     def fix_collision(self, collision: Collision, step: float = 5):
         vector = self.collision.center_position - collision.center_position
         self.center_position += vector.normalize() * step
+        self.velocity = vector.normalize() * step
         self.collision.center_position = self.center_position
+
+    def on_world_collide(self, collision: Collision):
+        pass

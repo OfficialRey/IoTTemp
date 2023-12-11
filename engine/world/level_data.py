@@ -62,6 +62,11 @@ class LevelData:
         if radius >= 0:
             collision.radius = radius
 
+    def change_collision_radius(self, x: int, y: int, motion: float):
+        position = self.convert_position(x, y)
+        collision = self.collision[position]
+        collision.radius += motion
+
     def save_level(self, path: str) -> None:
         # Create JSON object
         storage = {
