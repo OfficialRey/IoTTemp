@@ -30,7 +30,7 @@ class Player(ShootingUnit):
         super().update(world, delta_time)
 
     def run_behaviour(self, world, delta_time: float):
-        self.animate_rotation(self.cursor.center_position)
+        self.animate_rotation(self._get_cursor_world_position(world.camera))
 
     # Format: [w, a, s, d, space, mouse_x, mouse_y, left_click, right_click]
 
@@ -41,7 +41,7 @@ class Player(ShootingUnit):
 
         if game_info.fire_trigger.held:
             # TODO: Add inaccuracy
-            vector = self.cursor.center_position - self.center_position
+            vector = self._get_cursor_world_position(camera) - self.center_position
 
             animation_type = AnimationType.RANGED_ATTACK_W if vector.x < 0 else AnimationType.RANGED_ATTACK_E
 
@@ -51,6 +51,9 @@ class Player(ShootingUnit):
     def render(self, surface: pygame.Surface, camera: Camera) -> None:
         self.cursor.render(surface, camera)
         super().render(surface, camera)
+
+    def _get_cursor_world_position(self, camera: Camera):
+        return self.cursor.center_position + camera.center_position - (camera.resolution / 2)
 
     def on_hit(self):
         pass

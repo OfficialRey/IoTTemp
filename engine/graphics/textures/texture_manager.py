@@ -30,7 +30,7 @@ class TextureManager:
     # Class for loading and initializing all required textures of the game
     def __init__(self):
         # Level Textures
-        self.level_textures = LevelAtlas("level", "level_textures.png", 16, 16)
+        self.level_textures = LevelAtlas("level", "level_tiles.png", 16, 16)
 
         # Player
         self.cursor = AnimationAtlas("player", "target.png", CURSOR, 24, 24, animation_time=0.2)

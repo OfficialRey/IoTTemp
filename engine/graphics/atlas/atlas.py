@@ -13,7 +13,8 @@ class Atlas(ABC):
 
     def __init__(self, path: str, file_name: str, sprite_width: int, sprite_height: int, rotation_precision: int = 360):
         self.path = os.path.join(get_resource_path(), path)
-        self.surface = pygame.image.load(os.path.join(self.path, file_name)).convert_alpha()
+        self.file_name = file_name
+        self.surface = pygame.image.load(os.path.join(self.path, self.file_name)).convert_alpha()
         self.sprite_scale = Vector(1, 1)
         self.sprite_width, self.sprite_height = sprite_width, sprite_height
         self.scaled_width, self.scaled_height = sprite_width, sprite_height

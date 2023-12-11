@@ -1,3 +1,4 @@
+from enum import IntEnum
 from typing import List
 
 import pygame.draw
@@ -5,27 +6,35 @@ from pygame.math import clamp
 
 from engine.core.vector import Vector
 from engine.core.window import Window
-from engine.game_info.game_info import GameInformation
+from engine.game_info.game_info import GameInformation, TriggerInput
 from engine.graphics.atlas.level import LevelAtlas
 from engine.graphics.gui.editor.editor_widget import LevelEditorScrollTextureButton, LevelEditorSelectTextureButton
 from engine.graphics.gui.widget import Button
 from engine.graphics.textures.texture_manager import TextureManager
 from engine.util.constants import RED, WHITE, BLACK
-from engine.world.level_data import LevelData
+from engine.world.level_data import LevelData, load_level
 
 from tkinter import Tk
-from tkinter.filedialog import askopenfilename
+from tkinter.filedialog import askopenfilename, asksaveasfile
 
 DRAW_PERCENTAGE = 0.8
 BOX_OFFSET = 5
 GRAPHICS_PER_ROW = 20
 
 
-# TODO: Multiple layers per level
-# TODO: Change layers in editor
 # TODO: Save level layouts
 # TODO: Level Collision editor
-# TODO: Delete textures
+
+class EditingType(IntEnum):
+    TEXTURE = 0,
+    COLLISION = 1
+
+
+class GuiMode(IntEnum):
+    HIDE_NONE = 0,
+    HIDE_GUI = 1,
+    HIDE_ALL = 2,
+
 
 class LevelEditor:
     texture_atlas: LevelAtlas
@@ -35,6 +44,7 @@ class LevelEditor:
 
     def __init__(self, fps: int = 60):
         self.window = Window(Vector(1920, 1080), full_screen=False)
+        pygame.font.init()
 
         # Editor Parameters
         self.done = False
@@ -42,7 +52,6 @@ class LevelEditor:
         self.texture_atlas = self.texture_manager.level_textures
         self.texture_manager.scale_textures(5)
         self.level_data = None
-        self.world = None
 
         self.selected_texture = 0
         self.current_layer = 0
@@ -55,6 +64,11 @@ class LevelEditor:
         self.position = Vector(0, 0)
         self.n_textures_x = 0
         self.n_textures_y = 0
+
+        self.gui_mode = GuiMode.HIDE_NONE
+        self.layer_font = pygame.font.SysFont("arial", 20)
+        self.layer_info = self.layer_font.render(f"Layer: {self.current_layer}", True, WHITE)
+        self.space_trigger = TriggerInput()
 
         self.game_info = GameInformation()
 
@@ -150,12 +164,15 @@ class LevelEditor:
         keys = pygame.key.get_pressed()
         x = keys[pygame.K_d] - keys[pygame.K_a]
         y = keys[pygame.K_s] - keys[pygame.K_w]
-        layer = keys[pygame.K_DOWN] - keys[pygame.K_UP]
+        layer = keys[pygame.K_UP] - keys[pygame.K_DOWN]
+        self.space_trigger.update(keys[pygame.K_SPACE])
         self.position += Vector(x / 2, y / 2)
         self.position.x = clamp(self.position.x, 0, self.level_data.width - self.n_textures_x)
         self.position.y = clamp(self.position.y, 0, self.level_data.height - self.n_textures_y)
         self.current_layer += layer
         self.current_layer = clamp(self.current_layer, 0, self.level_data.layers - 1)
+        if layer != 0:
+            self.layer_info = self.layer_font.render(f"Layer: {self.current_layer}", True, WHITE)
 
         # Mouse
         left_click, _, right_click = pygame.mouse.get_pressed()
@@ -163,6 +180,18 @@ class LevelEditor:
             self.draw_level(Vector(*pygame.mouse.get_pos()))
         if right_click:
             self.remove_level(Vector(*pygame.mouse.get_pos()))
+
+        if self.space_trigger.pressed:
+            self.gui_mode += 1
+            if self.gui_mode >= len(GuiMode):
+                self.gui_mode = 0
+        # Load
+        if keys[pygame.K_l] and keys[pygame.K_LCTRL]:
+            self.load_level()
+
+        # Save
+        if keys[pygame.K_s] and keys[pygame.K_LCTRL]:
+            self.save_level()
 
     def render(self):
         self.window.surface.fill(BLACK)
@@ -187,6 +216,9 @@ class LevelEditor:
                     self.window.surface.blit(texture.images[0], destination)
 
     def render_grid(self):
+        if self.gui_mode == GuiMode.HIDE_ALL:
+            return
+
         width = self.window.get_width()
         height = self.window.get_height()
         for x in range(0, width, self.texture_atlas.sprite_width * self.texture_atlas.sprite_scale.x):
@@ -196,7 +228,10 @@ class LevelEditor:
             pygame.draw.line(self.window.surface, RED, (0, y), (width, y))
 
     def render_gui(self):
-        # Render Overlay
+        if self.gui_mode == GuiMode.HIDE_ALL or self.gui_mode == GuiMode.HIDE_GUI:
+            return
+
+            # Render Overlay
         pygame.draw.rect(self.window.surface, BLACK, (
             0, self.window.get_height() * DRAW_PERCENTAGE, self.window.get_width(), self.window.get_height()))
         pygame.draw.rect(self.window.surface, WHITE, (
@@ -207,6 +242,9 @@ class LevelEditor:
 
         # Render Textures
         self.render_gui_textures()
+
+        # Render Layer Info
+        self.window.surface.blit(self.layer_info, (BOX_OFFSET, self.window.get_height() * DRAW_PERCENTAGE * 0.9))
 
     def render_gui_textures(self):
         for button in self.buttons:
@@ -243,3 +281,17 @@ class LevelEditor:
         self.game_info.x, self.game_info.y = pygame.mouse.get_pos()
         m1, m2, m3 = pygame.mouse.get_pressed()
         self.game_info.fire_trigger.update(m1)
+
+    def load_level(self):
+        default = [("Level File", "*.lvl")]
+        file = askopenfilename(filetypes=default, defaultextension="*.lvl")
+        if file is None:
+            return
+        self.level_data = load_level(file)
+
+    def save_level(self):
+        default = [("Level File", "*.lvl")]
+        file = asksaveasfile(filetypes=default, defaultextension="*.lvl")
+        if file is None:
+            return
+        self.level_data.save_level(file.name)
