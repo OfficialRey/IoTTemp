@@ -1,5 +1,5 @@
 from engine.core.vector import Vector
-from engine.world.collision import Collision
+from engine.world.collision import Collision, CollisionShape
 
 
 class Movable:
@@ -33,10 +33,10 @@ class Movable:
             for y in range(-1, 2):
                 # Find the closest collision object
                 collision = world.level_data.get_collision(x_pos + x, y_pos + y)
-                if collision is None:
+                if collision is None or collision.shape == CollisionShape.NONE:
                     continue
                 calls = 0
-                while self.collision.collides_with(collision).hit:
+                if self.collision.collides_with(collision).hit:
                     self.fix_collision(collision)
                     calls += 1
 

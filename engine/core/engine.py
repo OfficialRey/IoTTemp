@@ -84,6 +84,7 @@ class Engine:
 
     def _update_delta_time(self) -> None:
         self.delta_time = self.clock.tick(self.max_fps) / MILLI_SECONDS
+        print(f"FPS: {1 / self.delta_time}")
 
     def _update_game_info(self):
         self.game_info.update(self.weapon_package)
