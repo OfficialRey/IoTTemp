@@ -5,7 +5,7 @@ from pygame.math import clamp
 
 from engine.core.vector import Vector
 from engine.core.window import Window
-from engine.graphics.animation.animation import AnimationType
+from engine.game_info.game_info import GameInformation
 from engine.graphics.atlas.level import LevelAtlas
 from engine.graphics.gui.editor.editor_widget import LevelEditorScrollTextureButton, LevelEditorSelectTextureButton
 from engine.graphics.gui.widget import Button
@@ -39,8 +39,8 @@ class LevelEditor:
         # Editor Parameters
         self.done = False
         self.texture_manager = TextureManager()
-        self.texture_manager.scale_textures(5)
         self.texture_atlas = self.texture_manager.level_textures
+        self.texture_manager.scale_textures(5)
         self.level_data = None
         self.world = None
 
@@ -54,6 +54,8 @@ class LevelEditor:
         self.position = Vector(0, 0)
         self.n_textures_x = 0
         self.n_textures_y = 0
+
+        self.game_info = GameInformation()
 
     def select_textures(self):
         while self.texture_atlas is None:
@@ -81,7 +83,7 @@ class LevelEditor:
         for index in range(len(self.texture_atlas.textures)):
             button = LevelEditorSelectTextureButton(self, texture_id=index)
             button.enabled = False
-            button.set_content(self.texture_atlas.textures[index].base_image)
+            button.set_content(self.texture_atlas.textures[index].images[0])
             self.buttons.append(button)
 
         self.upper_bound = len(self.buttons) // GRAPHICS_PER_ROW
@@ -91,7 +93,7 @@ class LevelEditor:
 
         button = LevelEditorScrollTextureButton(self, -1)
         button.enabled = True
-        button.set_content(self.texture_manager.arrow_up.get_texture(AnimationType.GENERIC).image)
+        button.set_content(self.texture_manager.arrow_up.textures[0].images[0])
         button.set_area((self.window.get_width() * 0.95, self.window.get_height() * 0.81,
                          self.texture_manager.arrow_up.sprite_width * 5,
                          self.texture_manager.arrow_up.sprite_height * 5))
@@ -99,7 +101,7 @@ class LevelEditor:
 
         button = LevelEditorScrollTextureButton(self, 1)
         button.enabled = True
-        button.set_content(self.texture_manager.arrow_down.get_texture(AnimationType.GENERIC).image)
+        button.set_content(self.texture_manager.arrow_down.textures[0].images[0])
         button.set_area((self.window.get_width() * 0.95, self.window.get_height() * 0.9,
                          self.texture_manager.arrow_up.sprite_width * 5,
                          self.texture_manager.arrow_up.sprite_height * 5))
@@ -114,11 +116,12 @@ class LevelEditor:
             if index >= len(self.buttons):
                 return
             button = self.buttons[index]
-            button.set_area((BOX_OFFSET * 2 + (i % GRAPHICS_PER_ROW) * self.texture_atlas.sprite_width * 1.1,
-                             self.window.get_height() * DRAW_PERCENTAGE + BOX_OFFSET * 3 + (
-                                     i // GRAPHICS_PER_ROW) * self.texture_atlas.sprite_height * 1.2,
-                             self.texture_atlas.sprite_width,
-                             self.texture_atlas.sprite_height))
+            start_x = int(BOX_OFFSET * 2 + (i % GRAPHICS_PER_ROW) * self.texture_atlas.scaled_width * 1.1)
+            start_y = int(self.window.get_height() * DRAW_PERCENTAGE + BOX_OFFSET * 3 + (
+                    i // GRAPHICS_PER_ROW) * self.texture_atlas.sprite_height * self.texture_atlas.sprite_scale.y * 1.2)
+            width = int(self.texture_atlas.scaled_width)
+            height = int(self.texture_atlas.scaled_height)
+            button.set_area((start_x, start_y, width, height))
             button.enabled = True
 
     def run(self):
@@ -129,15 +132,16 @@ class LevelEditor:
 
         while not self.done:
             self.clock.tick(self.fps)
+            self.update_game_info()
             self.check_events()
             self.render()
 
     def check_events(self):
         for event in pygame.event.get():
             for button in self.buttons:
-                button.update(event)
+                button.update(self.game_info)
             for button in self.scroll_buttons:
-                button.update(event)
+                button.update(self.game_info)
             if event.type == pygame.QUIT:
                 exit()
 
@@ -170,17 +174,17 @@ class LevelEditor:
 
                 texture = self.texture_atlas[texture_id]
                 destination = (
-                    x * self.texture_atlas.sprite_width,
-                    y * self.texture_atlas.sprite_height)
-                self.window.surface.blit(texture.image, destination)
+                    x * self.texture_atlas.sprite_width * self.texture_atlas.sprite_scale.x,
+                    y * self.texture_atlas.sprite_height * self.texture_atlas.sprite_scale.y)
+                self.window.surface.blit(texture.images[0], destination)
 
     def render_grid(self):
         width = self.window.get_width()
         height = self.window.get_height()
-        for x in range(0, width, self.texture_atlas.sprite_width):
+        for x in range(0, width, self.texture_atlas.sprite_width * self.texture_atlas.sprite_scale.x):
             pygame.draw.line(self.window.surface, RED, (x, 0), (x, height))
 
-        for y in range(0, height, self.texture_atlas.sprite_height):
+        for y in range(0, height, self.texture_atlas.sprite_height * self.texture_atlas.sprite_scale.y):
             pygame.draw.line(self.window.surface, RED, (0, y), (width, y))
 
     def render_gui(self):
@@ -217,6 +221,11 @@ class LevelEditor:
         # Get Level coordinates
         if position.y >= self.window.get_height() * DRAW_PERCENTAGE:
             return
-        x = position.x // self.texture_atlas.sprite_width + self.position.x
-        y = position.y // self.texture_atlas.sprite_height + self.position.y
+        x = position.x // (self.texture_atlas.sprite_width * self.texture_atlas.sprite_scale.x) + self.position.x
+        y = position.y // (self.texture_atlas.sprite_height * self.texture_atlas.sprite_scale.y) + self.position.y
         self.level_data.place_texture(self.selected_texture, int(x), int(y))
+
+    def update_game_info(self):
+        self.game_info.x, self.game_info.y = pygame.mouse.get_pos()
+        m1, m2, m3 = pygame.mouse.get_pressed()
+        self.game_info.fire_trigger.update(m1)

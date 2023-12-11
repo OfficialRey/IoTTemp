@@ -40,7 +40,7 @@ class Player(ShootingUnit):
         self.accelerate(self.cursor.center_position - camera.get_relative_position(self), delta_time)
 
         if game_info.fire_trigger.held:
-            self.animation_manager.single_play_animation(AnimationType.RANGED_ATTACK)
+            self.animation_manager.single_play_animation(AnimationType.RANGED_ATTACK_E)
             self.shoot_bullet((self.cursor.get_render_position() - self.get_render_position(camera)))
 
     def render(self, surface: pygame.Surface, camera: Camera) -> None:

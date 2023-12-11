@@ -1,10 +1,11 @@
 from engine.graphics.gui.widget import Button
+from engine.util.constants import BLACK, BLUE
 
 
 class LevelEditorSelectTextureButton(Button):
 
     def __init__(self, editor, texture_id=0):
-        super().__init__((0, 0, 0, 0))
+        super().__init__((0, 0, 0, 0), hover_color=BLUE)
         self.editor = editor
         self.texture_id = texture_id
 

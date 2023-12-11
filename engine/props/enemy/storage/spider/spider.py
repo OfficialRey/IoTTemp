@@ -19,6 +19,7 @@ class ShootingSpider(ShootingEnemy):
 
     def run_behaviour(self, world, delta_time: float):
         self.ai.run(world, delta_time)
+        self.animate_rotation(world.player.center_position)
 
     def on_attack(self):
         pass

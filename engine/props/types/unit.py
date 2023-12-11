@@ -90,7 +90,7 @@ class ShootingUnit(Unit, ABC):
         self.shot_delay = shot_delay
         self.current_shot_timer = 0
         self.bullets = []
-        self.animation_manager.get_animation_data(AnimationType.RANGED_ATTACK).set_cycle_time(self.shot_delay)
+        self.animation_manager.get_animation_data(AnimationType.RANGED_ATTACK_E).set_cycle_time(self.shot_delay)
 
     def shoot_bullet(self, direction: Vector) -> bool:
         if self.current_shot_timer >= self.shot_delay:

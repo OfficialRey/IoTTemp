@@ -22,13 +22,12 @@ class Widget(ABC):
         self.center_position = self.area.center
 
     def update(self, game_info: GameInformation):
-        if game_info.fire_trigger:
-            x_pos, y_pos = game_info.x, game_info.y
-            if self.area.x <= x_pos <= self.area.x + self.area.width and \
-                    self.area.y <= y_pos <= self.area.y + self.area.height:
-                self.set_hover(True)
-            else:
-                self.set_hover(False)
+        x_pos, y_pos = game_info.x, game_info.y
+        if self.area.x <= x_pos <= self.area.x + self.area.width and \
+                self.area.y <= y_pos <= self.area.y + self.area.height:
+            self.set_hover(True)
+        else:
+            self.set_hover(False)
 
     def set_hover(self, value: bool):
         if self.hovered == value:
@@ -90,7 +89,7 @@ class Label(Widget):
             )
 
     def update_content(self):
-        self.font = pygame.font.SysFont(self.font, self.area.height)
+        self.sys_font = pygame.font.SysFont(self.font, self.area.height)
         self.set_content(self.base_render_content)
 
     def set_area(self, area: Tuple[int, int, int, int] = (0, 0, 0, 0)):
@@ -108,7 +107,7 @@ class Label(Widget):
         if self.background_color is not None:
             surface.fill(self.background_color, self.area)
         if self.hovered and self.hover_color is not None:
-            surface.fill(self.hover_color, self.area)
+            surface.fill(self.hover_color, self.border_area)
         if self.render_content is not None:
             x = self.area.x + self.area.width // 2 - self.render_content.get_width() // 2
             y = self.area.y + self.area.height // 2 - self.render_content.get_height() // 2
@@ -129,7 +128,7 @@ class Button(Label, ABC):
         if not self.enabled:
             return
 
-        if self.hovered and game_info.fire_trigger.pressed:
+        if self.hovered and game_info.fire_trigger.held:
             self._on_press()
         elif game_info.fire_trigger.released:
             self._on_release()

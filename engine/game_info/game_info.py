@@ -62,6 +62,9 @@ class GameInformation:
         self.yaw = median(self.yaws)
         self.pitch = median(self.pitchs)
 
+    def __str__(self):
+        return f"X: {self.x}, Y: {self.y} | Yaw: {self.yaw}, Pitch: {self.pitch} | Fire Trigger: {self.fire_trigger}"
+
 
 if __name__ == '__main__':
     # Trigger Test

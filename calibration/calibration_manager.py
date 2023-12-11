@@ -13,7 +13,6 @@ class CalibrationManager:
 
     def add_calculation_point(self, point):
         self.calculation_points.append(point)
-        print(point.__str__())
 
     def calculate_formula(self):
         # TODO: Use points to calculate formula required variables

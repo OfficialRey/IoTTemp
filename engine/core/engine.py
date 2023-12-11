@@ -102,4 +102,7 @@ class Engine:
         # self.inputs = self.input_manager.read() DEPRECATED
 
     def _communicate(self):
+        # Update Server Package
+        self.server_package.laser = isinstance(self.current_menu, CalibrationMenu)
+
         self.weapon_package = self.communication.run(self.server_package)

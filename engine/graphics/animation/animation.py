@@ -18,11 +18,12 @@ class AnimationType(Enum):
     WALKING_NW = 9
 
     # Actions
-    RANGED_ATTACK = 10
-    MELEE_ATTACK = 11
-    DAMAGED = 12
-    DODGE = 13
-    DEATH = 14
+    RANGED_ATTACK_E = 10
+    RANGED_ATTACK_W = 11
+    MELEE_ATTACK = 12
+    DAMAGED = 13
+    DODGE = 14
+    DEATH = 15
 
 
 class AnimationData:

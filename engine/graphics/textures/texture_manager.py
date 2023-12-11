@@ -9,7 +9,7 @@ from engine.props.bullet.bullet import BulletManager
 
 SINGLE_SPRITE = [AnimationType.GENERIC]
 
-PLAYER = [AnimationType.IDLE, AnimationType.WALKING_E, None, AnimationType.RANGED_ATTACK, AnimationType.DAMAGED,
+PLAYER = [AnimationType.IDLE, AnimationType.WALKING_E, None, AnimationType.RANGED_ATTACK_E, AnimationType.DAMAGED,
           AnimationType.DEATH]
 CURSOR = [AnimationType.GENERIC]
 
@@ -22,7 +22,7 @@ CENTIPEDE_BODY = [None, None, None, None, None, None, None, None,
                   AnimationType.WALKING_W, AnimationType.WALKING_SW, AnimationType.WALKING_S, AnimationType.WALKING_SE,
                   None, AnimationType.DEATH]
 
-SPIDER = [AnimationType.IDLE, AnimationType.WALKING_E, AnimationType.RANGED_ATTACK, AnimationType.MELEE_ATTACK,
+SPIDER = [AnimationType.IDLE, AnimationType.WALKING_E, AnimationType.RANGED_ATTACK_E, AnimationType.MELEE_ATTACK,
           AnimationType.DEATH]
 
 
@@ -66,6 +66,8 @@ class TextureManager:
         ]
 
     def scale_textures(self, scale):
+        if isinstance(scale, (float, int)):
+            scale = Vector(scale, scale)
         for texture_atlas in self.game_textures:
             texture_atlas.scale_textures(scale)
 

@@ -14,9 +14,9 @@ class Atlas(ABC):
     def __init__(self, path: str, file_name: str, sprite_width: int, sprite_height: int, rotation_precision: int = 360):
         self.surface = pygame.image.load(
             os.path.join(get_resource_path(), os.path.join(path, file_name))).convert_alpha()
-        self.sprite_width, self.sprite_height = sprite_width, sprite_height
         self.sprite_scale = Vector(1, 1)
-        self.scaled_height = sprite_height
+        self.sprite_width, self.sprite_height = sprite_width, sprite_height
+        self.scaled_width, self.scaled_height = sprite_width, sprite_height
         self.rotation_precision = rotation_precision
 
         self.x_length = self.surface.get_width() // self.sprite_width
@@ -28,6 +28,8 @@ class Atlas(ABC):
         for texture in self.textures:
             texture.scale_texture(scale)
         self.sprite_scale *= scale
+        self.scaled_width *= scale.x
+        self.scaled_height *= scale.y
 
     def get_average_radius(self):
         return self.get_average_texture_size() / 2

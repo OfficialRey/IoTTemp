@@ -70,6 +70,13 @@ class Sprite(Movable, pygame.sprite.Sprite):
         index = min(int((self.get_velocity_rotation() + ANGLE_OFFSET) / 45), len(GENERIC_ANIMATIONS) - 1)
         self.animation_manager.update_animation_type(GENERIC_ANIMATIONS[index])
 
+    def animate_rotation(self, target_position: Vector):
+        position_to_target = target_position - self.center_position
+        if position_to_target.x >= 0:
+            self.animation_manager.update_animation_type(AnimationType.WALKING_E)
+        else:
+            self.animation_manager.update_animation_type(AnimationType.WALKING_W)
+
     def collide_generic(self, other) -> CollisionInformation:
         vector = other.get_collision_position() - self.get_collision_position()
         collision_radius = self.get_collision_radius() + other.get_collision_radius()
