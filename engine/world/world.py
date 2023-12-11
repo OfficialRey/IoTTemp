@@ -1,4 +1,5 @@
 import os
+import time
 
 import pygame.sprite
 
@@ -138,19 +139,27 @@ class World:
         self.wave_manager.render(window)
         pygame.display.flip()
 
+    # Improve
+    # Blit Time: 0.001 Seconds (Not the issue)
+    # Debug Time: 0.02202463150024414 (Issue) -> 0.01899886131286621 (Improvement, still an Issue)
     def _render_level(self, window: Window) -> None:
         zoom = self.get_camera_zoom()
         camera_x, camera_y = self.camera.get_position().as_int().as_tuple()
 
         sprite_width, sprite_height = self.level_data.texture_atlas.get_texture_size()
 
-        for layer in range(self.level_data.layers):
-            for x in range(int(-sprite_width), int(self.camera.resolution.x * zoom + sprite_width * 2), sprite_width):
-                for y in range(int(-sprite_height), int(self.camera.resolution.y * zoom + sprite_height * 2),
-                               sprite_height):
-                    x_pos = (x + camera_x) // sprite_width
-                    y_pos = (y + camera_y) // sprite_height
-                    if 0 <= x_pos < self.level_data.width and 0 <= y_pos < self.level_data.height:
+        x_range = range(int(-sprite_width), int(self.camera.resolution.x * zoom + sprite_width * 2), sprite_width)
+        y_range = range(int(-sprite_height), int(self.camera.resolution.y * zoom + sprite_height * 2),
+                        sprite_height)
+        width = self.level_data.width
+        height = self.level_data.height
+
+        for x in x_range:
+            for y in y_range:
+                x_pos = (x + camera_x) // sprite_width
+                y_pos = (y + camera_y) // sprite_height
+                if 0 <= x_pos < width and 0 <= y_pos < height:
+                    for layer in range(self.level_data.layers):
                         texture = self.level_data.get_texture(x_pos, y_pos, layer)
                         if texture is not None:
                             window.surface.blit(texture.get_image(),

@@ -27,10 +27,10 @@ GRAPHICS_PER_ROW = 20
 # Left Click: Place Textures & Select Textures
 # Right Click: Remove Textures
 # Arrow Key Up & Down: Change current layer
-# Ctrl + S: Save current level layout
-# Ctrl + L: Load existing level layout
 # W, A, S, D: Navigate current level layout
 # Tabulator: Switch between texture and collision editor
+# Ctrl + S: Save current level layout
+# Ctrl + L: Load existing level layout
 
 
 # TODO: Level Collision editor
