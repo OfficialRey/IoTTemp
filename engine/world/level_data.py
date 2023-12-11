@@ -1,27 +1,28 @@
 from engine.graphics.atlas.level import LevelAtlas
 from engine.graphics.textures.texture import Texture
 
-from random import random
-
 
 class LevelData:
 
-    def __init__(self, texture_atlas: LevelAtlas, world_name: str, width: int = 50, height: int = 50):
+    def __init__(self, texture_atlas: LevelAtlas, world_name: str, width: int = 50, height: int = 50, layers: int = 2):
         # TODO: Add multiple texture layers
         self.world_name = world_name
+        self.layers = layers
         self.width = width
         self.height = height
         self.texture_atlas = texture_atlas
-        self.level = [5 for _ in range(width * height)]
+        self.level = [[7 for _ in range(width * height)] for _ in range(self.layers)]
 
-    def get_texture(self, x: int, y: int) -> Texture:
-        return self.texture_atlas.textures[self.get_texture_id(x, y)]
+    def get_texture(self, x: int, y: int, layer: int) -> Texture:
+        if self.get_texture_id(x, y, layer) == -1:
+            return None
+        return self.texture_atlas.textures[self.get_texture_id(x, y, layer)]
 
-    def get_texture_id(self, x: int, y: int) -> int:
-        return self.level[self.convert_position(x, y)]
+    def get_texture_id(self, x: int, y: int, layer: int) -> int:
+        return self.level[layer][self.convert_position(x, y)]
 
-    def place_texture(self, texture_id: int, x: int, y: int) -> None:
-        self.level[self.convert_position(x, y)] = texture_id
+    def place_texture(self, texture_id: int, x: int, y: int, layer: int) -> None:
+        self.level[layer][self.convert_position(x, y)] = texture_id
 
     def save_level(self, path: str) -> None:
         pass

@@ -91,15 +91,19 @@ class ShootingUnit(Unit, ABC):
         self.current_shot_timer = 0
         self.bullets = []
         self.animation_manager.get_animation_data(AnimationType.RANGED_ATTACK_E).set_cycle_time(self.shot_delay)
+        self.animation_manager.get_animation_data(AnimationType.RANGED_ATTACK_W).set_cycle_time(self.shot_delay)
 
     def shoot_bullet(self, direction: Vector) -> bool:
-        if self.current_shot_timer >= self.shot_delay:
-            bullet = Bullet(self, self.bullet_type, self.center_position, direction)
-            self.bullets.append(bullet)
-            self.current_shot_timer = 0
-            self.sound_engine.play_sound(self.bullet_type.sound_type)
-            return True
-        return False
+        if self.is_dead():
+            return False
+        if self.current_shot_timer < self.shot_delay:
+            return False
+
+        bullet = Bullet(self, self.bullet_type, self.center_position, direction)
+        self.bullets.append(bullet)
+        self.current_shot_timer = 0
+        self.sound_engine.play_sound(self.bullet_type.sound_type)
+        return True
 
     def update(self, world, delta_time: float):
         super().update(world, delta_time)

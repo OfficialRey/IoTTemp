@@ -8,8 +8,8 @@ class CentipedeAI(MeleeAI):
     def __init__(self, entity):
         super().__init__(entity)
 
-    def run_ai(self, world, delta_time: float):
-        super().run_ai(world, delta_time)
+    def _run_ai(self, world, delta_time: float):
+        super()._run_ai(world, delta_time)
         for segment in self.entity.segments:
             segment.update(world, delta_time)
         self.remove_dead_segments()

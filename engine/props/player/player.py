@@ -30,7 +30,7 @@ class Player(ShootingUnit):
         super().update(world, delta_time)
 
     def run_behaviour(self, world, delta_time: float):
-        pass
+        self.animate_rotation(self.cursor.center_position)
 
     # Format: [w, a, s, d, space, mouse_x, mouse_y, left_click, right_click]
 
@@ -40,17 +40,19 @@ class Player(ShootingUnit):
         self.accelerate(self.cursor.center_position - camera.get_relative_position(self), delta_time)
 
         if game_info.fire_trigger.held:
-            self.animation_manager.single_play_animation(AnimationType.RANGED_ATTACK_E)
-            self.shoot_bullet((self.cursor.get_render_position() - self.get_render_position(camera)))
+            # TODO: Add inaccuracy
+            vector = self.cursor.center_position - self.center_position
+
+            animation_type = AnimationType.RANGED_ATTACK_W if vector.x < 0 else AnimationType.RANGED_ATTACK_E
+
+            if self.shoot_bullet((self.cursor.get_render_position() - self.get_render_position(camera))):
+                self.animation_manager.single_play_animation(animation_type)
 
     def render(self, surface: pygame.Surface, camera: Camera) -> None:
         self.cursor.render(surface, camera)
         super().render(surface, camera)
 
     def on_hit(self):
-        pass
-
-    def on_death(self):
         pass
 
     def on_attack(self):

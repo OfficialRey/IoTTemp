@@ -45,6 +45,7 @@ class LevelEditor:
         self.world = None
 
         self.selected_texture = 0
+        self.current_layer = 0
         self.current_row = 0
 
         self.upper_bound = 0
@@ -149,14 +150,19 @@ class LevelEditor:
         keys = pygame.key.get_pressed()
         x = keys[pygame.K_d] - keys[pygame.K_a]
         y = keys[pygame.K_s] - keys[pygame.K_w]
+        layer = keys[pygame.K_DOWN] - keys[pygame.K_UP]
         self.position += Vector(x / 2, y / 2)
         self.position.x = clamp(self.position.x, 0, self.level_data.width - self.n_textures_x)
         self.position.y = clamp(self.position.y, 0, self.level_data.height - self.n_textures_y)
+        self.current_layer += layer
+        self.current_layer = clamp(self.current_layer, 0, self.level_data.layers - 1)
 
         # Mouse
-        left_click, _, _ = pygame.mouse.get_pressed()
+        left_click, _, right_click = pygame.mouse.get_pressed()
         if left_click:
             self.draw_level(Vector(*pygame.mouse.get_pos()))
+        if right_click:
+            self.remove_level(Vector(*pygame.mouse.get_pos()))
 
     def render(self):
         self.window.surface.fill(BLACK)
@@ -166,17 +172,19 @@ class LevelEditor:
         pygame.display.flip()
 
     def render_world(self):
-        for x in range(self.n_textures_x):
-            for y in range(self.n_textures_y):
-                texture_id = self.level_data.get_texture_id(x + int(self.position.x), y + int(self.position.y))
-                if texture_id < 0:
-                    continue
+        for layer in range(self.level_data.layers):
+            for x in range(self.n_textures_x):
+                for y in range(self.n_textures_y):
+                    texture_id = self.level_data.get_texture_id(x + int(self.position.x), y + int(self.position.y),
+                                                                layer)
+                    if texture_id < 0:
+                        continue
 
-                texture = self.texture_atlas[texture_id]
-                destination = (
-                    x * self.texture_atlas.sprite_width * self.texture_atlas.sprite_scale.x,
-                    y * self.texture_atlas.sprite_height * self.texture_atlas.sprite_scale.y)
-                self.window.surface.blit(texture.images[0], destination)
+                    texture = self.texture_atlas[texture_id]
+                    destination = (
+                        x * self.texture_atlas.sprite_width * self.texture_atlas.sprite_scale.x,
+                        y * self.texture_atlas.sprite_height * self.texture_atlas.sprite_scale.y)
+                    self.window.surface.blit(texture.images[0], destination)
 
     def render_grid(self):
         width = self.window.get_width()
@@ -218,12 +226,18 @@ class LevelEditor:
         self.update_gui()
 
     def draw_level(self, position: Vector):
+        self.edit_level(position, self.current_layer, self.selected_texture)
+
+    def remove_level(self, position: Vector):
+        self.edit_level(position, self.current_layer, -1)
+
+    def edit_level(self, position: Vector, layer: int, texture: int):
         # Get Level coordinates
         if position.y >= self.window.get_height() * DRAW_PERCENTAGE:
             return
         x = position.x // (self.texture_atlas.sprite_width * self.texture_atlas.sprite_scale.x) + self.position.x
         y = position.y // (self.texture_atlas.sprite_height * self.texture_atlas.sprite_scale.y) + self.position.y
-        self.level_data.place_texture(self.selected_texture, int(x), int(y))
+        self.level_data.place_texture(texture, int(x), int(y), layer)
 
     def update_game_info(self):
         self.game_info.x, self.game_info.y = pygame.mouse.get_pos()

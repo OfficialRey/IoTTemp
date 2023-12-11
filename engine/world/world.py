@@ -136,14 +136,17 @@ class World:
 
         sprite_width, sprite_height = self.level_data.texture_atlas.get_texture_size()
 
-        for x in range(int(-sprite_width), int(self.camera.resolution.x * zoom + sprite_width * 2), sprite_width):
-            for y in range(int(-sprite_height), int(self.camera.resolution.y * zoom + sprite_height * 2),
-                           sprite_height):
-                x_pos = (x + camera_x) // sprite_width
-                y_pos = (y + camera_y) // sprite_height
-                if 0 <= x_pos < self.level_data.width and 0 <= y_pos < self.level_data.height:
-                    window.surface.blit(self.level_data.get_texture(x_pos, y_pos).get_image(),
-                                        (x - camera_x % sprite_width, y - camera_y % sprite_height))
+        for layer in range(self.level_data.layers):
+            for x in range(int(-sprite_width), int(self.camera.resolution.x * zoom + sprite_width * 2), sprite_width):
+                for y in range(int(-sprite_height), int(self.camera.resolution.y * zoom + sprite_height * 2),
+                               sprite_height):
+                    x_pos = (x + camera_x) // sprite_width
+                    y_pos = (y + camera_y) // sprite_height
+                    if 0 <= x_pos < self.level_data.width and 0 <= y_pos < self.level_data.height:
+                        texture = self.level_data.get_texture(x_pos, y_pos, layer)
+                        if texture is not None:
+                            window.surface.blit(texture.get_image(),
+                                                (x - camera_x % sprite_width, y - camera_y % sprite_height))
 
     def _render_units(self, window: Window) -> None:
         for unit in self.units:

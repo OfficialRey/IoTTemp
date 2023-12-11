@@ -36,12 +36,13 @@ class AnimationManager:
 
     # Play an animation once
     def single_play_animation(self, animation_type: AnimationType):
-        self.single_play = True
-        if self.get_animation_data(animation_type) is not self.current_animation:
+        self.single_play = False
+        if self.current_animation.animation_type is not animation_type:
             self.current_animation.timer = 0
             self.current_animation.count = 0
             self.previous_animation = self.current_animation
             self.update_animation_type(animation_type)
+            self.single_play = True
 
     def update_current_animation(self, timer: float = None, loop: bool = False):
         if timer is not None:
@@ -55,10 +56,15 @@ class AnimationManager:
         if animation_data is self.current_animation:
             return
 
-        self.previous_animation = self.current_animation
-        self.current_animation = animation_data
-        self.current_animation.timer = 0
-        self.current_animation.count = 0
+        if not self.single_play:
+            self.previous_animation = self.current_animation
+            self.current_animation = animation_data
+            self.current_animation.timer = 0
+            self.current_animation.count = 0
+        else:
+            self.previous_animation = animation_data
+            self.previous_animation.timer = 0
+            self.previous_animation.count = 0
 
     def update_animation_type(self, animation_type: AnimationType):
         if isinstance(self.atlas, AnimationAtlas):

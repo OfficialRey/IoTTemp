@@ -39,6 +39,7 @@ class Damageable(Sprite):
         self.animation_manager.current_animation.set_cycle_time(1)
         self.acceleration = 0
         self.velocity = Vector(0, 0)
+        self.on_death()
 
     def collide_generic(self, other) -> CollisionInformation:
         if self.is_dead():
@@ -57,3 +58,6 @@ class Damageable(Sprite):
         if self.atlas.get_animation_data(AnimationType.DEATH) is not None:
             return self.animation_manager.is_animation_finished()
         return True
+
+    def on_death(self):
+        raise NotImplementedError()

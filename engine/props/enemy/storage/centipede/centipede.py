@@ -38,6 +38,8 @@ class Centipede(MeleeEnemy):
             self.segments.append(previous_segment)
 
     def run_behaviour(self, world, delta_time: float):
+        # Fix Position of entity
+        self.center_position = self.segments[0].center_position
         self.ai.run(world, delta_time)
 
     def render(self, surface: pygame.Surface, camera) -> None:
@@ -58,9 +60,6 @@ class Centipede(MeleeEnemy):
         return len(self.segments) == 0
 
     def on_hit(self):
-        pass
-
-    def on_death(self):
         pass
 
     def on_attack(self):

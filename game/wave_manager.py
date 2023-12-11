@@ -41,6 +41,7 @@ class WaveManager:
         self.title_fade_time = title_fade_time
         self.title_sustain_time = title_sustain_time
         self.color = color
+        self.spawn_chance_increase = 0
 
         # Title animation
         self.animation_timer = 0
@@ -95,9 +96,11 @@ class WaveManager:
             self._generate_wave()
 
     def _spawn_enemy(self, delta_time: float):
-        spawn_chance = delta_time / SECONDS_PER_SPAWN
+        spawn_chance = delta_time / SECONDS_PER_SPAWN + self.spawn_chance_increase
         if random() < spawn_chance:
+            self.spawn_chance_increase += delta_time / 100
             return
+        self.spawn_chance_increase = 0
         enemy = self.enemies.pop()
         self.world.units.add(enemy)
 
