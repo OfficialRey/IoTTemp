@@ -7,9 +7,9 @@ from engine.core.vector import Vector
 from engine.graphics.animation.animation import AnimationType
 from engine.graphics.animation.animation_manager import AnimationManager
 from engine.graphics.atlas.atlas import Atlas
-from engine.props.types.collision import CollisionInformation
 from engine.props.types.movable import Movable
 from engine.util.constants import BLACK, WHITE, RED
+from engine.world.collision import Collision, CollisionShape, CollisionInformation
 
 GENERIC_ANIMATIONS = [AnimationType.WALKING_N, AnimationType.WALKING_NE, AnimationType.WALKING_E,
                       AnimationType.WALKING_SE, AnimationType.WALKING_S, AnimationType.WALKING_SW,
@@ -25,7 +25,9 @@ class Sprite(Movable, pygame.sprite.Sprite):
     def __init__(self, atlas: Atlas, max_speed: float = 0, acceleration: float = 0,
                  center_position: Vector = Vector(), velocity: Vector = Vector(),
                  animation_type: AnimationType = AnimationType.GENERIC):
-        super().__init__(max_speed, acceleration, center_position, velocity)
+        super().__init__(max_speed, acceleration, center_position, velocity,
+                         Collision(center_position, (atlas.sprite_width + atlas.sprite_height) // 2,
+                                   shape=CollisionShape.CIRCLE))
         self.atlas = atlas
         self.animation_manager = AnimationManager(self.atlas, animation_type)
         self.animation_manager.update_animation_type(AnimationType.GENERIC)
@@ -78,9 +80,7 @@ class Sprite(Movable, pygame.sprite.Sprite):
             self.animation_manager.update_animation_type(AnimationType.WALKING_W)
 
     def collide_generic(self, other) -> CollisionInformation:
-        vector = other.get_collision_position() - self.get_collision_position()
-        collision_radius = self.get_collision_radius() + other.get_collision_radius()
-        return CollisionInformation(vector.normalize(), vector.magnitude(), collision_radius)
+        return self.collision.collides_with(other.collision)
 
     def get_collision_position(self):
         return self.center_position + Vector(self.animation_manager.get_surface().get_width(),

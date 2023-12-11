@@ -1,8 +1,8 @@
 from engine.core.vector import Vector
 from engine.graphics.animation.animation import AnimationType
 from engine.graphics.atlas.animation import AnimationAtlas
-from engine.props.types.collision import CollisionInformation
 from engine.props.types.sprite import Sprite
+from engine.world.collision import CollisionInformation
 
 FLASH_TIME = 0.2
 

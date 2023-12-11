@@ -7,11 +7,11 @@ from engine.core.vector import Vector
 from engine.graphics.animation.animation import AnimationType
 from engine.graphics.atlas.animation import AnimationAtlas
 from engine.props.bullet.bullet import Bullet, BulletType
-from engine.props.types.collision import CollisionInformation
 from engine.props.types.damageable import Damageable
 from engine.props.types.sprite import Sprite
 from engine.sound.game_sound import SoundEngine, GameSound
 from engine.world.camera import Camera
+from engine.world.collision import CollisionInformation
 
 
 class Unit(Damageable, ABC):

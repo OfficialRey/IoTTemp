@@ -11,7 +11,8 @@ from engine.graphics.atlas.level import LevelAtlas
 from engine.graphics.gui.editor.editor_widget import LevelEditorScrollTextureButton, LevelEditorSelectTextureButton
 from engine.graphics.gui.widget import Button
 from engine.graphics.textures.texture_manager import TextureManager
-from engine.util.constants import RED, WHITE, BLACK
+from engine.util.constants import RED, WHITE, BLACK, GREEN
+from engine.world.collision import CollisionShape
 from engine.world.level_data import LevelData, load_level
 
 from tkinter import Tk
@@ -22,7 +23,16 @@ BOX_OFFSET = 5
 GRAPHICS_PER_ROW = 20
 
 
-# TODO: Save level layouts
+# Tutorial:
+# Left Click: Place Textures & Select Textures
+# Right Click: Remove Textures
+# Arrow Key Up & Down: Change current layer
+# Ctrl + S: Save current level layout
+# Ctrl + L: Load existing level layout
+# W, A, S, D: Navigate current level layout
+# Tabulator: Switch between texture and collision editor
+
+
 # TODO: Level Collision editor
 
 class EditingType(IntEnum):
@@ -65,10 +75,14 @@ class LevelEditor:
         self.n_textures_x = 0
         self.n_textures_y = 0
 
+        self.editing_type = EditingType.TEXTURE
         self.gui_mode = GuiMode.HIDE_NONE
         self.layer_font = pygame.font.SysFont("arial", 20)
         self.layer_info = self.layer_font.render(f"Layer: {self.current_layer}", True, WHITE)
+
         self.space_trigger = TriggerInput()
+        self.tab_trigger = TriggerInput()
+        self.left_trigger = TriggerInput()
 
         self.game_info = GameInformation()
 
@@ -162,29 +176,53 @@ class LevelEditor:
 
         # Movement
         keys = pygame.key.get_pressed()
+        mouse = pygame.mouse.get_pressed()
         x = keys[pygame.K_d] - keys[pygame.K_a]
         y = keys[pygame.K_s] - keys[pygame.K_w]
         layer = keys[pygame.K_UP] - keys[pygame.K_DOWN]
+
         self.space_trigger.update(keys[pygame.K_SPACE])
+        self.tab_trigger.update(keys[pygame.K_TAB])
+
         self.position += Vector(x / 2, y / 2)
         self.position.x = clamp(self.position.x, 0, self.level_data.width - self.n_textures_x)
         self.position.y = clamp(self.position.y, 0, self.level_data.height - self.n_textures_y)
+
         self.current_layer += layer
         self.current_layer = clamp(self.current_layer, 0, self.level_data.layers - 1)
         if layer != 0:
             self.layer_info = self.layer_font.render(f"Layer: {self.current_layer}", True, WHITE)
 
-        # Mouse
-        left_click, _, right_click = pygame.mouse.get_pressed()
-        if left_click:
-            self.draw_level(Vector(*pygame.mouse.get_pos()))
-        if right_click:
-            self.remove_level(Vector(*pygame.mouse.get_pos()))
+        if self.tab_trigger.pressed:
+            self.editing_type = int(not self.editing_type)
 
-        if self.space_trigger.pressed:
-            self.gui_mode += 1
-            if self.gui_mode >= len(GuiMode):
-                self.gui_mode = 0
+        self.texture_editing(keys, mouse)
+        self.collision_editing(keys, mouse)
+        self.file_management(keys)
+
+    def texture_editing(self, keys, mouse):
+        if self.editing_type == EditingType.TEXTURE:
+
+            # Mouse
+            left_click, _, right_click = mouse
+            if left_click:
+                self.draw_level(Vector(*pygame.mouse.get_pos()))
+            if right_click:
+                self.remove_level(Vector(*pygame.mouse.get_pos()))
+
+            if self.space_trigger.pressed:
+                self.gui_mode += 1
+                if self.gui_mode >= len(GuiMode):
+                    self.gui_mode = 0
+
+    def collision_editing(self, keys, mouse):
+        if self.editing_type == EditingType.COLLISION:
+            left_click, _, _ = mouse
+            self.left_trigger.update(left_click)
+            if self.left_trigger.pressed:
+                self.change_collision(Vector(*pygame.mouse.get_pos()))
+
+    def file_management(self, keys):
         # Load
         if keys[pygame.K_l] and keys[pygame.K_LCTRL]:
             self.load_level()
@@ -195,9 +233,13 @@ class LevelEditor:
 
     def render(self):
         self.window.surface.fill(BLACK)
+
         self.render_world()
-        self.render_grid()
-        self.render_gui()
+        if int(self.editing_type) is int(EditingType.TEXTURE):
+            self.render_grid()
+            self.render_gui()
+        if int(self.editing_type) is int(EditingType.COLLISION):
+            self.render_collision()
         pygame.display.flip()
 
     def render_world(self):
@@ -211,8 +253,8 @@ class LevelEditor:
 
                     texture = self.texture_atlas[texture_id]
                     destination = (
-                        x * self.texture_atlas.sprite_width * self.texture_atlas.sprite_scale.x,
-                        y * self.texture_atlas.sprite_height * self.texture_atlas.sprite_scale.y)
+                        x * self.texture_atlas.scaled_width,
+                        y * self.texture_atlas.scaled_height)
                     self.window.surface.blit(texture.images[0], destination)
 
     def render_grid(self):
@@ -252,6 +294,28 @@ class LevelEditor:
         for button in self.scroll_buttons:
             button.render(self.window.surface)
 
+    def render_collision(self):
+        for x in range(self.n_textures_x):
+            for y in range(self.n_textures_y):
+                collision = self.level_data.get_collision(x + int(self.position.x), y + int(self.position.y))
+                if collision.shape is CollisionShape.NONE:
+                    continue
+
+                if collision.shape is CollisionShape.CIRCLE:
+                    destination = collision.center_position - Vector(self.position.x * self.texture_atlas.scaled_width,
+                                                                     self.position.y * self.texture_atlas.scaled_height)
+                    pygame.draw.circle(self.window.surface, GREEN, destination.as_tuple(), collision.radius)
+
+                elif collision.shape is CollisionShape.RECTANGLE:
+                    destination = collision.rectangle.copy()
+                    destination.move(
+                        (collision.center_position - Vector(self.position.x * self.texture_atlas.scaled_width,
+                                                            self.position.y * self.texture_atlas.scaled_height) - Vector(
+                            self.texture_atlas.scaled_width * 0.5,
+                            self.texture_atlas.scaled_height * 0.5)).as_tuple()
+                    )
+                    pygame.draw.rect(self.window.surface, RED, destination)
+
     def select_texture(self, texture_id: int):
         self.buttons[self.selected_texture].background_color = None
         self.selected_texture = texture_id
@@ -273,9 +337,17 @@ class LevelEditor:
         # Get Level coordinates
         if position.y >= self.window.get_height() * DRAW_PERCENTAGE:
             return
-        x = position.x // (self.texture_atlas.sprite_width * self.texture_atlas.sprite_scale.x) + self.position.x
-        y = position.y // (self.texture_atlas.sprite_height * self.texture_atlas.sprite_scale.y) + self.position.y
+        x = position.x // self.texture_atlas.scaled_width + self.position.x
+        y = position.y // self.texture_atlas.scaled_height + self.position.y
         self.level_data.place_texture(texture, int(x), int(y), layer)
+
+    def change_collision(self, position: Vector):
+        x = position.x // self.texture_atlas.scaled_width + self.position.x
+        y = position.y // self.texture_atlas.scaled_height + self.position.y
+        center_position = Vector(x * self.texture_atlas.scaled_width + self.texture_atlas.scaled_width * 0.5,
+                                 y * self.texture_atlas.scaled_height + self.texture_atlas.scaled_height * 0.5)
+        self.level_data.change_collision(int(x), int(y), center_position,
+                                         (self.texture_atlas.scaled_width + self.texture_atlas.scaled_height) / 4)
 
     def update_game_info(self):
         self.game_info.x, self.game_info.y = pygame.mouse.get_pos()

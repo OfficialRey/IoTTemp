@@ -1,9 +1,12 @@
-from typing import List
+from typing import List, Union
 
+from engine.core.vector import Vector
 from engine.graphics.atlas.level import LevelAtlas
 from engine.graphics.textures.texture import Texture
 
 from json import loads
+
+from engine.world.collision import Collision
 
 WORLD = "world"
 LAYERS = "layers"
@@ -21,19 +24,23 @@ ATLAS_SPRITE_HEIGHT = "sprite_height"
 class LevelData:
 
     def __init__(self, texture_atlas: LevelAtlas, world_name: str, width: int = 50, height: int = 50, layers: int = 2,
-                 base_block: int = -1, level_data: List[List[int]] = None):
+                 base_block: int = -1, level_data: List[List[int]] = None, collision: List[List[Collision]] = None):
         # TODO: Add multiple texture layers
         if level_data is None:
             level_data = [[base_block for _ in range(width * height)] for _ in range(layers)]
+        if collision is None:
+            collision = [Collision() for _ in range(width * height)]
 
         self.texture_atlas = texture_atlas
         self.world_name = world_name
         self.layers = layers
         self.width = width
         self.height = height
+        self.collision = collision
         self.level = level_data
+        self.collision = collision
 
-    def get_texture(self, x: int, y: int, layer: int) -> Texture:
+    def get_texture(self, x: int, y: int, layer: int) -> Union[None, Texture]:
         if self.get_texture_id(x, y, layer) == -1:
             return None
         return self.texture_atlas.textures[self.get_texture_id(x, y, layer)]
@@ -43,6 +50,20 @@ class LevelData:
 
     def place_texture(self, texture_id: int, x: int, y: int, layer: int) -> None:
         self.level[layer][self.convert_position(x, y)] = texture_id
+
+    def get_collision(self, x: int, y: int):
+        position = self.convert_position(x, y)
+        if position < 0 or position >= len(self.collision):
+            return None
+        return self.collision[position]
+
+    def change_collision(self, x: int, y: int, center_position: Vector, radius: float = -1):
+        position = self.convert_position(x, y)
+        collision = self.collision[position]
+        collision.update_center_position(center_position)
+        collision.change_collision_shape()
+        if radius >= 0:
+            collision.radius = radius
 
     def save_level(self, path: str) -> None:
         # Create JSON object
@@ -65,7 +86,7 @@ class LevelData:
             file.close()
 
     def convert_position(self, x: int, y: int) -> int:
-        return x + self.width * y
+        return int(x + self.width * y)
 
 
 def load_level(path: str) -> LevelData:

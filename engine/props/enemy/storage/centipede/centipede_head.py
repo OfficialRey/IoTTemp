@@ -4,8 +4,8 @@ from engine.props.bullet.bullet import Bullet
 from engine.props.data import UnitData
 from engine.props.enemy.enemy import MeleeEnemy
 from engine.props.player.player import Player
-from engine.props.types.collision import CollisionInformation
 from engine.props.types.sprite import Sprite
+from engine.world.collision import CollisionInformation
 
 
 class CentipedeHead(MeleeEnemy):

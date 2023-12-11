@@ -6,12 +6,12 @@ from engine.graphics.animation.animation import AnimationType
 from engine.graphics.textures.texture_manager import TextureManager
 from engine.props.data import UnitData
 from engine.props.player.cursor import Cursor
-from engine.props.types.collision import CollisionInformation
 from engine.props.types.sprite import Sprite
 from engine.props.types.unit import ShootingUnit
 from engine.props.weapon.weapon import WeaponManager
 from engine.sound.game_sound import SoundEngine
 from engine.world.camera import Camera
+from engine.world.collision import CollisionInformation
 
 
 class Player(ShootingUnit):

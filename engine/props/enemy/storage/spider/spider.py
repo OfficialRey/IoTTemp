@@ -4,9 +4,9 @@ from engine.props.bullet.bullet import BulletType
 from engine.props.data import UnitData
 from engine.props.enemy.ai.ai import ShootingAI
 from engine.props.enemy.enemy import ShootingEnemy
-from engine.props.types.collision import CollisionInformation
 from engine.props.types.sprite import Sprite
 from engine.sound.game_sound import SoundEngine
+from engine.world.collision import CollisionInformation
 
 TARGET_DISTANCE = 350
 

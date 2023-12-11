@@ -9,8 +9,8 @@ from engine.props.enemy.ai.centipede_ai import CentipedeAI
 from engine.props.enemy.enemy import MeleeEnemy
 from engine.props.enemy.storage.centipede.centipede_body import CentipedeBody
 from engine.props.enemy.storage.centipede.centipede_head import CentipedeHead
-from engine.props.types.collision import CollisionInformation
 from engine.sound.game_sound import SoundEngine
+from engine.world.collision import CollisionInformation
 
 
 class Centipede(MeleeEnemy):

@@ -5,8 +5,8 @@ from engine.props.data import UnitData
 from engine.props.enemy.enemy import MeleeEnemy
 from engine.props.enemy.storage.centipede.centipede_head import CentipedeHead
 from engine.props.player.player import Player
-from engine.props.types.collision import CollisionInformation
 from engine.props.types.sprite import Sprite
+from engine.world.collision import CollisionInformation
 
 TIGHTNESS = 50
 DISTANCE_FACTOR = 1.2
