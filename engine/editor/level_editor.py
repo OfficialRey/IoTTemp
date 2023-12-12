@@ -185,7 +185,7 @@ class LevelEditor:
         self.space_trigger.update(keys[pygame.K_SPACE])
         self.tab_trigger.update(keys[pygame.K_TAB])
 
-        self.position += Vector(x / 2, y / 2)
+        self.position += Vector(x, y)
         self.position.x = clamp(self.position.x, 0, max(0, self.level_data.width - self.n_textures_x))
         self.position.y = clamp(self.position.y, 0, max(0, self.level_data.height - self.n_textures_y))
 
@@ -311,21 +311,18 @@ class LevelEditor:
                 if collision.shape is CollisionShape.NONE:
                     continue
 
+                render_position = Vector(self.position.x * self.texture_atlas.scaled_width,
+                                         self.position.y * self.texture_atlas.scaled_height).as_int()
+
                 if collision.shape is CollisionShape.CIRCLE:
-                    destination = collision.center_position - Vector(self.position.x * self.texture_atlas.scaled_width,
-                                                                     self.position.y * self.texture_atlas.scaled_height)
+                    destination = collision.center_position - render_position
                     pygame.draw.circle(self.window.surface, GREEN, destination.as_tuple(), collision.radius)
 
                 elif collision.shape is CollisionShape.RECTANGLE:
-                    destination = collision.rectangle.copy()
-                    print(destination)
-                    destination.move(
-                        (collision.center_position - Vector(self.position.x * self.texture_atlas.scaled_width,
-                                                            self.position.y * self.texture_atlas.scaled_height) - Vector(
-                            self.texture_atlas.scaled_width * 0.5,
-                            self.texture_atlas.scaled_height * 0.5)).as_tuple()
-                    )
-                    pygame.draw.rect(self.window.surface, RED, destination)
+                    destination = collision.center_position - render_position - Vector(
+                        self.texture_atlas.scaled_width // 2, self.texture_atlas.scaled_height // 2)
+                    pygame.draw.rect(self.window.surface, RED,
+                                     (destination.x, destination.y, collision.radius * 2, collision.radius * 2))
 
     def select_texture(self, texture_id: int):
         self.buttons[self.selected_texture].background_color = None
