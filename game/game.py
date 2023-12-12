@@ -13,7 +13,7 @@ class TopDownGame:
             self.engine.texture_manager,
             self.engine.window,
             7,
-            level_file="test.lvl"
+            level_file="level0.lvl"
         )
 
         print_debug(f"Loaded {self.world.texture_manager.count_textures()} surfaces into memory!")

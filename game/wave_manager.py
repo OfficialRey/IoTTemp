@@ -15,6 +15,8 @@ from engine.util.resources import get_resource_path
 MAX_WAVE = 1000
 SECONDS_PER_SPAWN = 3
 
+WAVE_TIME = 5
+
 
 class WaveManager:
 
@@ -40,6 +42,7 @@ class WaveManager:
 
         # Title animation
         self.animation_timer = 0
+        self.wave_spawn_time = WAVE_TIME
 
         self._create_render_objects()
 
@@ -81,6 +84,10 @@ class WaveManager:
     def _spawn_wave(self, delta_time: float):
         # Spawn wave if enemies left
 
+        if self.wave_spawn_time > 0:
+            self.wave_spawn_time -= delta_time
+            return
+
         if len(self.enemies) > 0:
             if len(self.world.units) > self.max_units:
                 return
@@ -104,6 +111,8 @@ class WaveManager:
         self.current_wave += 1
         self.animation_timer = 0
         level = self.current_wave
+
+        self.wave_spawn_time = WAVE_TIME
 
         enemy_count = int(3 + (level / 4) + random() * (level / 2))
         for i in range(enemy_count):

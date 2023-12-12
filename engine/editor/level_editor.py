@@ -104,8 +104,8 @@ class LevelEditor:
         height = int(input("Height:"))
 
         self.level_data = LevelData(self.texture_atlas, width, height)
-        self.n_textures_x = self.window.get_width() // self.texture_atlas.scaled_width
-        self.n_textures_y = self.window.get_height() // self.texture_atlas.scaled_height
+        self.n_textures_x = self.window.get_width() // self.texture_atlas.scaled_width + 1
+        self.n_textures_y = self.window.get_height() // self.texture_atlas.scaled_height + 1
 
     def load_textures(self):
         self.buttons = []
@@ -168,12 +168,13 @@ class LevelEditor:
     def check_events(self):
         events = pygame.event.get()
         for event in events:
-            for button in self.buttons:
-                button.update(self.game_info)
-            for button in self.scroll_buttons:
-                button.update(self.game_info)
             if event.type == pygame.QUIT:
                 exit()
+            if self.gui_mode == GuiMode.HIDE_NONE:
+                for button in self.buttons:
+                    button.update(self.game_info)
+                for button in self.scroll_buttons:
+                    button.update(self.game_info)
 
         # Movement
         keys = pygame.key.get_pressed()
@@ -343,7 +344,7 @@ class LevelEditor:
 
     def edit_level(self, position: Vector, layer: int, texture: int):
         # Get Level coordinates
-        if position.y >= self.window.get_height() * DRAW_PERCENTAGE:
+        if position.y >= self.window.get_height() * DRAW_PERCENTAGE and self.gui_mode == GuiMode.HIDE_NONE:
             return
         x = position.x // self.texture_atlas.scaled_width + self.position.x
         y = position.y // self.texture_atlas.scaled_height + self.position.y
