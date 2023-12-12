@@ -68,4 +68,5 @@ class SoundEngine:
     def play_music(self, music: GameMusic):
         path = os.path.join(self.music_path, music.get_file_name())
         pygame.mixer.music.load(path)
+        pygame.mixer.music.set_volume(self.music_volume)
         pygame.mixer.music.play(loops=-1)
