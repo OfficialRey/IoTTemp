@@ -1,6 +1,8 @@
 from engine.core.vector import Vector
 from engine.world.collision import Collision, CollisionShape
 
+COLLISION_SPEED_FACTOR = 0.5
+
 
 class Movable:
 
@@ -42,9 +44,18 @@ class Movable:
                     calls += 1
 
     def fix_collision(self, collision: Collision, step: float = 5):
+        # Get Vector of Object->Self
         vector = self.collision.center_position - collision.center_position
+
+        # Move unit away from object
         self.center_position += vector.normalize() * step
-        self.velocity = self.velocity.rotate_counter_clockwise(5)  # Smoothly rotate velocity so units don't get stuck
+
+        # Adjust own velocity to erase movement towards object
+        me_to_object = vector.inverse().normalize()
+        speed = self.velocity.magnitude() * COLLISION_SPEED_FACTOR
+        self.velocity = (self.velocity.normalize() - me_to_object.normalize()) * speed
+
+        # Update own collision object
         self.collision.center_position = self.center_position
 
     def on_world_collide(self, collision: Collision):
