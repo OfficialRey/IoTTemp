@@ -44,7 +44,7 @@ class Movable:
     def fix_collision(self, collision: Collision, step: float = 5):
         vector = self.collision.center_position - collision.center_position
         self.center_position += vector.normalize() * step
-        self.velocity = vector.normalize() * step
+        self.velocity = self.velocity.rotate_counter_clockwise(1)  # Smoothly rotate velocity so units don't get stuck
         self.collision.center_position = self.center_position
 
     def on_world_collide(self, collision: Collision):

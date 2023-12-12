@@ -3,6 +3,7 @@ from typing import Tuple
 import pygame.mouse
 
 from engine.graphics.gui.widget import Button, WHITE
+from engine.sound.game_sound import GameMusic
 from engine.util.util import show_cursor
 
 BACKGROUND_COLOR = 142, 33, 33
@@ -19,6 +20,7 @@ class StartButton(Button):
 
     def on_press(self):
         self.engine.current_menu = None
+        self.engine.sound_engine.play_music(GameMusic.DEFAULT)
         show_cursor(False)
 
     def on_release(self):

@@ -28,49 +28,44 @@ class GameSound(Enum):
 
 
 class GameMusic(Enum):
-    pass
+    DEFAULT = "game_music_loop.wav",
 
-
-class Sound:
-
-    def __init__(self, file_name: str, volume: float):
-        self.path = os.path.join(get_resource_path(), os.path.join("sound", file_name))
-        self.sound = pygame.mixer.Sound(self.path)
-        self.set_volume(volume)
-
-    def play_sound(self):
-        self.sound.play()
-
-    def stop_sound(self):
-        self.sound.stop()
-
-    def set_volume(self, value: float):
-        self.sound.set_volume(value)
+    def get_file_name(self):
+        return self.value[0]
 
 
 class SoundEngine:
 
     def __init__(self, sound_volume: float = 0.1, music_volume: float = 0.1):
         pygame.mixer.init()
-        self.sounds: Dict[GameSound, Sound] = {}
+        self.sound_path = os.path.join(get_resource_path(), "sound")
+        self.music_path = os.path.join(get_resource_path(), "music")
+        self.sounds: Dict[GameSound, pygame.mixer.Sound] = {}
         self.sound_volume = sound_volume
         self.music_volume = music_volume
 
         self._load_sounds()
-        self.set_sound_volume(self.sound_volume)
 
     def _load_sounds(self):
         self.sounds = {}
-        for sound in GameSound:
-            self.sounds[sound] = Sound(sound.get_file_name(), 1)
+        for game_sound in GameSound:
+            path = os.path.join(self.sound_path, game_sound.get_file_name())
+            sound = pygame.mixer.Sound(path)
+            sound.set_volume(self.sound_volume)
+            self.sounds[game_sound] = sound
 
     def get_sound(self, sound: GameSound):
         return self.sounds[sound]
 
     def play_sound(self, sound: GameSound):
-        self.sounds[sound].play_sound()
+        self.sounds[sound].play()
 
     def set_sound_volume(self, value):
         value = max(0, min(value, 1))
         for key in self.sounds.keys():
             self.sounds[key].set_volume(value)
+
+    def play_music(self, music: GameMusic):
+        path = os.path.join(self.music_path, music.get_file_name())
+        pygame.mixer.music.load(path)
+        pygame.mixer.music.play(loops=-1)
