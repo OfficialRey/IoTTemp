@@ -1,5 +1,5 @@
 import os
-import time
+from random import choice
 
 import pygame.sprite
 
@@ -38,7 +38,8 @@ class World:
         else:
             path = self.path = os.path.join(get_resource_path(), os.path.join("level", level_file))
             self.level_data = load_level(path)
-        self.player = Player(self.sound_engine, self.texture_manager, self.weapon_manager, UnitData.PLAYER)
+        self.player = Player(self.sound_engine, self.texture_manager, self.weapon_manager, UnitData.PLAYER,
+                             choice(self.level_data.player_spawn_points))
         self.texture_atlas = self.level_data.texture_atlas
 
         self.units = pygame.sprite.Group()

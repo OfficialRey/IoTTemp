@@ -17,6 +17,9 @@ COLLISION = "collision"
 SCALE = "scale"
 ATLAS = "atlas"
 
+PLAYER_SPAWN_POINT = 0
+ENEMY_SPAWN_POINT = 1
+
 
 class LevelData:
 
@@ -37,8 +40,14 @@ class LevelData:
         self.level = level_data
         self.collision = collision
 
+        self.player_spawn_points = []
+        self.enemy_spawn_points = []
+
+        self._load_spawn_points()
+
     def get_texture(self, x: int, y: int, layer: int) -> Union[None, Texture]:
-        if self.get_texture_id(x, y, layer) == -1:
+        texture_id = self.get_texture_id(x, y, layer)
+        if texture_id <= ENEMY_SPAWN_POINT:
             return None
         return self.texture_atlas.textures[self.get_texture_id(x, y, layer)]
 
@@ -84,6 +93,20 @@ class LevelData:
 
     def convert_position(self, x: int, y: int) -> int:
         return int(x + self.width * y)
+
+    def _load_spawn_points(self):
+        for layer in range(self.layers):
+            for x in range(self.width):
+                for y in range(self.height):
+                    position = Vector(
+                        x * self.texture_atlas.scaled_width + self.texture_atlas.scaled_width // 2,
+                        y * self.texture_atlas.scaled_height + self.texture_atlas.scaled_height // 2
+                    )
+                    texture_id = self.get_texture_id(x, y, layer)
+                    if texture_id == PLAYER_SPAWN_POINT:
+                        self.player_spawn_points.append(position)
+                    elif texture_id == ENEMY_SPAWN_POINT:
+                        self.enemy_spawn_points.append(position)
 
 
 def load_level(path: str) -> LevelData:

@@ -1,6 +1,5 @@
-# TODO: Add Enemy Spawn-points
 import os
-from typing import Tuple, List
+from typing import Tuple
 
 from random import random, choice
 
@@ -20,10 +19,7 @@ SECONDS_PER_SPAWN = 3
 class WaveManager:
 
     def __init__(self, world, bullet_manager, max_units: int = 7, title_detail: int = 50, title_size: int = 100,
-                 color: Tuple[int, int, int] = WHITE, title_fade_time: float = 1, title_sustain_time: float = 2,
-                 spawn_positions: List[Vector] = None):
-        if spawn_positions is None:
-            spawn_positions = [Vector()]
+                 color: Tuple[int, int, int] = WHITE, title_fade_time: float = 1, title_sustain_time: float = 2):
 
         self.world = world
         self.bullet_manager = bullet_manager
@@ -31,7 +27,6 @@ class WaveManager:
         # Wave System
         self.current_wave = 0
         self.enemies = []
-        self.spawn_positions = spawn_positions
         self.max_units = max_units
 
         # Cached title animation
@@ -117,7 +112,7 @@ class WaveManager:
     def _get_random_enemy(self, level: int):
         enemy_type = int(random() * 2)
 
-        spawn_position = choice(self.spawn_positions)
+        spawn_position = choice(self.world.level_data.enemy_spawn_points)
 
         if enemy_type == 0:
             return Centipede(self.world.sound_engine, self.world.texture_manager, spawn_position, level)

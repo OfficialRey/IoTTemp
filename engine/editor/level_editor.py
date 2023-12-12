@@ -12,6 +12,7 @@ from engine.graphics.gui.editor.editor_widget import LevelEditorScrollTextureBut
 from engine.graphics.gui.widget import Button
 from engine.graphics.textures.texture_manager import TextureManager
 from engine.util.constants import RED, WHITE, BLACK, GREEN
+from engine.util.debug import print_debug
 from engine.util.util import sign
 from engine.world.collision import CollisionShape
 from engine.world.level_data import LevelData, load_level
@@ -379,3 +380,4 @@ class LevelEditor:
         if file is None:
             return
         self.level_data.save_level(file.name)
+        print_debug(f"Saved level as {file.name}")
