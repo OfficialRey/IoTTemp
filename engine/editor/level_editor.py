@@ -61,7 +61,7 @@ class LevelEditor:
         self.done = False
         self.texture_manager = TextureManager()
         self.texture_atlas = self.texture_manager.level_textures
-        self.texture_manager.scale_textures(5)
+        self.texture_atlas.scale_textures(Vector(5, 5))
         self.level_data = None
 
         self.selected_texture = 0
@@ -87,6 +87,8 @@ class LevelEditor:
 
         self.game_info = GameInformation()
 
+        self.save_path = None
+
     def select_textures(self):
         while self.texture_atlas is None:
             Tk().withdraw()
@@ -98,15 +100,12 @@ class LevelEditor:
             self.texture_atlas = LevelAtlas(path, file_name, sprite_width, sprite_height)
 
     def create_world(self):
-        # world_name = input("World Name:")
-        # width = int(input("Width:"))
-        # height = int(input("Height:"))
-        world_name = "Test"
-        width = 200
-        height = 200
-        self.level_data = LevelData(self.texture_atlas, world_name, width, height)
-        self.n_textures_x = self.window.get_width() // self.texture_atlas.sprite_width
-        self.n_textures_y = self.window.get_height() // self.texture_atlas.sprite_height
+        width = int(input("Width:"))
+        height = int(input("Height:"))
+
+        self.level_data = LevelData(self.texture_atlas, width, height)
+        self.n_textures_x = self.window.get_width() // self.texture_atlas.scaled_width
+        self.n_textures_y = self.window.get_height() // self.texture_atlas.scaled_height
 
     def load_textures(self):
         self.buttons = []
@@ -180,15 +179,15 @@ class LevelEditor:
         keys = pygame.key.get_pressed()
         mouse = pygame.mouse.get_pressed()
         x = keys[pygame.K_d] - keys[pygame.K_a]
-        y = keys[pygame.K_s] - keys[pygame.K_w]
+        y = int(keys[pygame.K_s] and not keys[pygame.K_LCTRL]) - keys[pygame.K_w]
         layer = keys[pygame.K_UP] - keys[pygame.K_DOWN]
 
         self.space_trigger.update(keys[pygame.K_SPACE])
         self.tab_trigger.update(keys[pygame.K_TAB])
 
         self.position += Vector(x / 2, y / 2)
-        self.position.x = clamp(self.position.x, 0, self.level_data.width - self.n_textures_x)
-        self.position.y = clamp(self.position.y, 0, self.level_data.height - self.n_textures_y)
+        self.position.x = clamp(self.position.x, 0, max(0, self.level_data.width - self.n_textures_x))
+        self.position.y = clamp(self.position.y, 0, max(0, self.level_data.height - self.n_textures_y))
 
         self.current_layer += layer
         self.current_layer = clamp(self.current_layer, 0, self.level_data.layers - 1)
@@ -238,6 +237,9 @@ class LevelEditor:
         # Save
         if keys[pygame.K_s] and keys[pygame.K_LCTRL]:
             self.save_level()
+        if keys[pygame.K_s] and keys[pygame.K_LCTRL] and keys[pygame.K_LSHIFT]:
+            self.save_path = None
+            self.save_level()
 
     def render(self):
         self.window.surface.fill(BLACK)
@@ -252,8 +254,8 @@ class LevelEditor:
 
     def render_world(self):
         for layer in range(self.level_data.layers):
-            for x in range(self.n_textures_x):
-                for y in range(self.n_textures_y):
+            for x in range(min(self.level_data.width, self.n_textures_x)):
+                for y in range(min(self.level_data.height, self.n_textures_y)):
                     texture_id = self.level_data.get_texture_id(x + int(self.position.x), y + int(self.position.y),
                                                                 layer)
                     if texture_id < 0:
@@ -316,6 +318,7 @@ class LevelEditor:
 
                 elif collision.shape is CollisionShape.RECTANGLE:
                     destination = collision.rectangle.copy()
+                    print(destination)
                     destination.move(
                         (collision.center_position - Vector(self.position.x * self.texture_atlas.scaled_width,
                                                             self.position.y * self.texture_atlas.scaled_height) - Vector(
@@ -373,11 +376,15 @@ class LevelEditor:
         if file is None:
             return
         self.level_data = load_level(file)
+        self.save_path = file
 
     def save_level(self):
-        default = [("Level File", "*.lvl")]
-        file = asksaveasfile(filetypes=default, defaultextension="*.lvl")
-        if file is None:
-            return
-        self.level_data.save_level(file.name)
-        print_debug(f"Saved level as {file.name}")
+        if self.save_path is None:
+            default = [("Level File", "*.lvl")]
+            file = asksaveasfile(filetypes=default, defaultextension="*.lvl")
+            if file is None:
+                return
+            self.save_path = file.name
+
+        self.level_data.save_level(self.save_path)
+        print_debug(f"Saved level as {self.save_path}")

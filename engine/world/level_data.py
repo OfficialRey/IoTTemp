@@ -8,7 +8,6 @@ from json import loads
 
 from engine.world.collision import Collision, load_collision
 
-WORLD = "world"
 LAYERS = "layers"
 WIDTH = "width"
 HEIGHT = "height"
@@ -23,7 +22,7 @@ ENEMY_SPAWN_POINT = 1
 
 class LevelData:
 
-    def __init__(self, texture_atlas: LevelAtlas, world_name: str, width: int = 50, height: int = 50, layers: int = 2,
+    def __init__(self, texture_atlas: LevelAtlas, width: int = 50, height: int = 50, layers: int = 2,
                  base_block: int = -1, level_data: List[List[int]] = None, collision: List[Collision] = None):
         # TODO: Add multiple texture layers
         if level_data is None:
@@ -32,7 +31,6 @@ class LevelData:
             collision = [Collision() for _ in range(width * height)]
 
         self.texture_atlas = texture_atlas
-        self.world_name = world_name
         self.layers = layers
         self.width = width
         self.height = height
@@ -51,10 +49,26 @@ class LevelData:
             return None
         return self.texture_atlas.textures[self.get_texture_id(x, y, layer)]
 
+    def are_coordinates_valid(self, x: int, y: int, layer: int):
+        if not (0 <= layer < self.layers):
+            return False
+
+        data = self.level[layer]
+        position = self.convert_position(x, y)
+
+        if not (0 <= position < len(data)):
+            return False
+
+        return True
+
     def get_texture_id(self, x: int, y: int, layer: int) -> int:
+        if not self.are_coordinates_valid(x, y, layer):
+            return -1
         return self.level[layer][self.convert_position(x, y)]
 
     def place_texture(self, texture_id: int, x: int, y: int, layer: int) -> None:
+        if not self.are_coordinates_valid(x, y, layer):
+            return
         self.level[layer][self.convert_position(x, y)] = texture_id
 
     def get_collision(self, x: int, y: int):
@@ -80,7 +94,6 @@ class LevelData:
         # Create JSON object
         storage = {
             ATLAS: self.texture_atlas.get_dict(),
-            WORLD: self.world_name,
             WIDTH: self.width,
             HEIGHT: self.height,
             LAYERS: self.layers,
@@ -116,7 +129,6 @@ def load_level(path: str) -> LevelData:
 
     return LevelData(
         load_atlas(content[ATLAS]),
-        content[WORLD],
         content[WIDTH],
         content[HEIGHT],
         content[LAYERS],
