@@ -52,6 +52,8 @@ class World:
 
         self.wave_manager = WaveManager(self, self.bullet_manager)
 
+        self.cached_world = self._cache_world()
+
     def get_camera_zoom(self):
         return self.camera.get_zoom()
 
@@ -143,58 +145,28 @@ class World:
     # Blit Time: 0.001 Seconds (Not the issue)
     # Debug Time: 0.02202463150024414 (Issue) -> 0.01899886131286621 (Improvement, still an Issue)
     def _render_level(self, window: Window) -> None:
-
-        for_time = 0
-        statement_time = 0
-        texture_time = 0
-        blit_time = 0
-
-        zoom = self.get_camera_zoom()
-        camera_x, camera_y = self.camera.get_position().as_int().as_tuple()
-
-        sprite_width, sprite_height = self.level_data.texture_atlas.get_texture_size()
-
-        x_range = range(int(-sprite_width), int(self.camera.resolution.x * zoom + sprite_width * 2), sprite_width)
-        y_range = range(int(-sprite_height), int(self.camera.resolution.y * zoom + sprite_height * 2),
-                        sprite_height)
-        width = self.level_data.width
-        height = self.level_data.height
-
-        old_time = time.time()
-
-        for x in x_range:
-            for y in y_range:
-
-                for_time += time.time() - old_time
-                old_time = time.time()
-
-                x_pos = (x + camera_x) // sprite_width
-                y_pos = (y + camera_y) // sprite_height
-
-                statement_time += time.time() - old_time
-                old_time = time.time()
-
-                if 0 <= x_pos < width and 0 <= y_pos < height:
-                    for layer in range(self.level_data.layers):
-                        texture = self.level_data.get_texture(x_pos, y_pos, layer)
-
-                        texture_time += time.time() - old_time
-                        old_time = time.time()
-
-                        if texture is not None:
-                            window.surface.blit(texture.get_image(),
-                                                (x - camera_x % sprite_width, y - camera_y % sprite_height))
-
-                        blit_time += time.time() - old_time
-                        old_time = time.time()
-
-        print(f"For Loop: {for_time} | Statement: {statement_time} | Texture: {texture_time} | Blit: {blit_time}")
+        # Render cached world
+        window.surface.blit(self.cached_world, (self.camera.get_position().inverse().as_int().as_tuple()))
 
     def _render_units(self, window: Window) -> None:
         for unit in self.units:
             if unit is not self.player:
                 unit.render(window.surface, self.camera)
         self.player.render(window.surface, self.camera)
+
+    def _cache_world(self):
+        surface = pygame.Surface((
+            self.level_data.width * self.texture_atlas.scaled_width,
+            self.level_data.height * self.texture_atlas.scaled_height
+        )).convert_alpha()
+        for x in range(self.level_data.width):
+            for y in range(self.level_data.height):
+                for layer in range(self.level_data.layers):
+                    texture = self.level_data.get_texture(x, y, layer)
+                    if texture is not None:
+                        surface.blit(texture.get_image(),
+                                     (x * self.texture_atlas.scaled_width, y * self.texture_atlas.scaled_height))
+        return surface
 
     def are_enemies_dead(self):
         for unit in self.units.sprites():
