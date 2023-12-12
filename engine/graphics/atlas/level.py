@@ -7,6 +7,7 @@ from engine.core.vector import Vector
 from engine.graphics.atlas.atlas import Atlas
 from engine.graphics.textures.texture import Texture
 from engine.util.debug import print_debug
+from engine.util.resources import get_resource_path
 
 PATH = "path"
 FILE = "file"
@@ -42,9 +43,10 @@ class LevelAtlas(Atlas):
         return textures
 
     def _load_spawn_points(self):
+        path = os.path.join(get_resource_path(), self.path)
         textures = [
-            Texture(pygame.image.load(os.path.join(self.path, "player_spawn.png"))),
-            Texture(pygame.image.load(os.path.join(self.path, "enemy_spawn.png")))
+            Texture(pygame.image.load(os.path.join(path, "player_spawn.png"))),
+            Texture(pygame.image.load(os.path.join(path, "enemy_spawn.png")))
         ]
         return textures
 
