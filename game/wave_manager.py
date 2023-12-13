@@ -16,7 +16,7 @@ from engine.util.resources import get_resource_path
 MAX_WAVE = 1000
 SECONDS_PER_SPAWN = 3
 
-WAVE_TIME = 5
+WAVE_TIME = 1
 
 
 class EnemyType(IntEnum):

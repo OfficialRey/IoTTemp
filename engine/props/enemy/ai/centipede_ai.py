@@ -1,8 +1,9 @@
 from enum import IntEnum
 
+from pygame.math import clamp
+
 from engine.core.vector import Vector
 from engine.props.enemy.ai.ai import MeleeAI
-from engine.props.enemy.ai.path_finding.path import Path
 from engine.props.enemy.enemy import MeleeEnemy
 
 
@@ -12,8 +13,11 @@ class CentipedeState(IntEnum):
 
 
 TIGHTNESS = 50
-DISTANCE_FACTOR = 1.2
-PREVIOUS_INFLUENCE = 0.1
+DISTANCE_FACTOR = 1
+DISTANCE_RANGE_FACTOR = 1.2
+PREVIOUS_INFLUENCE = 0.3
+BODY_ACCELERATION_FACTOR = 100
+MAX_BODY_ACCELERATION_STRENGTH = 100
 
 
 class CentipedeAI(MeleeAI):
@@ -41,15 +45,22 @@ class CentipedeAI(MeleeAI):
             self.entity.set_state(CentipedeState.HEAD)
             return
 
-        # Accelerate towards previous segment
-        me_to_segment = self.entity.previous_segment.center_position - self.entity.center_position
+        previous = self.entity.previous_segment
 
-        distance = me_to_segment.magnitude()
-        target_distance = self.entity.get_collision_radius() * DISTANCE_FACTOR
-        direction = me_to_segment.normalize()
+        # Get direction to previous segment
+        direction = previous.center_position - self.entity.center_position
+        distance = direction.magnitude()
 
-        acceleration = direction * TIGHTNESS
-        acceleration += self.entity.previous_segment.velocity.normalize() * PREVIOUS_INFLUENCE
-        acceleration *= (distance - self.entity.atlas.get_average_radius()) / target_distance * DISTANCE_FACTOR
+        # Calculate target position
+        target_distance = self.entity.atlas.get_average_radius() * DISTANCE_FACTOR
+        target_position = previous.center_position - previous.velocity.normalize() * target_distance
+        target_direction = (target_position - self.entity.center_position).normalize()
 
-        self.entity.accelerate_uncapped(acceleration)
+        # Calculate influence of previous segment
+        previous_velocity = previous.velocity.normalize()
+
+        # Calculate final acceleration
+        acceleration = target_direction * (1 - PREVIOUS_INFLUENCE) + previous_velocity * PREVIOUS_INFLUENCE
+
+        # Apply acceleration
+        self.entity.accelerate_normalized(acceleration, delta_time)

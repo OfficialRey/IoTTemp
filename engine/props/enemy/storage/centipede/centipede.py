@@ -28,9 +28,11 @@ class Centipede(MeleeEnemy):
 
         if self.centipede_state is CentipedeState.HEAD:
             self.animation_manager = AnimationManager(self.centipede_head)
+            self.update_unit_data(UnitData.CENTIPEDE)
 
         elif self.centipede_state is CentipedeState.BODY:
             self.animation_manager = AnimationManager(self.centipede_body)
+            self.update_unit_data(UnitData.CENTIPEDE_BODY)
 
     def run_behaviour(self, world, delta_time: float):
         self.ai.run(world, delta_time)

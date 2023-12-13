@@ -1,11 +1,11 @@
 from engine.core.vector import Vector
 from engine.world.collision import Collision, CollisionShape
 
-COLLISION_SPEED_FACTOR = 0.25
+COLLISION_SPEED_FACTOR = 0.75
 
 ACCELERATION_FACTOR = 500
 
-VELOCITY_DECAY = 0.99
+VELOCITY_DECAY = 0.9
 
 
 class Movable:
@@ -14,25 +14,24 @@ class Movable:
                  velocity: Vector = Vector(), collision=Collision()):
         super().__init__()
         # From now on: center position
-        self.collision = collision
         self.center_position = center_position
         self.velocity = velocity
         self.max_speed = max_speed
         self.acceleration = acceleration
+        self.collision = collision
 
     def accelerate_uncapped(self, acceleration: Vector):
         self.velocity += acceleration * ACCELERATION_FACTOR
-        self.cap_velocity()
 
     def accelerate_normalized(self, acceleration: Vector, delta_time: float) -> None:
         self.velocity += acceleration.normalize() * self.acceleration * delta_time * ACCELERATION_FACTOR
-        self.cap_velocity()
 
     def cap_velocity(self):
         if self.velocity.magnitude() > self.max_speed:
-            self.velocity = self.velocity.normalize() * self.max_speed
+            self.velocity *= VELOCITY_DECAY
 
     def update(self, world, delta_time: float) -> None:
+        self.cap_velocity()
         self.center_position += self.velocity * delta_time / world.get_camera_zoom()
         self.collision.center_position = self.center_position
 

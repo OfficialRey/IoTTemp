@@ -9,8 +9,9 @@ class UnitData(Enum):
     NONE = (0, 0, 0, 0, 0, 0)
     PLAYER = (100, 0, 0, 2700, 6, 0)
 
-    CENTIPEDE = (8, 8, 0, 1500, 4, 0)
-    SHOOTING_SPIDER = (12, 4, 0, 1200, 4, 2)
+    CENTIPEDE = (6, 4, 0, 1500, 4, 0)
+    CENTIPEDE_BODY = (12, 2, 0, 1550, 30, 0)
+    SHOOTING_SPIDER = (12, 2, 0, 1200, 4, 2)
 
     def get_health(self):
         return self.value[0]

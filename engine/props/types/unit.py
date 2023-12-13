@@ -7,6 +7,7 @@ from engine.core.vector import Vector
 from engine.graphics.animation.animation import AnimationType
 from engine.graphics.atlas.animation import AnimationAtlas
 from engine.props.bullet.bullet import Bullet, BulletType
+from engine.props.data import UnitData
 from engine.props.types.damageable import Damageable
 from engine.props.types.sprite import Sprite
 from engine.sound.game_sound import SoundMixer, GameSound
@@ -25,6 +26,13 @@ class Unit(Damageable, ABC):
         self.sound_mixer = sound_mixer
         self.is_enemy = is_enemy
         self.triggered_death = False
+
+    def update_unit_data(self, data: UnitData):
+        self.max_health = data.get_health()
+        self.attack = data.get_attack()
+        self.defense = data.get_defense()
+        self.max_speed = data.get_max_speed()
+        self.acceleration = data.get_acceleration()
 
     def update(self, world, delta_time: float):
         super().update(world, delta_time)
@@ -87,6 +95,10 @@ class ShootingUnit(Unit, ABC):
         self.bullets = []
         self.animation_manager.get_animation_data(AnimationType.RANGED_ATTACK_E).set_cycle_time(self.shot_delay)
         self.animation_manager.get_animation_data(AnimationType.RANGED_ATTACK_W).set_cycle_time(self.shot_delay)
+
+    def update_unit_data(self, data: UnitData):
+        super().update_unit_data(data)
+        self.shot_delay = data.get_shot_delay()
 
     def shoot_bullet(self, direction: Vector) -> bool:
         if self.is_dead():

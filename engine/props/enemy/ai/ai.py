@@ -9,6 +9,7 @@ from engine.props.types.unit import Unit
 from engine.util.constants import FULL_ROTATION
 
 MIN_UNIT_DISTANCE = 100
+UNIT_DISTANCING_FACTOR = 0.1
 
 
 class EnemyAI:
@@ -37,7 +38,7 @@ class EnemyAI:
             distance = vector.magnitude()
 
             if distance < MIN_UNIT_DISTANCE:
-                self.entity.accelerate_uncapped(vector.normalize() * delta_time)
+                self.entity.accelerate_uncapped(vector.normalize() * delta_time * UNIT_DISTANCING_FACTOR)
 
     def _run_ai(self, world, delta_time: float):
         raise NotImplementedError()
@@ -68,8 +69,9 @@ class MeleeAI(EnemyAI):
         vector = target.center_position - self.entity.center_position
         distance = vector.magnitude()
 
+        return
         if distance < self.attack_distance:
-            self.entity.accelerate_normalized(vector * self.attack_acceleration, delta_time)
+            self.entity.accelerate_uncapped(vector * self.attack_acceleration)
             self.attack_timer = self.attack_cooldown
 
 
