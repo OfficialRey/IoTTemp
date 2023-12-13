@@ -1,4 +1,5 @@
 from abc import ABC
+from random import choice, random
 from typing import List
 
 import pygame
@@ -14,14 +15,18 @@ from engine.sound.game_sound import SoundMixer, GameSound
 from engine.world.camera import Camera
 from engine.world.collision import CollisionInformation
 
+AMBIENCE_TIME = 5  # Play every 3 seconds
+
 
 class Unit(Damageable, ABC):
 
-    def __init__(self, sound_mixer: SoundMixer, atlas: AnimationAtlas, world, max_health: int, attack: int,
+    def __init__(self, sound_mixer: SoundMixer, atlas: AnimationAtlas, world, ambience: List[GameSound],
+                 max_health: int, attack: int,
                  defense: int, max_speed: float = 0, acceleration: float = 0, center_position: Vector = Vector(),
                  velocity: Vector = Vector(), is_enemy: bool = True):
         super().__init__(sound_mixer, atlas, world, max_health, attack, defense, max_speed, acceleration,
                          center_position, velocity)
+        self.ambience = ambience
         self.is_enemy = is_enemy
         self.triggered_death = False
 
@@ -37,6 +42,7 @@ class Unit(Damageable, ABC):
         if self.is_dead():
             return
         self.run_behaviour(world, delta_time)
+        self.play_ambience(world, delta_time)
 
     def register_bullet_hits(self, bullets: List[Bullet]):
         # Ensure bullets exist
@@ -80,11 +86,20 @@ class Unit(Damageable, ABC):
                 other.life_time = 0
                 self.on_hit()
 
+    def play_ambience(self, world, delta_time: float):
+        if len(self.ambience) == 0:
+            return
+
+        if random() > delta_time / AMBIENCE_TIME:
+            return
+        sound = choice(self.ambience)
+        self.sound_mixer.play_positioned_sound(sound, world, self.center_position)
+
     def run_behaviour(self, world, delta_time: float):
         raise NotImplementedError("Must implement generic behaviour")
 
     def on_death(self):
-        self.play_sound(GameSound.DEATH, self.center_position - self.world.player.center_position)
+        self.sound_mixer.play_positioned_sound(GameSound.DEATH, self.world, self.center_position)
         super().on_death()
 
     def on_attack(self):
@@ -95,10 +110,11 @@ class Unit(Damageable, ABC):
 
 
 class ShootingUnit(Unit, ABC):
-    def __init__(self, sound_mixer: SoundMixer, atlas: AnimationAtlas, world, bullet_type: BulletType, max_health: int,
+    def __init__(self, sound_mixer: SoundMixer, atlas: AnimationAtlas, world, ambience: List[GameSound],
+                 bullet_type: BulletType, max_health: int,
                  attack: int, defense: int, max_speed: float, acceleration: float, shot_delay: float,
                  center_position: Vector = Vector(), velocity: Vector = Vector(), is_enemy: bool = True):
-        super().__init__(sound_mixer, atlas, world, max_health, attack, defense, max_speed, acceleration,
+        super().__init__(sound_mixer, atlas, world, ambience, max_health, attack, defense, max_speed, acceleration,
                          center_position, velocity, is_enemy)
         self.bullet_type = bullet_type
         self.shot_delay = shot_delay
@@ -147,11 +163,9 @@ class ShootingUnit(Unit, ABC):
 
 class MeleeUnit(Unit, ABC):
 
-    def __init__(self, sound_mixer: SoundMixer, atlas: AnimationAtlas, world, max_health: int, attack: int,
-                 defense: int,
-                 max_speed: float, acceleration: float, center_position: Vector = Vector(), velocity: Vector = Vector(),
-                 is_enemy: bool = True):
-        super().__init__(sound_mixer, atlas, world, max_health, attack, defense, max_speed, acceleration,
-                         center_position,
-                         velocity, is_enemy)
+    def __init__(self, sound_mixer: SoundMixer, atlas: AnimationAtlas, world, ambience: List[GameSound],
+                 max_health: int, attack: int, defense: int, max_speed: float, acceleration: float,
+                 center_position: Vector = Vector(), velocity: Vector = Vector(), is_enemy: bool = True):
+        super().__init__(sound_mixer, atlas, world, ambience, max_health, attack, defense, max_speed, acceleration,
+                         center_position, velocity, is_enemy)
         self.melee_cooldown = 0

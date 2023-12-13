@@ -127,11 +127,7 @@ class WaveManager:
             self.enemies.append(EnemyType(int(random() * len(EnemyType))))
 
     def _get_enemy(self, enemy_type: EnemyType):
-
-        enemy_type = EnemyType.CENTIPEDE
-
         spawn_position = choice(self.world.level_data.enemy_spawn_points)
-
         if enemy_type is EnemyType.CENTIPEDE:
             return self._spawn_centipede(spawn_position)
             # return Centipede(self.world, self.world.sound_mixer, self.world.texture_manager, spawn_position, level)

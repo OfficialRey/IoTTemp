@@ -13,7 +13,8 @@ I_RANGED = 0.3
 
 class Damageable(Sprite):
 
-    def __init__(self, sound_mixer: SoundMixer, atlas: AnimationAtlas, world, max_health: int, attack: int, defense: int,
+    def __init__(self, sound_mixer: SoundMixer, atlas: AnimationAtlas, world, max_health: int, attack: int,
+                 defense: int,
                  max_speed: float = 0, acceleration: float = 0, center_position: Vector = Vector(),
                  velocity: Vector = Vector()):
         super().__init__(atlas, max_speed, acceleration, center_position, velocity)
@@ -88,4 +89,4 @@ class Damageable(Sprite):
         self.play_death_animation()
 
     def on_hit(self):
-        self.play_sound(GameSound.HURT, self.center_position - self.world.player.center_position)
+        self.sound_mixer.play_positioned_sound(GameSound.HURT, self.world, self.center_position)

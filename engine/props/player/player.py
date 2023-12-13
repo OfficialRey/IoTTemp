@@ -18,9 +18,9 @@ class Player(ShootingUnit):
 
     def __init__(self, world, sound_mixer: SoundMixer, texture_manager: TextureManager, weapon_manager: WeaponManager,
                  data: UnitData, center_position: Vector):
-        super().__init__(sound_mixer, texture_manager.player, world, weapon_manager.laser_gun.bullet_type, data.get_health(),
-                         data.get_attack(), data.get_defense(), data.get_max_speed(), data.get_acceleration(), 0.3,
-                         center_position=center_position, is_enemy=False)
+        super().__init__(sound_mixer, texture_manager.player, world, [], weapon_manager.laser_gun.bullet_type,
+                         data.get_health(), data.get_attack(), data.get_defense(), data.get_max_speed(),
+                         data.get_acceleration(), 0.3, center_position=center_position, is_enemy=False)
         self.input_manager = None
         self.cursor = Cursor(texture_manager)
         self.cursor.play_animation(AnimationType.GENERIC)

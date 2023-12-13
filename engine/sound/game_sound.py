@@ -25,6 +25,11 @@ class GameSound(Enum):
     # EFFECTS
     POWER_UP = "power_up.wav",
 
+    # SPIDER
+    SPIDER_AMBIENCE_0 = "spider_ambient_0.wav",
+    SPIDER_AMBIENCE_1 = "spider_ambient_1.wav",
+    SPIDER_AMBIENCE_2 = "spider_ambient_2.wav",
+
     def get_file_name(self):
         return self.value[0]
 
@@ -54,6 +59,10 @@ class SoundMixer:
 
     def get_sound(self, game_sound: GameSound):
         return self.sounds[game_sound]
+
+    def play_positioned_sound(self, game_sound: GameSound, world, position: Vector):
+        direction = position - world.player.center_position
+        self.play_sound(game_sound, direction)
 
     def play_sound(self, game_sound: GameSound, direction: Vector = None):
         if direction is None:

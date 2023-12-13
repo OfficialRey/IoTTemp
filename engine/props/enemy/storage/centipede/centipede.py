@@ -15,7 +15,7 @@ class Centipede(MeleeEnemy):
 
     def __init__(self, world, sound_mixer: SoundMixer, texture_manager: TextureManager, center_position: Vector,
                  previous_segment: Unit = None):
-        super().__init__(sound_mixer, texture_manager.centipede_head, world, UnitData.CENTIPEDE, center_position)
+        super().__init__(sound_mixer, texture_manager.centipede_head, world, [], UnitData.CENTIPEDE, center_position)
         self.centipede_head = texture_manager.centipede_head
         self.centipede_body = texture_manager.centipede_body
 

@@ -14,7 +14,7 @@ UNIT_DISTANCING_FACTOR = 0.1
 
 class EnemyAI:
 
-    def __init__(self, entity):
+    def __init__(self, entity ):
         self.entity = entity
 
     def run(self, world, delta_time: float):
@@ -95,14 +95,18 @@ class ShootingAI(EnemyAI):
         self.entity.animation_manager.get_animation_data(AnimationType.RANGED_ATTACK_W).set_cycle_time(self.round_delay)
 
     def _run_ai(self, world, delta_time: float):
+
+        # Update shot timer
+        self.shot_timer -= delta_time
+        self.round_timer -= delta_time
+
         me_to_player: Vector = world.player.center_position - self.entity.center_position
         if me_to_player.magnitude() > self.target_distance:
             self.walk_to_player(world, delta_time)
+            return
         else:
-            self.entity.accelerate_normalized(me_to_player.inverse())
+            self.entity.accelerate_normalized(me_to_player.inverse(), delta_time)
 
-        self.shot_timer -= delta_time
-        self.round_timer -= delta_time
         if self.shot_timer <= 0 and self.round_timer <= 0:
             self.shoot(world)
 
