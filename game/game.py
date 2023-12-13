@@ -6,7 +6,7 @@ from engine.world.world import World
 class TopDownGame:
 
     def __init__(self):
-        self.engine = Engine(max_fps=144)
+        self.engine = Engine(max_fps=240)
 
         self.world = World(
             self.engine.sound_mixer,

@@ -1,8 +1,5 @@
 from enum import IntEnum
 
-from pygame.math import clamp
-
-from engine.core.vector import Vector
 from engine.props.enemy.ai.ai import MeleeAI
 from engine.props.enemy.enemy import MeleeEnemy
 
@@ -12,9 +9,7 @@ class CentipedeState(IntEnum):
     BODY = 1
 
 
-TIGHTNESS = 50
 DISTANCE_FACTOR = 1
-DISTANCE_RANGE_FACTOR = 1.2
 PREVIOUS_INFLUENCE = 0.3
 BODY_ACCELERATION_FACTOR = 100
 MAX_BODY_ACCELERATION_STRENGTH = 100
@@ -46,10 +41,6 @@ class CentipedeAI(MeleeAI):
             return
 
         previous = self.entity.previous_segment
-
-        # Get direction to previous segment
-        direction = previous.center_position - self.entity.center_position
-        distance = direction.magnitude()
 
         # Calculate target position
         target_distance = self.entity.atlas.get_average_radius() * DISTANCE_FACTOR

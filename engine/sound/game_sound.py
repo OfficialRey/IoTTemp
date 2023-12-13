@@ -21,6 +21,7 @@ class GameSound(Enum):
 
     # SHOOTING
     LASER = "laser.wav",
+    COMET = "comet.wav",
 
     # EFFECTS
     POWER_UP = "power_up.wav",

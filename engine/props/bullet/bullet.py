@@ -24,9 +24,11 @@ class BulletManager:
     def __init__(self, bullet_atlas):
         self.atlas = bullet_atlas
         self.laser = BulletType(bullet_atlas, 16, 8000, 90, 5, 10, GameSound.LASER)
+        self.comet = BulletType(bullet_atlas, 17, 9000, 90, 4, 2, GameSound.COMET)
 
         self.bullets = [
-            self.laser
+            self.laser,
+            self.comet
         ]
 
         self.scale_bullets()

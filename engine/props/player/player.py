@@ -8,7 +8,7 @@ from engine.props.data import UnitData
 from engine.props.player.cursor import Cursor
 from engine.props.types.sprite import Sprite
 from engine.props.types.unit import ShootingUnit
-from engine.props.weapon.weapon import WeaponManager
+from engine.props.weapon.weapon import WeaponManager, Weapon
 from engine.sound.game_sound import SoundMixer
 from engine.world.camera import Camera
 from engine.world.collision import CollisionInformation
@@ -18,16 +18,21 @@ class Player(ShootingUnit):
 
     def __init__(self, world, sound_mixer: SoundMixer, texture_manager: TextureManager, weapon_manager: WeaponManager,
                  data: UnitData, center_position: Vector):
-        super().__init__(sound_mixer, texture_manager.player, world, [], weapon_manager.laser_gun.bullet_type,
+        super().__init__(sound_mixer, texture_manager.player, world, [], weapon_manager.comet_gun.bullet_type,
                          data.get_health(), data.get_attack(), data.get_defense(), data.get_max_speed(),
-                         data.get_acceleration(), 0.3, center_position=center_position, is_enemy=False)
+                         data.get_acceleration(), 0, center_position=center_position, is_enemy=False)
         self.input_manager = None
         self.cursor = Cursor(texture_manager)
         self.cursor.play_animation(AnimationType.GENERIC)
+        self.set_weapon(weapon_manager.comet_gun)
 
     def update(self, world, delta_time: float) -> None:
         self.cursor.update(world, delta_time)
         super().update(world, delta_time)
+
+    def set_weapon(self, weapon: Weapon):
+        self.bullet_type = weapon.bullet_type
+        self.shot_delay = weapon.shot_delay
 
     def run_behaviour(self, world, delta_time: float):
         self.animate_rotation(self._get_cursor_world_position(world.camera))
