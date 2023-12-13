@@ -15,12 +15,12 @@ class StartButton(Button):
 
     def __init__(self, area: Tuple[int, int, int, int], engine):
         super().__init__(area, "Start Game", WHITE, BACKGROUND_COLOR, BORDER_COLOR, HOVER_COLOR,
-                         sound_engine=engine.sound_engine)
+                         sound_mixer=engine.sound_mixer)
         self.engine = engine
 
     def on_press(self):
         self.engine.current_menu = None
-        self.engine.sound_engine.play_music(GameMusic.DEFAULT)
+        self.engine.sound_mixer.play_music(GameMusic.DEFAULT)
         show_cursor(False)
 
     def on_release(self):
@@ -31,7 +31,7 @@ class QuitButton(Button):
 
     def __init__(self, area: Tuple[int, int, int, int], engine):
         super().__init__(area, "Quit To Desktop", WHITE, BACKGROUND_COLOR, BORDER_COLOR, HOVER_COLOR,
-                         sound_engine=engine.sound_engine)
+                         sound_mixer=engine.sound_mixer)
 
     def on_press(self):
         exit(0)

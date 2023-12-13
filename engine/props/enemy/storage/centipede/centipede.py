@@ -9,14 +9,15 @@ from engine.props.enemy.ai.centipede_ai import CentipedeAI
 from engine.props.enemy.enemy import MeleeEnemy
 from engine.props.enemy.storage.centipede.centipede_body import CentipedeBody
 from engine.props.enemy.storage.centipede.centipede_head import CentipedeHead
-from engine.sound.game_sound import SoundEngine
+from engine.sound.game_sound import SoundMixer
 from engine.world.collision import CollisionInformation
 
 
 class Centipede(MeleeEnemy):
 
-    def __init__(self, sound_engine: SoundEngine, texture_manager: TextureManager, center_position: Vector, level: int):
-        super().__init__(sound_engine, texture_manager.centipede_head, UnitData.NONE, center_position)
+    def __init__(self, world, sound_mixer: SoundMixer, texture_manager: TextureManager, center_position: Vector,
+                 level: int):
+        super().__init__(sound_mixer, texture_manager.centipede_head, world, UnitData.NONE, center_position)
         self.head_texture = texture_manager.centipede_head
         self.body_texture = texture_manager.centipede_body
         self.segments = []
@@ -27,11 +28,12 @@ class Centipede(MeleeEnemy):
         self._create_centipede()
 
     def _create_centipede(self):
-        previous_segment = CentipedeHead(self.sound_engine, self, self.head_texture, self.center_position)
+        previous_segment = CentipedeHead(self.world, self.sound_mixer, self, self.head_texture, self.center_position)
         self.segments = [previous_segment]
         for i in range(1, self.length):
             new_position = previous_segment.center_position + Vector(-1, 0) * self.get_collision_radius()
-            previous_segment = CentipedeBody(self.sound_engine, self, self.body_texture, previous_segment, new_position)
+            previous_segment = CentipedeBody(self.world, self.sound_mixer, self, self.body_texture, previous_segment,
+                                             new_position)
 
             previous_segment.offset_animation()
             previous_segment.velocity = Vector()

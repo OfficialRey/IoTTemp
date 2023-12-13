@@ -124,7 +124,7 @@ class WaveManager:
         spawn_position = choice(self.world.level_data.enemy_spawn_points)
 
         if enemy_type == 0:
-            return Centipede(self.world.sound_engine, self.world.texture_manager, spawn_position, level)
+            return Centipede(self.world, self.world.sound_mixer, self.world.texture_manager, spawn_position, level)
         if enemy_type == 1:
-            return ShootingSpider(self.world.sound_engine, self.world.texture_manager, self.bullet_manager.laser,
-                                  spawn_position)
+            return ShootingSpider(self.world, self.world.sound_mixer, self.world.texture_manager,
+                                  self.bullet_manager.laser, spawn_position)

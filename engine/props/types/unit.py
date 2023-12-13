@@ -9,33 +9,28 @@ from engine.graphics.atlas.animation import AnimationAtlas
 from engine.props.bullet.bullet import Bullet, BulletType
 from engine.props.types.damageable import Damageable
 from engine.props.types.sprite import Sprite
-from engine.sound.game_sound import SoundEngine, GameSound
+from engine.sound.game_sound import SoundMixer, GameSound
 from engine.world.camera import Camera
 from engine.world.collision import CollisionInformation
 
 
 class Unit(Damageable, ABC):
 
-    def __init__(self, sound_engine: SoundEngine, atlas: AnimationAtlas, max_health: int, attack: int, defense: int,
+    def __init__(self, sound_mixer: SoundMixer, atlas: AnimationAtlas, world, max_health: int, attack: int,
+                 defense: int,
                  max_speed: float = 0, acceleration: float = 0, center_position: Vector = Vector(),
                  velocity: Vector = Vector(), is_enemy: bool = True):
         super().__init__(atlas, max_health, attack, defense, max_speed, acceleration, center_position, velocity)
-        self.sound_engine = sound_engine
+        self.world = world
+        self.sound_mixer = sound_mixer
         self.is_enemy = is_enemy
         self.triggered_death = False
 
     def update(self, world, delta_time: float):
         super().update(world, delta_time)
-        self._death_update()
         if self.is_dead():
             return
         self.run_behaviour(world, delta_time)
-
-    def _death_update(self):
-        if self.is_dead() and not self.triggered_death:
-            self.on_death()
-            self.animation_manager.flash_time = 0
-            self.triggered_death = True
 
     def register_bullet_hits(self, bullets: List[Bullet]):
         # Ensure bullets exist
@@ -60,17 +55,18 @@ class Unit(Damageable, ABC):
                 other.life_time = 0
                 self.on_hit()
 
-    def play_sound(self, sound: GameSound):
-        self.sound_engine.play_sound(sound)
+    def play_sound(self, sound: GameSound, direction: Vector = None):
+        self.sound_mixer.play_sound(sound, direction)
 
     def run_behaviour(self, world, delta_time: float):
         raise NotImplementedError("Must implement generic behaviour")
 
     def on_hit(self):
-        self.play_sound(GameSound.HURT)
+        self.play_sound(GameSound.HURT, self.center_position - self.world.player.center_position)
 
     def on_death(self):
-        self.play_sound(GameSound.DEATH)
+        self.play_sound(GameSound.DEATH, self.center_position - self.world.player.center_position)
+        super().on_death()
 
     def on_attack(self):
         raise NotImplementedError("Must implement on_attack behaviour")
@@ -80,12 +76,11 @@ class Unit(Damageable, ABC):
 
 
 class ShootingUnit(Unit, ABC):
-    def __init__(self, sound_engine: SoundEngine, atlas: AnimationAtlas, bullet_type: BulletType, max_health: int,
+    def __init__(self, sound_mixer: SoundMixer, atlas: AnimationAtlas, world, bullet_type: BulletType, max_health: int,
                  attack: int, defense: int, max_speed: float, acceleration: float, shot_delay: float,
                  center_position: Vector = Vector(), velocity: Vector = Vector(), is_enemy: bool = True):
-        super().__init__(sound_engine, atlas, max_health, attack, defense, max_speed, acceleration, center_position,
-                         velocity,
-                         is_enemy)
+        super().__init__(sound_mixer, atlas, world, max_health, attack, defense, max_speed, acceleration,
+                         center_position, velocity, is_enemy)
         self.bullet_type = bullet_type
         self.shot_delay = shot_delay
         self.current_shot_timer = 0
@@ -102,7 +97,8 @@ class ShootingUnit(Unit, ABC):
         bullet = Bullet(self, self.bullet_type, self.center_position, direction)
         self.bullets.append(bullet)
         self.current_shot_timer = 0
-        self.sound_engine.play_sound(self.bullet_type.sound_type)
+        self.sound_mixer.play_sound(self.bullet_type.sound_type,
+                                    self.center_position - self.world.player.center_position)
         return True
 
     def update(self, world, delta_time: float):
@@ -128,9 +124,11 @@ class ShootingUnit(Unit, ABC):
 
 class MeleeUnit(Unit, ABC):
 
-    def __init__(self, sound_engine: SoundEngine, atlas: AnimationAtlas, max_health: int, attack: int, defense: int,
+    def __init__(self, sound_mixer: SoundMixer, atlas: AnimationAtlas, world, max_health: int, attack: int,
+                 defense: int,
                  max_speed: float, acceleration: float, center_position: Vector = Vector(), velocity: Vector = Vector(),
                  is_enemy: bool = True):
-        super().__init__(sound_engine, atlas, max_health, attack, defense, max_speed, acceleration, center_position,
+        super().__init__(sound_mixer, atlas, world, max_health, attack, defense, max_speed, acceleration,
+                         center_position,
                          velocity, is_enemy)
         self.melee_cooldown = 0

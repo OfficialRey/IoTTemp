@@ -4,7 +4,7 @@ from typing import Tuple
 import pygame
 
 from engine.game_info.game_info import GameInformation
-from engine.sound.game_sound import SoundEngine, GameSound
+from engine.sound.game_sound import SoundMixer, GameSound
 
 WHITE = (255, 255, 255)
 
@@ -119,9 +119,9 @@ class Button(Label, ABC):
     def __init__(self, area: Tuple[int, int, int, int] = (0, 0, 0, 0), text: str = None,
                  font_color: Tuple[int, int, int] = WHITE, background_color: Tuple[int, int, int] = None,
                  border_color: Tuple[int, int, int] = None, hover_color: Tuple[int, int, int] = None,
-                 font: str = "comicsansms", sound_engine: SoundEngine = None):
+                 font: str = "comicsansms", sound_mixer: SoundMixer = None):
         super().__init__(area, text, font_color, background_color, border_color, hover_color, font)
-        self.sound_engine = sound_engine
+        self.sound_mixer = sound_mixer
 
     def update(self, game_info: GameInformation):
         super().update(game_info)
@@ -134,8 +134,8 @@ class Button(Label, ABC):
             self._on_release()
 
     def _on_press(self):
-        if self.sound_engine is not None:
-            self.sound_engine.play_sound(GameSound.GUI_CONFIRM)
+        if self.sound_mixer is not None:
+            self.sound_mixer.play_sound(GameSound.GUI_CONFIRM)
         self.on_press()
 
     def _on_release(self):
@@ -148,5 +148,5 @@ class Button(Label, ABC):
         raise NotImplementedError()
 
     def on_hover(self):
-        if self.sound_engine is not None:
-            self.sound_engine.play_sound(GameSound.GUI_HOVER)
+        if self.sound_mixer is not None:
+            self.sound_mixer.play_sound(GameSound.GUI_HOVER)

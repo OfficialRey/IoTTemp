@@ -17,6 +17,7 @@ class Damageable(Sprite):
         self.health = self.max_health
         self.attack = attack
         self.defense = defense
+        self.triggered_death = False
 
     def apply_knock_back(self, direction: Vector, strength: float):
         self.accelerate(direction.normalize(), strength)
@@ -31,15 +32,18 @@ class Damageable(Sprite):
         self.flash_image(FLASH_TIME)
 
         if self.health <= 0:
-            self.play_death_animation()
+            if not self.triggered_death:
+                self.on_death()
 
     def play_death_animation(self):
+        self.animation_manager.flash_time = 0
+        self.triggered_death = True
+        self.animation_manager.single_play = False
         self.animation_manager.update_animation_type(AnimationType.DEATH)
         self.animation_manager.update_current_animation(loop=False)
         self.animation_manager.current_animation.set_cycle_time(1)
         self.acceleration = 0
         self.velocity = Vector(0, 0)
-        self.on_death()
 
     def collide_generic(self, other) -> CollisionInformation:
         if self.is_dead():
@@ -60,4 +64,4 @@ class Damageable(Sprite):
         return True
 
     def on_death(self):
-        raise NotImplementedError()
+        self.play_death_animation()

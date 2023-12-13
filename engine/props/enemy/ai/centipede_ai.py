@@ -12,9 +12,9 @@ class CentipedeAI(MeleeAI):
         super()._run_ai(world, delta_time)
         for segment in self.entity.segments:
             segment.update(world, delta_time)
-        self.remove_dead_segments()
+        self.remove_dead_segments(world)
 
-    def remove_dead_segments(self):
+    def remove_dead_segments(self, world):
         to_remove = []
         for segment in self.entity.segments:
             if segment.can_remove():
@@ -23,15 +23,15 @@ class CentipedeAI(MeleeAI):
         if len(to_remove) > 0:
             for removable in to_remove:
                 self.entity.segments.remove(removable)
-        self.split_centipede()
+        self.split_centipede(world)
 
-    def split_centipede(self):
+    def split_centipede(self, world):
         for i in range(len(self.entity.segments)):
             current_segment = self.entity.segments[i]
             if isinstance(current_segment, CentipedeBody):
                 # Create new head
                 if not current_segment.is_dead() and not current_segment.has_head():
-                    self.entity.segments[i] = CentipedeHead(self.entity.sound_engine, self, self.entity.head_texture,
+                    self.entity.segments[i] = CentipedeHead(world, self.entity.sound_mixer, self, self.entity.head_texture,
                                                             current_segment.center_position)
                     if i + 1 < len(self.entity.segments):
                         self.entity.segments[i + 1].previous_segment = self.entity.segments[i]

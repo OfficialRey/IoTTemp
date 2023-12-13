@@ -1,5 +1,5 @@
 from engine.props.bullet.bullet import BulletManager, BulletType
-from engine.sound.game_sound import SoundEngine
+from engine.sound.game_sound import SoundMixer
 
 
 class Weapon:
@@ -11,8 +11,8 @@ class Weapon:
     def get_bullet_type(self):
         return self.bullet_type
 
-    def get_sound(self, sound_engine: SoundEngine):
-        return sound_engine.get_sound(self.bullet_type.sound_type)
+    def get_sound(self, sound_mixer: SoundMixer):
+        return sound_mixer.get_sound(self.bullet_type.sound_type)
 
 
 class WeaponManager:

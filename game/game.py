@@ -9,7 +9,7 @@ class TopDownGame:
         self.engine = Engine(max_fps=144)
 
         self.world = World(
-            self.engine.sound_engine,
+            self.engine.sound_mixer,
             self.engine.texture_manager,
             self.engine.window,
             7,

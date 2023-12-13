@@ -10,8 +10,8 @@ from engine.world.collision import CollisionInformation
 
 class CentipedeHead(MeleeEnemy):
 
-    def __init__(self, sound_engine, core, atlas: AnimationAtlas, center_position: Vector):
-        super().__init__(sound_engine, atlas, UnitData.CENTIPEDE_HEAD, center_position)
+    def __init__(self, world, sound_mixer, core, atlas: AnimationAtlas, center_position: Vector):
+        super().__init__(sound_mixer, atlas, world, UnitData.CENTIPEDE_HEAD, center_position)
         self.core = core
 
     def run_behaviour(self, world, delta_time: float):

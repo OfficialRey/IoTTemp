@@ -12,7 +12,7 @@ from engine.props.data import UnitData
 from engine.props.player.player import Player
 from engine.props.types.unit import ShootingUnit, Unit
 from engine.props.weapon.weapon import WeaponManager
-from engine.sound.game_sound import SoundEngine
+from engine.sound.game_sound import SoundMixer
 from engine.util.constants import WHITE
 from engine.util.debug import print_debug
 from engine.util.resources import get_resource_path
@@ -23,22 +23,22 @@ from game.wave_manager import WaveManager
 
 class World:
 
-    def __init__(self, sound_engine: SoundEngine, texture_manager: TextureManager, window: Window, zoom: float,
+    def __init__(self, sound_mixer: SoundMixer, texture_manager: TextureManager, window: Window, zoom: float,
                  level_file: str = None):
         print_debug("Creating world...")
 
         self.texture_manager = texture_manager
         self.bullet_manager = BulletManager(self.texture_manager.bullets)
         self.weapon_manager = WeaponManager(self.bullet_manager)
-        self.sound_engine = sound_engine
+        self.sound_mixer = sound_mixer
         self.camera = Camera(window, zoom)
 
         if level_file is None:
-            self.level_data = LevelData(self.texture_manager.level_textures, "Test", 20, 20)
+            self.level_data = LevelData(self.texture_manager.level_textures, 20, 20)
         else:
             path = self.path = os.path.join(get_resource_path(), os.path.join("level", level_file))
             self.level_data = load_level(path)
-        self.player = Player(self.sound_engine, self.texture_manager, self.weapon_manager, UnitData.PLAYER,
+        self.player = Player(self, self.sound_mixer, self.texture_manager, self.weapon_manager, UnitData.PLAYER,
                              choice(self.level_data.player_spawn_points))
         self.texture_atlas = self.level_data.texture_atlas
 

@@ -10,7 +10,7 @@ from engine.game_info.game_info import GameInformation
 from engine.graphics.textures.texture_manager import TextureManager
 from engine.menu.menu import Menu
 from engine.menu.storage.calibration_menu import CalibrationMenu
-from engine.sound.game_sound import SoundEngine
+from engine.sound.game_sound import SoundMixer
 from engine.util.debug import print_debug
 from protocol.server_package import ServerPackage
 from protocol.weapon_package import WeaponPackage
@@ -43,7 +43,7 @@ class Engine:
         self.texture_manager = TextureManager()
         # self.input_manager = InputManager() DEPRECATED
         # self.inputs = self.input_manager.read() DEPRECATED
-        self.sound_engine = SoundEngine()
+        self.sound_mixer = SoundMixer(sound_volume=0.5)
         self.done = False
 
         self.clock = pygame.time.Clock()
