@@ -71,7 +71,7 @@ class LevelData:
             return
         self.level[layer][self.convert_position(x, y)] = texture_id
 
-    def get_collision(self, x: int, y: int):
+    def get_collision(self, x: int, y: int) -> Collision:
         position = self.convert_position(x, y)
         if position < 0 or position >= len(self.collision):
             return None

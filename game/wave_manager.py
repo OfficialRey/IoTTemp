@@ -1,4 +1,5 @@
 import os
+from enum import IntEnum
 from typing import Tuple
 
 from random import random, choice
@@ -18,6 +19,11 @@ SECONDS_PER_SPAWN = 3
 WAVE_TIME = 5
 
 
+class EnemyType(IntEnum):
+    SHOOTING_SPIDER = 0,
+    CENTIPEDE = 1
+
+
 class WaveManager:
 
     def __init__(self, world, bullet_manager, max_units: int = 7, title_detail: int = 50, title_size: int = 100,
@@ -27,7 +33,7 @@ class WaveManager:
         self.bullet_manager = bullet_manager
 
         # Wave System
-        self.current_wave = 0
+        self.current_wave = -1
         self.enemies = []
         self.max_units = max_units
 
@@ -45,6 +51,7 @@ class WaveManager:
         self.wave_spawn_time = WAVE_TIME
 
         self._create_render_objects()
+        self._generate_wave()
 
     def _create_render_objects(self):
         path = os.path.join(get_resource_path(), os.path.join("font", "VCR_OSD_MONO_1.001.ttf"))
@@ -67,7 +74,7 @@ class WaveManager:
     def render(self, window: Window):
         if self.animation_timer > self.title_fade_time + self.title_sustain_time:
             return
-        current_titles = self.titles[self.current_wave - 1]
+        current_titles = self.titles[self.current_wave]
 
         if self.animation_timer < self.title_fade_time:
             index = self.animation_timer / self.title_fade_time * self.title_detail
@@ -103,8 +110,8 @@ class WaveManager:
             self.spawn_chance_increase += delta_time / 100
             return
         self.spawn_chance_increase = 0
-        enemy = self.enemies.pop()
-        self.world.units.add(enemy)
+        enemy_type = self.enemies.pop()
+        self.world.units.add(self._get_enemy(enemy_type))
 
     def _generate_wave(self):
         self.enemies = []
@@ -115,16 +122,29 @@ class WaveManager:
         self.wave_spawn_time = WAVE_TIME
 
         enemy_count = int(3 + (level / 4) + random() * (level / 2))
-        for i in range(enemy_count):
-            self.enemies.append(self._get_random_enemy(level))
 
-    def _get_random_enemy(self, level: int):
-        enemy_type = int(random() * 2)
+        for i in range(enemy_count):
+            self.enemies.append(EnemyType(int(random() * len(EnemyType))))
+
+    def _get_enemy(self, enemy_type: EnemyType):
+
+        enemy_type = EnemyType.CENTIPEDE
 
         spawn_position = choice(self.world.level_data.enemy_spawn_points)
 
-        if enemy_type == 0:
-            return Centipede(self.world, self.world.sound_mixer, self.world.texture_manager, spawn_position, level)
-        if enemy_type == 1:
+        if enemy_type is EnemyType.CENTIPEDE:
+            return self._spawn_centipede(spawn_position)
+            # return Centipede(self.world, self.world.sound_mixer, self.world.texture_manager, spawn_position, level)
+        if enemy_type is EnemyType.SHOOTING_SPIDER:
             return ShootingSpider(self.world, self.world.sound_mixer, self.world.texture_manager,
                                   self.bullet_manager.laser, spawn_position)
+
+    def _spawn_centipede(self, spawn_position: Vector):
+        length = int(self.current_wave / 5 + 3 + random() * 3)
+        segments = []
+        segment = None
+        for i in range(length):
+            segment = Centipede(self.world, self.world.sound_mixer, self.world.texture_manager, spawn_position,
+                                segment)
+            segments.append(segment)
+        return segments

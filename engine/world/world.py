@@ -9,6 +9,7 @@ from engine.game_info.game_info import GameInformation
 from engine.graphics.textures.texture_manager import TextureManager
 from engine.props.bullet.bullet import BulletManager
 from engine.props.data import UnitData
+from engine.props.enemy.ai.path_finding.path import Grid
 from engine.props.player.player import Player
 from engine.props.types.unit import ShootingUnit, Unit
 from engine.props.weapon.weapon import WeaponManager
@@ -52,6 +53,7 @@ class World:
         self.set_camera_zoom(zoom)
 
         self.wave_manager = WaveManager(self, self.bullet_manager)
+        self.grid = Grid(self)
 
         self.cached_world = self._cache_world()
 

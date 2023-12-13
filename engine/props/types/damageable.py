@@ -20,7 +20,7 @@ class Damageable(Sprite):
         self.triggered_death = False
 
     def apply_knock_back(self, direction: Vector, strength: float):
-        self.accelerate(direction.normalize(), strength)
+        self.accelerate_normalized(direction.normalize(), strength)
 
     def damage(self, value: float, collision_info: CollisionInformation, knock_back_strength: float = 0.15):
         self.damage_true(value * self.get_damage_multiplier())

@@ -37,10 +37,9 @@ class Player(ShootingUnit):
     def handle_input(self, game_info: GameInformation, camera, delta_time: float):
         position = Vector(game_info.x, game_info.y)
         self.cursor.set_position(position)
-        self.accelerate(self.cursor.center_position - camera.get_relative_position(self), delta_time)
+        self.accelerate_normalized(self.cursor.center_position - camera.get_relative_position(self), delta_time)
 
         if game_info.fire_trigger.held:
-            # TODO: Add inaccuracy
             vector = self._get_cursor_world_position(camera) - self.center_position
 
             animation_type = AnimationType.RANGED_ATTACK_W if vector.x < 0 else AnimationType.RANGED_ATTACK_E

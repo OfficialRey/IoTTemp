@@ -20,9 +20,11 @@ class CollisionShape(IntEnum):
 
 class CollisionInformation:
 
-    def __init__(self, direction: Vector = Vector(), distance: float = math.inf, hit: bool = False):
+    def __init__(self, direction: Vector = Vector(), center_distance: float = math.inf, hit: bool = False,
+                 collision_distance: float = 0):
         self.direction = direction
-        self.distance = distance
+        self.center_distance = center_distance
+        self.collision_distance = collision_distance
         self.hit = hit
 
 
@@ -75,9 +77,10 @@ class Collision:
 
 def intersect_circle_circle(circle, other) -> CollisionInformation:
     vector = circle.center_position - other.center_position
-    distance = vector.magnitude()
-    hit = distance < circle.radius + other.radius
-    return CollisionInformation(vector, distance, hit)
+    center_distance = vector.magnitude()
+    collision_distance = circle.radius + other.radius - center_distance
+    hit = center_distance < circle.radius + other.radius
+    return CollisionInformation(vector, center_distance, hit, collision_distance)
 
 
 def intersect_rectangle_rectangle(rectangle, other) -> CollisionInformation:

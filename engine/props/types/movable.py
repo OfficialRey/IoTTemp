@@ -1,7 +1,11 @@
 from engine.core.vector import Vector
 from engine.world.collision import Collision, CollisionShape
 
-COLLISION_SPEED_FACTOR = 0.5
+COLLISION_SPEED_FACTOR = 0.25
+
+ACCELERATION_FACTOR = 500
+
+VELOCITY_DECAY = 0.99
 
 
 class Movable:
@@ -16,8 +20,15 @@ class Movable:
         self.max_speed = max_speed
         self.acceleration = acceleration
 
-    def accelerate(self, acceleration: Vector, delta_time: float) -> None:
-        self.velocity += acceleration * self.acceleration * delta_time
+    def accelerate_uncapped(self, acceleration: Vector):
+        self.velocity += acceleration * ACCELERATION_FACTOR
+        self.cap_velocity()
+
+    def accelerate_normalized(self, acceleration: Vector, delta_time: float) -> None:
+        self.velocity += acceleration.normalize() * self.acceleration * delta_time * ACCELERATION_FACTOR
+        self.cap_velocity()
+
+    def cap_velocity(self):
         if self.velocity.magnitude() > self.max_speed:
             self.velocity = self.velocity.normalize() * self.max_speed
 
@@ -37,13 +48,11 @@ class Movable:
                 collision = world.level_data.get_collision(x_pos + x, y_pos + y)
                 if collision is None or collision.shape == CollisionShape.NONE:
                     continue
-                calls = 0
                 if self.collision.collides_with(collision).hit:
                     self.on_world_collide(collision)
                     self.fix_collision(collision)
-                    calls += 1
 
-    def fix_collision(self, collision: Collision, step: float = 5):
+    def fix_collision(self, collision: Collision, step: float = 10):
         # Get Vector of Object->Self
         vector = self.collision.center_position - collision.center_position
 

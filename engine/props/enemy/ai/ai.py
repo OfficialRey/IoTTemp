@@ -2,11 +2,13 @@ from random import random
 
 from engine.core.vector import Vector
 from engine.graphics.animation.animation import AnimationType
-from engine.props.enemy.enemy import ShootingEnemy
+from engine.props.enemy.ai.path_finding.path import Path
+from engine.props.enemy.enemy import ShootingEnemy, MeleeEnemy
 from engine.props.player.player import Player
+from engine.props.types.unit import Unit
 from engine.util.constants import FULL_ROTATION
 
-MIN_DISTANCE = 200
+MIN_UNIT_DISTANCE = 100
 
 
 class EnemyAI:
@@ -15,25 +17,27 @@ class EnemyAI:
         self.entity = entity
 
     def run(self, world, delta_time: float):
-        acceleration = Vector()
-        # Keep distance to other units
+        # Execute specific ai
+        self._run_ai(world, delta_time)
+
+    def walk_to_player(self, world, delta_time: float):
+        target = world.player
+        path = Path(world, self.entity.center_position, target.center_position)
+        target_direction = path.get_target_direction(self.entity)
+        self.entity.accelerate_normalized(target_direction, delta_time)
+
+    def space_units(self, world, delta_time: float):
         for unit in world.units.sprites():
             if isinstance(unit, Player):
                 continue
-            if unit == self.entity:
+            if unit is self.entity:
                 continue
 
-            me_to_unit: Vector = unit.center_position - self.entity.center_position
-            distance = me_to_unit.magnitude()
-            if distance == 0:  # Add random offset if distance is 0
-                acceleration += Vector.random()
-            elif distance < MIN_DISTANCE:
-                acceleration += me_to_unit.normalize().inverse() * (MIN_DISTANCE - distance)
+            vector = self.entity.center_position - unit.center_position
+            distance = vector.magnitude()
 
-        self.entity.accelerate(acceleration, delta_time)
-
-        # Execute specific ai
-        self._run_ai(world, delta_time)
+            if distance < MIN_UNIT_DISTANCE:
+                self.entity.accelerate_uncapped(vector.normalize() * delta_time)
 
     def _run_ai(self, world, delta_time: float):
         raise NotImplementedError()
@@ -41,11 +45,32 @@ class EnemyAI:
 
 class MeleeAI(EnemyAI):
 
-    def __init__(self, entity):
+    def __init__(self, entity: MeleeEnemy, attack_cooldown: float = 3, attack_distance: float = 500,
+                 attack_acceleration: int = 3000):
         super().__init__(entity)
+        self.attack_cooldown = attack_cooldown
+        self.attack_distance = attack_distance
+        self.attack_acceleration = attack_acceleration
+
+        self.attack_timer = 0
 
     def _run_ai(self, world, delta_time: float):
-        pass
+        self.walk_to_player(world, delta_time)
+
+        target = world.player
+        self._attack_unit(target, delta_time)
+
+    def _attack_unit(self, target: Unit, delta_time: float):
+        if self.attack_timer > 0:
+            self.attack_timer -= delta_time
+            return
+
+        vector = target.center_position - self.entity.center_position
+        distance = vector.magnitude()
+
+        if distance < self.attack_distance:
+            self.entity.accelerate_normalized(vector * self.attack_acceleration, delta_time)
+            self.attack_timer = self.attack_cooldown
 
 
 class ShootingAI(EnemyAI):
@@ -68,12 +93,11 @@ class ShootingAI(EnemyAI):
         self.entity.animation_manager.get_animation_data(AnimationType.RANGED_ATTACK_W).set_cycle_time(self.round_delay)
 
     def _run_ai(self, world, delta_time: float):
-        target = world.player
-        vector = target.center_position - self.entity.center_position
-        distance = vector.magnitude()
-
-        acceleration = vector.normalize() * (distance - self.target_distance)
-        self.entity.accelerate(acceleration, delta_time)
+        me_to_player: Vector = world.player.center_position - self.entity.center_position
+        if me_to_player.magnitude() > self.target_distance:
+            self.walk_to_player(world, delta_time)
+        else:
+            self.entity.accelerate_normalized(me_to_player.inverse())
 
         self.shot_timer -= delta_time
         self.round_timer -= delta_time

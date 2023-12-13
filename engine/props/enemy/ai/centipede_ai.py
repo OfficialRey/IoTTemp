@@ -1,37 +1,55 @@
+from enum import IntEnum
+
+from engine.core.vector import Vector
 from engine.props.enemy.ai.ai import MeleeAI
-from engine.props.enemy.storage.centipede.centipede_body import CentipedeBody
-from engine.props.enemy.storage.centipede.centipede_head import CentipedeHead
+from engine.props.enemy.ai.path_finding.path import Path
+from engine.props.enemy.enemy import MeleeEnemy
+
+
+class CentipedeState(IntEnum):
+    HEAD = 0
+    BODY = 1
+
+
+TIGHTNESS = 50
+DISTANCE_FACTOR = 1.2
+PREVIOUS_INFLUENCE = 0.1
 
 
 class CentipedeAI(MeleeAI):
 
-    def __init__(self, entity):
+    def __init__(self, entity: MeleeEnemy):
         super().__init__(entity)
 
     def _run_ai(self, world, delta_time: float):
+        self.space_units(world, delta_time)
+        self.run_head(world, delta_time)
+        self.run_body(world, delta_time)
+        self.entity.animate_generic()
+
+    def run_head(self, world, delta_time: float):
+        if self.entity.centipede_state is not CentipedeState.HEAD:
+            return
         super()._run_ai(world, delta_time)
-        for segment in self.entity.segments:
-            segment.update(world, delta_time)
-        self.remove_dead_segments(world)
 
-    def remove_dead_segments(self, world):
-        to_remove = []
-        for segment in self.entity.segments:
-            if segment.can_remove():
-                to_remove.append(segment)
+    def run_body(self, world, delta_time: float):
+        if self.entity.centipede_state is not CentipedeState.BODY:
+            return
 
-        if len(to_remove) > 0:
-            for removable in to_remove:
-                self.entity.segments.remove(removable)
-        self.split_centipede(world)
+        # Check if previous part exists
+        if self.entity.previous_segment is None or self.entity.previous_segment.is_dead():
+            self.entity.set_state(CentipedeState.HEAD)
+            return
 
-    def split_centipede(self, world):
-        for i in range(len(self.entity.segments)):
-            current_segment = self.entity.segments[i]
-            if isinstance(current_segment, CentipedeBody):
-                # Create new head
-                if not current_segment.is_dead() and not current_segment.has_head():
-                    self.entity.segments[i] = CentipedeHead(world, self.entity.sound_mixer, self, self.entity.head_texture,
-                                                            current_segment.center_position)
-                    if i + 1 < len(self.entity.segments):
-                        self.entity.segments[i + 1].previous_segment = self.entity.segments[i]
+        # Accelerate towards previous segment
+        me_to_segment = self.entity.previous_segment.center_position - self.entity.center_position
+
+        distance = me_to_segment.magnitude()
+        target_distance = self.entity.get_collision_radius() * DISTANCE_FACTOR
+        direction = me_to_segment.normalize()
+
+        acceleration = direction * TIGHTNESS
+        acceleration += self.entity.previous_segment.velocity.normalize() * PREVIOUS_INFLUENCE
+        acceleration *= (distance - self.entity.atlas.get_average_radius()) / target_distance * DISTANCE_FACTOR
+
+        self.entity.accelerate_uncapped(acceleration)
