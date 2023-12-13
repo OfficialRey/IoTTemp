@@ -2,34 +2,52 @@ from engine.core.vector import Vector
 from engine.graphics.animation.animation import AnimationType
 from engine.graphics.atlas.animation import AnimationAtlas
 from engine.props.types.sprite import Sprite
+from engine.sound.game_sound import GameSound, SoundMixer
 from engine.world.collision import CollisionInformation
 
 FLASH_TIME = 0.2
 
+I_MELEE = 0.5
+I_RANGED = 0.3
+
 
 class Damageable(Sprite):
 
-    def __init__(self, atlas: AnimationAtlas, max_health: int, attack: int, defense: int,
+    def __init__(self, sound_mixer: SoundMixer, atlas: AnimationAtlas, world, max_health: int, attack: int, defense: int,
                  max_speed: float = 0, acceleration: float = 0, center_position: Vector = Vector(),
                  velocity: Vector = Vector()):
         super().__init__(atlas, max_speed, acceleration, center_position, velocity)
+        self.sound_mixer = sound_mixer
+        self.world = world
         self.max_health = max_health
         self.health = self.max_health
         self.attack = attack
         self.defense = defense
         self.triggered_death = False
+        self.invincibility_time = 0
+
+    def update(self, world, delta_time: float) -> None:
+        self.invincibility_time -= delta_time
+        super().update(world, delta_time)
 
     def apply_knock_back(self, direction: Vector, strength: float):
         self.accelerate_normalized(direction.normalize(), strength)
 
-    def damage(self, value: float, collision_info: CollisionInformation, knock_back_strength: float = 0.15):
-        self.damage_true(value * self.get_damage_multiplier())
-        if collision_info is not None:
-            self.apply_knock_back(collision_info.direction.inverse(), knock_back_strength)
+    def damage(self, value: float, collision_info: CollisionInformation, knock_back_strength: float = 5,
+               melee_damage: bool = False):
+        if self.invincibility_time > 0:
+            return
+        self.damage_true(value * self.get_damage_multiplier(), melee_damage)
+        if collision_info is not None and melee_damage:
+            self.apply_knock_back(collision_info.direction, knock_back_strength)
 
-    def damage_true(self, value: float):
+    def damage_true(self, value: float, melee_damage: bool = False):
+        if self.invincibility_time > 0:
+            return
+        self.invincibility_time = I_MELEE if melee_damage else I_RANGED
         self.health -= value
-        self.flash_image(FLASH_TIME)
+        self.flash_image(self.invincibility_time)
+        self.on_hit()
 
         if self.health <= 0:
             if not self.triggered_death:
@@ -63,5 +81,11 @@ class Damageable(Sprite):
             return self.animation_manager.is_animation_finished()
         return True
 
+    def play_sound(self, sound: GameSound, direction: Vector = None):
+        self.sound_mixer.play_sound(sound, direction)
+
     def on_death(self):
         self.play_death_animation()
+
+    def on_hit(self):
+        self.play_sound(GameSound.HURT, self.center_position - self.world.player.center_position)

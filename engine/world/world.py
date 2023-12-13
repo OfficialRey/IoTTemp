@@ -89,7 +89,6 @@ class World:
         self._reset_package_values()
         self._process_player(game_info, delta_time)
         self._process_units(delta_time)
-        self._process_bullets()
         self._remove_units()
 
     def _reset_package_values(self):
@@ -115,19 +114,13 @@ class World:
         for unit in self.units.sprites():
             unit.update(self, delta_time)
 
-    def _process_bullets(self):
-        for unit in self.units.sprites():
+            # Melee Damage
+            unit.register_melee_hits(self.units.sprites())
+
+            # Ranged Damage
             if isinstance(unit, ShootingUnit):
-                bullets = unit.get_bullets()
-
-                if len(bullets) == 0:
-                    continue
-
                 for target in self.units.sprites():
-                    # Return if trying to attack own team
-                    if unit.is_enemy == target.is_enemy:
-                        continue
-                    target.register_bullet_hits(bullets)
+                    target.register_bullet_hits(unit.get_bullets())
 
     def _remove_units(self):
         to_remove = []

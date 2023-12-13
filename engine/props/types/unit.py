@@ -18,12 +18,10 @@ from engine.world.collision import CollisionInformation
 class Unit(Damageable, ABC):
 
     def __init__(self, sound_mixer: SoundMixer, atlas: AnimationAtlas, world, max_health: int, attack: int,
-                 defense: int,
-                 max_speed: float = 0, acceleration: float = 0, center_position: Vector = Vector(),
+                 defense: int, max_speed: float = 0, acceleration: float = 0, center_position: Vector = Vector(),
                  velocity: Vector = Vector(), is_enemy: bool = True):
-        super().__init__(atlas, max_health, attack, defense, max_speed, acceleration, center_position, velocity)
-        self.world = world
-        self.sound_mixer = sound_mixer
+        super().__init__(sound_mixer, atlas, world, max_health, attack, defense, max_speed, acceleration,
+                         center_position, velocity)
         self.is_enemy = is_enemy
         self.triggered_death = False
 
@@ -48,10 +46,29 @@ class Unit(Damageable, ABC):
         # Calculate collision and damage
         for bullet in bullets:
             if bullet.life_time > 0:
-                collision_info = self.collide_generic(bullet)
-                if collision_info.hit:
-                    self.on_generic_collision(bullet, collision_info)
-                    continue
+                self.register_bullet_damage(bullet)
+
+    def register_melee_hits(self, units: List):
+        for unit in units:
+            if unit is not self:
+                if unit.is_enemy and not self.is_enemy:  # Only enemies can melee damage
+                    self.register_melee_damage(unit)
+
+    def register_bullet_damage(self, bullet):
+        collision_info = self.collide_generic(bullet)
+        if collision_info.hit:
+            # Bullet Hits
+            if isinstance(bullet, Bullet):
+                if bullet.owner.is_enemy is not self.is_enemy:
+                    self.damage(bullet.get_attack(), collision_info)
+                    bullet.life_time = 0
+                    self.on_hit()
+
+    def register_melee_damage(self, unit):
+        collision_info = self.collision.collides_with(unit.collision)
+        if collision_info.hit:
+            self.damage(unit.attack, collision_info, melee_damage=True)
+            self.on_hit()
 
     def on_generic_collision(self, other: Sprite, collision_info: CollisionInformation):
         self.on_collision(other, collision_info)
@@ -63,14 +80,8 @@ class Unit(Damageable, ABC):
                 other.life_time = 0
                 self.on_hit()
 
-    def play_sound(self, sound: GameSound, direction: Vector = None):
-        self.sound_mixer.play_sound(sound, direction)
-
     def run_behaviour(self, world, delta_time: float):
         raise NotImplementedError("Must implement generic behaviour")
-
-    def on_hit(self):
-        self.play_sound(GameSound.HURT, self.center_position - self.world.player.center_position)
 
     def on_death(self):
         self.play_sound(GameSound.DEATH, self.center_position - self.world.player.center_position)
